@@ -26,10 +26,9 @@ void DCQCN::initialize()
     frSteps_th = par("frSteps_th");
     Rai = par("Rai");
     Rhai = par("Rhai");
-    currentRate = linkspeed;
-    targetRate = linkspeed;
-    rateTimer =  new TimerMsg("rateTimer");
-    alphaTimer = new TimerMsg("alphaTimer");
+    max_pck_size=par("max_pck_size");
+    senddata = new TimerMsg("senddata");
+    senddata->setKind(SENDDATA);
 
     registerService(Protocol::udp, gate("upperIn"), gate("upperOut"));
     registerProtocol(Protocol::udp, gate("lowerOut"), gate("lowerIn"));
@@ -70,25 +69,20 @@ void DCQCN::handleSelfMessage(cMessage *pck)
         }
         case RATETIMER:
         {
-            TimeFrSteps++;
-            increaseTxRate(timer->getDestAddr());
-            cancelEvent(rateTimer);
-            rateTimer->setKind(RATETIMER);
-            rateTimer->setDestAddr(timer->getDestAddr());
-            scheduleAt(simTime()+RateTimer_th,rateTimer);
+            sender_flowinfo sndinfo = sender_flowMap.find(timer->getFlowId())->second;
+            sndinfo.TimeFrSteps++;
+            increaseTxRate(timer->getFlowId());
+            cancelEvent(sndinfo.rateTimer);
+            sndinfo.rateTimer->setKind(RATETIMER);
+            scheduleAt(simTime()+RateTimer_th,sndinfo.rateTimer);
             break;
         }
         case ALPHATIMER:
         {
-            updateAlpha();
+            updateAlpha(timer->getFlowId());
             break;
         }
     }
-}
-
-void DCQCN::refreshDisplay() const
-{
-
 }
 
 // Record the packet from app to transmit it to the dest
@@ -100,7 +94,6 @@ void DCQCN::processUpperpck(Packet *pck)
             snd_info.flowid = region.getTag()->getFlowId();
             snd_info.cretime = region.getTag()->getCreationtime();
             snd_info.priority = region.getTag()->getPriority();
-            snd_info.flowsize = region.getTag()->getFlowSize();
             EV << "store new flow, id = "<<snd_info.flowid<<
                     ", creationtime = "<<snd_info.cretime<<endl;
         }
@@ -108,24 +101,26 @@ void DCQCN::processUpperpck(Packet *pck)
         srcAddr = addressReq->getSrcAddress();
         L3Address destAddr = addressReq->getDestAddress();
 
-        if(SenderState==STOPPING){
-            TimerMsg *senddata = new TimerMsg("senddata");
-            senddata->setKind(SENDDATA);
-            senddata->setDestAddr(destAddr);
-            senddata->setFlowId(snd_info.flowid);
-            SenderState=SENDING;
-            scheduleAt(simTime(),senddata);
-        }
         auto udpHeader = pck->removeAtFront<UdpHeader>();
 
+        snd_info.remainLength = pck->getByteLength();
         snd_info.destAddr = destAddr;
         snd_info.srcPort = udpHeader->getSrcPort();
         snd_info.destPort = udpHeader->getDestPort();
+        snd_info.pckseq = 0;
         snd_info.crcMode = udpHeader->getCrcMode();
         snd_info.crc = udpHeader->getCrc();
+        snd_info.currentRate = linkspeed;
+        snd_info.targetRate = linkspeed;
+        snd_info.rateTimer =  new TimerMsg("rateTimer");
+        snd_info.alphaTimer = new TimerMsg("alphaTimer");
         sender_flowMap[snd_info.flowid] =snd_info;
         // send packet timer
         delete pck;
+        if(SenderState==STOPPING){
+            SenderState=SENDING;
+            scheduleAt(simTime(),senddata);
+        }
     }
     else
     {
@@ -138,13 +133,26 @@ void DCQCN::send_data()
 {
     sender_flowinfo snd_info = sender_flowMap.begin()->second;
     std::ostringstream str;
-    str << packetName << "-" <<snd_info.flowid;
+    str << packetName << "-" <<snd_info.flowid<<"-" <<snd_info.pckseq;
     Packet *packet = new Packet(str.str().c_str());
-    const auto& payload = makeShared<ByteCountChunk>(B(snd_info.flowsize));
+    int pcklength;
+    if (snd_info.remainLength > max_pck_size)
+    {
+        pcklength=max_pck_size;
+        snd_info.remainLength = snd_info.remainLength - max_pck_size;
+    }
+    else
+    {
+        pcklength=snd_info.remainLength;
+        snd_info.remainLength = 0;
+    }
+    const auto& payload = makeShared<ByteCountChunk>(B(pcklength));
     auto tag = payload->addTag<HiTag>();
     tag->setFlowId(snd_info.flowid);
     tag->setPriority(snd_info.priority);
     tag->setCreationtime(snd_info.cretime);
+    tag->setPacketId(snd_info.pckseq);
+    snd_info.pckseq += 1;
 
     packet->insertAtBack(payload);
 
@@ -165,26 +173,33 @@ void DCQCN::send_data()
     packet->addTagIfAbsent<EcnReq>()->setExplicitCongestionNotification(1);
     packet->setKind(0);
 
-    EV<<"packet length = "<<packet->getByteLength()<<", current rate = "<<currentRate<<endl;
-    nxtSendTime = (long)((packet->getByteLength()+70)*8/currentRate) + simTime();
-    TimerMsg *senddata = new TimerMsg("senddata");
-    senddata->setKind(SENDDATA);
-    senddata->setDestAddr(snd_info.destAddr);
-    senddata->setFlowId(snd_info.flowid);
-    if (SenderAcceleratingState != Normal)
+    EV<<"packet length = "<<packet->getByteLength()<<", current rate = "<<snd_info.currentRate<<endl;
+    simtime_t nxtSendTime = simtime_t((packet->getByteLength()+58)*8/snd_info.currentRate) + simTime();
+    //58=20(IP)+14(EthernetMac)+8(EthernetPhy)+4(EthernetFcs)+12(interframe gap,IFG)
+    EV << "prepare to send packet, remaining data size = " << snd_info.remainLength <<endl;
+    if (snd_info.SenderAcceleratingState != Normal)
     {
-        ByteCounter += packet->getByteLength();
-        if (ByteCounter >= ByteCounter_th)
+        snd_info.ByteCounter += packet->getByteLength();
+        if (snd_info.ByteCounter >= ByteCounter_th)
         {
-            ByteFrSteps++;
-            ByteCounter = 0;
-            EV<<"byte counter expired, byte fr steps = "<<ByteFrSteps<<endl;
-            increaseTxRate(snd_info.destAddr);
+            snd_info.ByteFrSteps++;
+            snd_info.ByteCounter = 0;
+            EV<<"byte counter expired, byte fr steps = "<<snd_info.ByteFrSteps<<endl;
+            increaseTxRate(snd_info.flowid);
         }
     }
+    sender_flowMap[snd_info.flowid] =snd_info;
     scheduleAt(nxtSendTime,senddata);
     sendDown(packet);
-    sender_flowMap.erase(snd_info.flowid);
+    if (snd_info.remainLength == 0)
+    {
+        cancelEvent(snd_info.rateTimer);
+        delete snd_info.rateTimer;
+        cancelEvent(snd_info.alphaTimer);
+        delete snd_info.alphaTimer;
+        sender_flowMap.erase(snd_info.flowid);
+    }
+
 }
 
 void DCQCN::processLowerpck(Packet *pck)
@@ -198,7 +213,7 @@ void DCQCN::processLowerpck(Packet *pck)
         receive_data(pck);
     }
     else
-    {EV<<"send up"<<endl;
+    {
         sendUp(pck);
     }
 }
@@ -206,106 +221,108 @@ void DCQCN::processLowerpck(Packet *pck)
 void DCQCN::receive_data(Packet *pck)
 {
     auto l3AddressInd = pck->getTag<L3AddressInd>();
-    auto srcAddr = l3AddressInd->getSrcAddress();
-    auto destAddr = l3AddressInd->getDestAddress();
+    auto rcv_srcAddr = l3AddressInd->getSrcAddress();
+    auto rcv_destAddr = l3AddressInd->getDestAddress();
     auto ecn = pck->addTagIfAbsent<EcnInd>()->getExplicitCongestionNotification();
-
-    if (ecn == 3&&simTime()-lastCnpTime>min_cnp_interval) // ecn==1, enabled; ecn==3, marked.
-    {
-        send_cnp(srcAddr);
+    uint flowid;
+    for (auto& region : pck->peekData()->getAllTags<HiTag>()){
+        flowid = region.getTag()->getFlowId();
     }
     EV<<"receive packet, "<<", ecn = "<<ecn<<endl;
+    if (ecn == 3&&simTime()-lastCnpTime[flowid]>min_cnp_interval) // ecn==1, enabled; ecn==3, marked.
+    {
+        Packet *cnp = new Packet("CNP");
+        cnp->addTagIfAbsent<L3AddressReq>()->setDestAddress(rcv_srcAddr);
+        cnp->addTagIfAbsent<L3AddressReq>()->setSrcAddress(rcv_destAddr);
+        cnp->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(&Protocol::ipv4);
+        cnp->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::udp);
+        sendDown(cnp);
+        EV_INFO << "Sending CNP packet to "<<rcv_srcAddr<<", cnp interval = "<<simTime()-lastCnpTime[flowid]<<endl;
+        lastCnpTime[flowid] = simTime();
+    }
     sendUp(pck);
-}
-
-void DCQCN::send_cnp(L3Address destaddr)
-{
-    Packet *cnp = new Packet("CNP");
-
-    cnp->addTagIfAbsent<L3AddressReq>()->setDestAddress(destaddr);
-    cnp->addTagIfAbsent<L3AddressReq>()->setSrcAddress(srcAddr);
-    cnp->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(&Protocol::ipv4);
-    cnp->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::udp);
-    EV_INFO << "Sending CNP packet to "<<destaddr <<", cnp interval = "<<simTime()-lastCnpTime<<endl;
-    lastCnpTime = simTime();
-
-    sendDown(cnp);
 }
 
 void DCQCN::receive_cnp(Packet *pck)
 {
-    L3Address destAddr = pck->addTagIfAbsent<L3AddressInd>()->getSrcAddress();
-
+    uint32_t flowid;
+    for (auto& region : pck->peekData()->getAllTags<HiTag>()){
+        flowid = region.getTag()->getFlowId();
+    }
+    sender_flowinfo sndinfo = sender_flowMap.find(flowid)->second;
     // cut rate
-    targetRate = currentRate;
-    currentRate = currentRate * (1 - alpha/2);
-    alpha = (1 - gamma) * alpha + gamma;
-    EV<<"after cutting, the current rate = "<<currentRate<<
-            ", target rate = "<<targetRate<<endl;
+    sndinfo.targetRate = sndinfo.currentRate;
+    sndinfo.currentRate = sndinfo.currentRate * (1 - sndinfo.alpha/2);
+    sndinfo.alpha = (1 - gamma) * sndinfo.alpha + gamma;
+    EV<<"after cutting, the current rate = "<<sndinfo.currentRate<<
+            ", target rate = "<<sndinfo.targetRate<<endl;
 
     // reset timers and counter
-    ByteCounter = 0;
-    ByteFrSteps = 0;
-    TimeFrSteps = 0;
-    iRhai = 0;
-    cancelEvent(alphaTimer);
-    cancelEvent(rateTimer);
+    sndinfo.ByteCounter = 0;
+    sndinfo.ByteFrSteps = 0;
+    sndinfo.TimeFrSteps = 0;
+    sndinfo.iRhai = 0;
+    cancelEvent(sndinfo.alphaTimer);
+    cancelEvent(sndinfo.rateTimer);
 
-    alphaTimer->setKind(ALPHATIMER);
+    sndinfo.alphaTimer->setKind(ALPHATIMER);
 
-    rateTimer->setKind(RATETIMER);
-    rateTimer->setDestAddr(destAddr);
+    sndinfo.rateTimer->setKind(RATETIMER);
+    sndinfo.rateTimer->setFlowId(flowid);
     // update alpha
-    scheduleAt(simTime()+AlphaTimer_th,alphaTimer);
+    scheduleAt(simTime()+AlphaTimer_th,sndinfo.alphaTimer);
 
     // schedule to rate increase event
-    scheduleAt(simTime()+RateTimer_th,rateTimer);
+    scheduleAt(simTime()+RateTimer_th,sndinfo.rateTimer);
 }
 
-void DCQCN::increaseTxRate(L3Address destaddr)
+void DCQCN::increaseTxRate(uint32_t flowid)
 {
-    double oldrate = currentRate;
+    sender_flowinfo sndinfo = sender_flowMap.find(flowid)->second;
 
-    if (max(ByteFrSteps,TimeFrSteps) < frSteps_th)
+    if (max(sndinfo.ByteFrSteps,sndinfo.TimeFrSteps) < frSteps_th)
     {
-        SenderAcceleratingState = Fast_Recovery;
+        sndinfo.SenderAcceleratingState = Fast_Recovery;
     }
-    else if (min(ByteFrSteps,TimeFrSteps) > frSteps_th)
+    else if (min(sndinfo.ByteFrSteps,sndinfo.TimeFrSteps) > frSteps_th)
     {
-        SenderAcceleratingState = Hyper_Increase;
+        sndinfo.SenderAcceleratingState = Hyper_Increase;
     }
     else
     {
-        SenderAcceleratingState = Additive_Increase;
+        sndinfo.SenderAcceleratingState = Additive_Increase;
     }
-    EV<<"entering incease rate, sender state = "<<SenderAcceleratingState<<endl;
+    EV<<"entering incease rate, sender state = "<<sndinfo.SenderAcceleratingState<<endl;
 
-    if (SenderAcceleratingState == Fast_Recovery)
+    if (sndinfo.SenderAcceleratingState == Fast_Recovery)
     {// Fast Recovery
-        currentRate = (currentRate + targetRate) / 2;
+        sndinfo.currentRate = (sndinfo.currentRate + sndinfo.targetRate) / 2;
     }
-    else if (SenderAcceleratingState == Additive_Increase)
+    else if (sndinfo.SenderAcceleratingState == Additive_Increase)
     {// Additive Increase
-        targetRate += Rai;
-        targetRate = (targetRate > maxTxRate) ? maxTxRate : targetRate;
+        sndinfo.targetRate += Rai;
+        sndinfo.targetRate = (sndinfo.targetRate > sndinfo.maxTxRate) ? sndinfo.maxTxRate : sndinfo.targetRate;
 
-        currentRate = (currentRate + targetRate) / 2;
+        sndinfo.currentRate = (sndinfo.currentRate + sndinfo.targetRate) / 2;
     }
-    else if (SenderAcceleratingState == Hyper_Increase)
+    else if (sndinfo.SenderAcceleratingState == Hyper_Increase)
     {// Hyper Increase
-        iRhai++;
-        targetRate += iRhai*Rhai;
-        targetRate = (targetRate > maxTxRate) ? maxTxRate : targetRate;
-        currentRate = (currentRate + targetRate) / 2;
+        sndinfo.iRhai++;
+        sndinfo.targetRate += sndinfo.iRhai*Rhai;
+        sndinfo.targetRate = (sndinfo.targetRate > sndinfo.maxTxRate) ? sndinfo.maxTxRate : sndinfo.targetRate;
+        sndinfo.currentRate = (sndinfo.currentRate + sndinfo.targetRate) / 2;
     }
-    EV<<"after increasing, the current rate = "<<currentRate<<
-            ", target rate = "<<targetRate<<endl;
+    EV<<"after increasing, the current rate = "<<sndinfo.currentRate<<
+            ", target rate = "<<sndinfo.targetRate<<endl;
+    sender_flowMap[flowid] = sndinfo;
 }
 
-void DCQCN::updateAlpha()
+void DCQCN::updateAlpha(uint32_t flowid)
 {
-    alpha = (1 - gamma) * alpha;
-    scheduleAt(simTime() + AlphaTimer_th, alphaTimer);
+    sender_flowinfo sndinfo = sender_flowMap.find(flowid)->second;
+    sndinfo.alpha = (1 - gamma) * sndinfo.alpha;
+    sender_flowMap[flowid] = sndinfo;
+    scheduleAt(simTime() + AlphaTimer_th, sndinfo.alphaTimer);
 }
 
 void DCQCN::sendDown(Packet *pck)
@@ -318,6 +335,11 @@ void DCQCN::sendUp(Packet *pck)
 {
     EV<<"sendup"<<endl;
     send(pck,upperOutGate);
+}
+
+void DCQCN::refreshDisplay() const
+{
+
 }
 
 void DCQCN::finish()

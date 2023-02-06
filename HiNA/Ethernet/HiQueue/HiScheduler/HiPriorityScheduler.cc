@@ -16,7 +16,7 @@ void HiPriorityScheduler::initialize(int stage)
     PacketSchedulerBase::initialize(stage);
     if (stage == INITSTAGE_LOCAL) {
         for (auto provider : providers)
-            collections.push_back(dynamic_cast<IPacketCollection *>(provider));
+            collections.push_back(dynamic_cast<REDPFCQueue *>(provider));
         numInputs = gateSize("in");
 
         cModule *radioModule = getParentModule()->getParentModule();EV<<"parentmodule = "<<radioModule<<endl;
@@ -128,9 +128,21 @@ void HiPriorityScheduler::processpfcframe(cObject *obj){
     Enter_Method("processpfcframe");
     auto pauseFrame = check_and_cast<const EthernetPfcFrame *>(obj);
     if(pauseFrame->getOpCode()==ETHERNET_PFC_PAUSE){
-        ispaused[pauseFrame->getPriority()]=true;EV<<"priority "<<pauseFrame->getPriority()<<" paused"<<endl;
+        ispaused[pauseFrame->getPriority()]=true;
+        EV<<"priority "<<pauseFrame->getPriority()<<" paused"<<endl;
+        for(auto collection : collections){
+            if(collection->priority==pauseFrame->getPriority()){
+                collection->pfcpaused();
+            }
+        }
     }else if(pauseFrame->getOpCode()==ETHERNET_PFC_RESUME){
-        ispaused[pauseFrame->getPriority()]=false;EV<<"priority "<<pauseFrame->getPriority()<<" resumed"<<endl;
+        ispaused[pauseFrame->getPriority()]=false;
+        EV<<"priority "<<pauseFrame->getPriority()<<" resumed"<<endl;
+        for(auto collection : collections){
+            if(collection->priority==pauseFrame->getPriority()){
+                collection->pfcresumed();
+            }
+        }
     }
 }
 } // namespace inet

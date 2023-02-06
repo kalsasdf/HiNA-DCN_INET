@@ -5,7 +5,7 @@
 //
 
 
-package inet.HiNA.Ethernet.HiQueue.ABMQueue;
+package inet.HiNA.Ethernet.HiQueue.PCNQueue;
 
 import inet.queueing.base.PacketQueueBase;
 import inet.queueing.contract.IPacketQueue;
@@ -54,7 +54,7 @@ import inet.queueing.contract.IPacketQueue;
 //
 // @see ~IPacketBuffer
 //
-simple ABMQueue extends PacketQueueBase like IPacketQueue
+simple PCNQueue extends PacketQueueBase like IPacketQueue
 {
     parameters:
         int packetCapacity = default(-1); // maximum number of packets in the queue, no limit by default
@@ -71,11 +71,9 @@ simple ABMQueue extends PacketQueueBase like IPacketQueue
         int Kmax @unit(B);
         int Kmin @unit(B);
         double Pmax;
-        double alpha = default(1);
-        int sharedBuffer @unit(b)= default(-1b);
-        @class(ABMQueue);
+        @class(PCNQueue);
         @signal[packetPushStarted](type=inet::Packet);
-        @signal[packetPushEnded](type=inet::Packet?);
+        @signal[packetPushEnded](type=inet::Packet?);//A question mark after the class name means that the signal is allowed to emit nullptr pointers.
         @signal[packetPulled](type=inet::Packet);
         @signal[packetRemoved](type=inet::Packet);
         @signal[packetDropped](type=inet::Packet);

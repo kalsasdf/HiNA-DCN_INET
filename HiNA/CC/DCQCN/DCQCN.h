@@ -13,8 +13,6 @@ using namespace std;
 
 namespace inet {
 
-class IInterfaceTable;
-
 class DCQCN : public cSimpleModule
 {
 protected:
@@ -22,7 +20,7 @@ protected:
         SENDING,
         STOPPING
     };
-    SenderState SenderState = STOPPING;
+    SenderState SenderState=STOPPING;
 
     enum SenderAcceleratingState{
         Normal,
@@ -30,7 +28,7 @@ protected:
         Additive_Increase,
         Hyper_Increase
     };
-    SenderAcceleratingState SenderAcceleratingState = Normal;
+
 
     enum SelfpckKindValues {
         SENDDATA,
@@ -38,35 +36,35 @@ protected:
         RATETIMER,
     };
 
-    simtime_t lastCnpTime = 0;
+    map<uint32_t,simtime_t> lastCnpTime;
 
-    typedef struct sender{
+    struct sender_flowinfo{
         L3Address destAddr;
-        uint32_t flowid;
+        uint flowid;
+        uint pckseq;
         int srcPort;
         int destPort;
-        int flowsize;
         CrcMode crcMode;
         uint16_t crc;
         uint32_t priority;
         simtime_t cretime;
-    }sender_flowinfo;
+        int64_t remainLength;
+
+        SenderAcceleratingState SenderAcceleratingState = Normal;
+        TimerMsg *rateTimer;
+        TimerMsg *alphaTimer;
+        int ByteCounter = 0;
+        double currentRate;
+        double targetRate;
+        double maxTxRate;
+        double alpha = 1;
+        int iRhai = 0;
+        int ByteFrSteps = 0;
+        int TimeFrSteps = 0;
+    };
 
     L3Address srcAddr;
-    simtime_t nxtSendTime;
-    int ByteCounter = 0; // for gaining rate
-    int ByteCounter_th;
-    double currentRate;
-    double targetRate;
-    double maxTxRate;
-    double alpha = 1;
-    simtime_t lasttime;
-    int iRhai = 0;
-    int ByteFrSteps = 0; // rate have been increased for frSteps times.
-    int TimeFrSteps = 0; // rate have been increased for frSteps times.
-    int frSteps_th;
-    TimerMsg *rateTimer;
-    TimerMsg *alphaTimer;
+    TimerMsg *senddata = nullptr;
 
     // configuration for .ned file
     double linkspeed;
@@ -76,6 +74,9 @@ protected:
     simtime_t RateTimer_th;
     double Rai;
     double Rhai;
+    int64_t max_pck_size;
+    int ByteCounter_th;
+    int frSteps_th;
 
     const char *packetName = "DcqcnData";
 
@@ -93,13 +94,12 @@ protected:
     virtual void handleMessage(cMessage *msg) override;
     virtual void handleSelfMessage(cMessage *msg);
     virtual void refreshDisplay() const override;
-    virtual ~DCQCN() {delete rateTimer; delete alphaTimer;}
+    virtual ~DCQCN() {cancelEvent(senddata); delete senddata;}
 
     virtual void sendDown(Packet *pck);
     virtual void sendUp(Packet *pck);
 
     virtual void send_data();
-    virtual void send_cnp(L3Address destaddr);
     /*
      * Process the Packet from upper layer
      */
@@ -114,9 +114,9 @@ protected:
     /*
      * rate increase at the sender
      */
-    virtual void increaseTxRate(L3Address destaddr);
+    virtual void increaseTxRate(uint32_t flowid);
 
-    virtual void updateAlpha();
+    virtual void updateAlpha(uint32_t flowid);
 
     virtual void finish() override;
 };

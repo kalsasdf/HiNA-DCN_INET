@@ -59,8 +59,6 @@ void HiEthernetMac::initialize(int stage)
         cModule *radioModule = getParentModule()->getParentModule();EV<<"parentmodule = "<<radioModule<<endl;
         radioModule->subscribe(REDPFCQueue::pfcPausedSignal,this);
         radioModule->subscribe(REDPFCQueue::pfcResumeSignal,this);
-        radioModule->subscribe(ABMQueue::pfcPausedSignal,this);
-        radioModule->subscribe(ABMQueue::pfcResumeSignal,this);
 
         if (!par("duplexMode"))
             throw cRuntimeError("Half duplex operation is not supported by HiEthernetMac, use the EthernetCsmaMac module for that! (Please enable csmacdSupport on EthernetInterface)");
@@ -505,8 +503,8 @@ void HiEthernetMac::handleCanPullPacketChanged(cGate *gate)
 
 void HiEthernetMac::receiveSignal(cComponent *source, simsignal_t signalID, cObject *obj, cObject *details)
 {
-    if(signalID==REDPFCQueue::pfcPausedSignal||signalID==REDPFCQueue::pfcResumeSignal||signalID==ABMQueue::pfcPausedSignal||
-            signalID==ABMQueue::pfcResumeSignal){
+    if(signalID==REDPFCQueue::pfcPausedSignal||signalID==REDPFCQueue::pfcResumeSignal
+            ){
         EV<<"HiEthernetMac::receiveSignal(), receive pfc signal"<<endl;
         processpfccommand(obj);
     }

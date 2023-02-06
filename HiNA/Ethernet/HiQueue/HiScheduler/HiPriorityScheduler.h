@@ -11,6 +11,7 @@
 #include "inet/queueing/base/PacketSchedulerBase.h"
 #include "inet/queueing/contract/IPacketCollection.h"
 #include "inet/HiNA/Ethernet/HiEthernetMac/HiEthernetMac.h"
+#include "../REDPFCQueue/REDPFCQueue.h"
 
 namespace inet {
 using namespace inet::queueing;
@@ -18,17 +19,10 @@ using namespace inet::queueing;
 class INET_API HiPriorityScheduler : public PacketSchedulerBase, public virtual IPacketCollection, public cListener
 {
   protected:
-    std::vector<IPacketCollection *> collections;
+    std::vector<REDPFCQueue *> collections;
 
     std::map<int,bool> ispaused;
     int numInputs;
-    int Kmax = NaN;
-    int Kmin = NaN;
-    double Pmax = NaN;
-    bool useEcn = false;
-    bool markNext = false;
-    enum RedResult { RANDOMLY_ABOVE_LIMIT, RANDOMLY_BELOW_LIMIT, ABOVE_MAX_LIMIT, BELOW_MIN_LIMIT };
-    mutable RedResult lastResult;
 
   protected:
     virtual void initialize(int stage) override;

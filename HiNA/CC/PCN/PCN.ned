@@ -13,30 +13,22 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package inet.HiNA.CC.DCQCN;
+package inet.HiNA.CC.PCN;
 
 import inet.HiNA.CC.UdpCC;
-// TODO documentation
-//
-//import inet.common.queue.IOutputQueue;
 
 //
-// Drop-tail queue, to be used in network interfaces.
-// Conforms to the ~IOutputQueue interface.
+// TODO auto-generated type
 //
-simple DCQCN like UdpCC
+simple PCN like UdpCC
 {
-    parameters:
-        double linkspeed @unit(bps) = default (1Gbps);
- 		double min_cnp_interval @unit(s) = default(50us);
- 		double AlphaTimer_th @unit(s) = default(55us);
- 		double RateTimer_th @unit(s) = default(55us);
- 		int ByteCounter_th @unit(B) = default(10MiB);
- 		double Rai @unit(bps) = default(4e7bps);
- 		double Rhai @unit(bps) = default(4e8bps);
- 		int frSteps_th = default(5);
- 		double gamma = default(1/256);
- 		int max_pck_size = default(1472);
+    parameters:     
+        double linkspeed @unit(bps) = default (40Gbps);
+        double min_cnp_interval @unit(s) = default(50us);
+ 		double periodTime @unit(s) = default(50us);
+ 		double omega_min = default(0.01);
+ 		double omega_max = default(0.5);
+ 		int max_pck_size = default(1468);
         
         // If unschedPrioResolutionMode is set to EXPLICIT,
         // then this string defines the priority cutoff points of unsched
@@ -44,11 +36,10 @@ simple DCQCN like UdpCC
         string explicitUnschedPrioCutoff = default("");
         
         @display("i=block/downarrow,grey80;is=s;i2=status/down");
+
     gates:
         input upperIn @labels(UdpHeader,IPv4ControlInfo/down,IPv6ControlInfo/down);// higher layer
         output upperOut @labels(UdpHeader,IPv4ControlInfo/up,IPv6ControlInfo/up);
         output lowerOut @labels(UdpHeader,IPv4ControlInfo/down,IPv6ControlInfo/down);
         input lowerIn @labels(UdpHeader,IPv4ControlInfo/up,IPv6ControlInfo/up);
 }
-
-

@@ -30,7 +30,7 @@ using namespace inet::queueing;
 
 class INET_API REDPFCQueue : public PacketQueueBase, public IPacketBuffer::ICallback
 {
-  protected:
+  public:
     int packetCapacity = -1;
     b dataCapacity = b(-1);
 
@@ -94,6 +94,9 @@ class INET_API REDPFCQueue : public PacketQueueBase, public IPacketBuffer::ICall
     virtual Packet *pullPacket(cGate *gate) override;
 
     virtual void handlePacketRemoved(Packet *packet) override;
+
+    virtual void pfcpaused() {}
+    virtual void pfcresumed() {}
 };
 
 } // namespace inet

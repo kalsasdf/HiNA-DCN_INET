@@ -90,10 +90,16 @@ void PCN::processUpperpck(Packet *pck)
         snd_info.pckseq = 0;
         snd_info.crcMode = udpHeader->getCrcMode();
         snd_info.crc = udpHeader->getCrc();
-        snd_info.currentRate = linkspeed;
+        snd_info.currentRate = linkspeed;EV<<"currentRate = "<<snd_info.currentRate<<endl;
         snd_info.targetRate = linkspeed;
         snd_info.omega = omega_min;
-        sender_flowMap[snd_info.flowid] =snd_info;
+        if(sender_flowMap.empty()){
+            sender_flowMap[snd_info.flowid]=snd_info;
+            iter=sender_flowMap.begin();
+        }else{
+            sender_flowMap[snd_info.flowid]=snd_info;
+        }
+
         // send packet timer
         delete pck;
         if(SenderState==STOPPING){
@@ -110,7 +116,7 @@ void PCN::processUpperpck(Packet *pck)
 
 void PCN::send_data()
 {
-    sender_flowinfo snd_info = sender_flowMap.begin()->second;
+    sender_flowinfo snd_info=iter->second;
     std::ostringstream str;
     str << packetName << "-" <<snd_info.flowid<< "-" <<snd_info.pckseq;
     Packet *packet = new Packet(str.str().c_str());
@@ -125,6 +131,7 @@ void PCN::send_data()
         pcklength=snd_info.remainLength;
         snd_info.remainLength = 0;
     }
+    EV<<"send_data(), flowid = "<<snd_info.flowid<<", pcklength = "<<pcklength<<endl;
     const auto& payload = makeShared<ByteCountChunk>(B(pcklength));
     auto tag = payload->addTag<HiTag>();
     tag->setFlowId(snd_info.flowid);
@@ -146,27 +153,30 @@ void PCN::send_data()
     udpHeader->setDestinationPort(snd_info.destPort);
     udpHeader->setCrc(snd_info.crc);
     udpHeader->setCrcMode(snd_info.crcMode);
-    udpHeader->setTotalLengthField(udpHeader->getChunkLength() + packet->getTotalLength()); //add by zhouyukun
+    udpHeader->setTotalLengthField(udpHeader->getChunkLength() + packet->getTotalLength());
     insertTransportProtocolHeader(packet, Protocol::udp, udpHeader);
     packet->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(l3Protocol);
     packet->addTagIfAbsent<EcnReq>()->setExplicitCongestionNotification(1);
     packet->setKind(0);
 
     EV<<"packet length = "<<packet->getByteLength()<<", current rate = "<<snd_info.currentRate<<endl;
+    EV << "prepare to send packet, remaining data size = " << snd_info.remainLength <<endl;
 
+    if (snd_info.remainLength == 0){
+        sender_flowMap.erase(snd_info.flowid);
+        iter++;
+    }else{
+        sender_flowMap[snd_info.flowid]=snd_info;
+    }
     simtime_t nxtSendTime = simtime_t((packet->getByteLength()+58)*8/snd_info.currentRate) + simTime();
     //58=20(IP)+14(EthernetMac)+8(EthernetPhy)+4(EthernetFcs)+12(interframe gap,IFG)
-    EV << "prepare to send packet, remaining data size = " << snd_info.remainLength <<endl;
-    sender_flowMap[snd_info.flowid] =snd_info;
     scheduleAt(nxtSendTime,senddata);
     sendDown(packet);
-    if (snd_info.remainLength == 0)
-        sender_flowMap.erase(snd_info.flowid);
 }
 
 void PCN::processLowerpck(Packet *pck)
 {
-    if (!strcmp(pck->getFullName(),"CNP")||!strcmp(pck->getFullName(),"CNP_switch"))
+    if (!strcmp(pck->getFullName(),"CNP"))
     {
         receive_cnp(pck);
     }
@@ -225,7 +235,7 @@ void PCN::receive_data(Packet *pck)
 
     simtime_t intervalTime = simTime() - rcvinfo.lastCnpTime;
 
-    EV<<"Flowid = "<<flowid<<", receive number = "<<rcvinfo.recNum<<", receive data = "<<rcvinfo.recData<<", receive ecn number = "<<rcvinfo.ecnNum<<", intervalTime = "<<intervalTime.dbl()<<", min_cnp_interval = "<<min_cnp_interval.dbl()<<endl;
+    EV<<"Flowid = "<<flowid<<", receive number = "<<rcvinfo.recNum<<", receive data = "<<rcvinfo.recData<<", receive ecn number = "<<rcvinfo.ecnNum<<", intervalTime = "<<intervalTime.dbl()<<endl;
 
     if(intervalTime.dbl() >= rcvinfo.cnp_interval_num*min_cnp_interval.dbl()){
         double tempRecRate = 0;
@@ -253,7 +263,9 @@ void PCN::receive_data(Packet *pck)
                 rcvinfo.recRate = 0;
                 receiver_flowMap[flowid] = rcvinfo;
             }
-            EV<<"Flowid = "<<flowid<<", receive number = "<<rcvinfo.recNum<<", receive data = "<<rcvinfo.recData<<", receive ecn number = "<<rcvinfo.ecnNum<<", intervalTime = "<<intervalTime.dbl()<<", min_cnp_interval = "<<min_cnp_interval.dbl()<<", receive rate = "<<rcvinfo.recRate<<endl;
+            EV<<"Flowid = "<<flowid<<", receive number = "<<rcvinfo.recNum<<", receive data = "
+                    <<rcvinfo.recData<<", receive ecn number = "<<rcvinfo.ecnNum<<", intervalTime = "<<intervalTime.dbl()
+                    <<", receive rate = "<<rcvinfo.recRate<<endl;
             send_cnp(flowid);
         }else{
             rcvinfo.cnp_interval_num++;
@@ -263,6 +275,7 @@ void PCN::receive_data(Packet *pck)
         rcvinfo.ecnNum = 0;
         receiver_flowMap[flowid] = rcvinfo;
     }
+    send_cnp(flowid);
 
     EV<<"receive packet, sequence number = "<<pckseq<<", ecn = "<<ecn<<endl;
     sendUp(pck);
@@ -306,32 +319,36 @@ void PCN::receive_cnp(Packet *pck)
 
     EV_INFO << "Receiving CNP packet from dest: "<< destAddr << ", ECN mark "<< ecn <<endl;
 
-    sender_flowinfo sndinfo = sender_flowMap.find(flowid)->second;
-    //decrease rate
-    if(ecn == 1){
-        auto recRateChunk = pck->peekAtFront<CNP>();
+    if(sender_flowMap.find(flowid)!=sender_flowMap.end()){
+        EV<<"flow exists"<<endl;
+        sender_flowinfo sndinfo = sender_flowMap.find(flowid)->second;
+        //decrease rate
+        if(ecn == 1){
+            auto recRateChunk = pck->peekAtFront<CNP>();
 
-        EV<<"recRate = "<<recRateChunk->getRecRate()<<endl;
+            EV<<"recRate = "<<recRateChunk->getRecRate()<<endl;
 
-        EV<<"before decreasing, the current rate = "<<sndinfo.currentRate<<endl;
+            EV<<"before decreasing, the current rate = "<<sndinfo.currentRate<<endl;
 
-        auto recRate = recRateChunk->getRecRate();
+            auto recRate = recRateChunk->getRecRate();
 
-        double tempRecRate = recRate * (1 - omega_min);
-        if(sndinfo.currentRate > tempRecRate){
+            double tempRecRate = recRate * (1 - omega_min);
+            if(sndinfo.currentRate > tempRecRate){
 
-            sndinfo.currentRate = tempRecRate;
+                sndinfo.currentRate = tempRecRate;
+            }
+            sndinfo.omega = omega_min;
+            EV<<"after decreasing, the current rate = "<<sndinfo.currentRate<<
+                            ", target rate = "<<recRate * (1 - omega_min)<<endl;
         }
-        sndinfo.omega = omega_min;
-        EV<<"after decreasing, the current rate = "<<sndinfo.currentRate<<
-                        ", target rate = "<<recRate * (1 - omega_min)<<endl;
+        //increase rate
+        else if(ecn == 0){
+            sndinfo.currentRate = sndinfo.currentRate * (1 - sndinfo.omega) + linkspeed * sndinfo.omega;
+            sndinfo.omega = sndinfo.omega * (1 - sndinfo.omega) + omega_max * sndinfo.omega;
+        }
+        sender_flowMap[flowid] = sndinfo;
     }
-    //increase rate
-    else if(ecn == 0){
-        sndinfo.currentRate = sndinfo.currentRate * (1 - sndinfo.omega) + linkspeed * sndinfo.omega;
-        sndinfo.omega = sndinfo.omega * (1 - sndinfo.omega) + omega_max * sndinfo.omega;
-    }
-    sender_flowMap[flowid] = sndinfo;
+    delete pck;
 }
 
 void PCN::sendDown(Packet *pck)

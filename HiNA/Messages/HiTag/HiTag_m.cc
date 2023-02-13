@@ -177,17 +177,12 @@ HiTag& HiTag::operator=(const HiTag& other)
 
 void HiTag::copy(const HiTag& other)
 {
-    this->PathID = other.PathID;
     this->Priority = other.Priority;
     this->PacketId = other.PacketId;
     this->FirstRttPcks = other.FirstRttPcks;
     this->FlowId = other.FlowId;
     this->FlowSize = other.FlowSize;
     this->PacketSize = other.PacketSize;
-    this->IsLossless = other.IsLossless;
-    this->STT = other.STT;
-    this->recirculat = other.recirculat;
-    this->gate = other.gate;
     this->reverse = other.reverse;
     this->creationtime = other.creationtime;
     this->op = other.op;
@@ -197,17 +192,12 @@ void HiTag::copy(const HiTag& other)
 void HiTag::parsimPack(omnetpp::cCommBuffer *b) const
 {
     ::inet::TagBase::parsimPack(b);
-    doParsimPacking(b,this->PathID);
     doParsimPacking(b,this->Priority);
     doParsimPacking(b,this->PacketId);
     doParsimPacking(b,this->FirstRttPcks);
     doParsimPacking(b,this->FlowId);
     doParsimPacking(b,this->FlowSize);
     doParsimPacking(b,this->PacketSize);
-    doParsimPacking(b,this->IsLossless);
-    doParsimPacking(b,this->STT);
-    doParsimPacking(b,this->recirculat);
-    doParsimPacking(b,this->gate);
     doParsimPacking(b,this->reverse);
     doParsimPacking(b,this->creationtime);
     doParsimPacking(b,this->op);
@@ -217,31 +207,16 @@ void HiTag::parsimPack(omnetpp::cCommBuffer *b) const
 void HiTag::parsimUnpack(omnetpp::cCommBuffer *b)
 {
     ::inet::TagBase::parsimUnpack(b);
-    doParsimUnpacking(b,this->PathID);
     doParsimUnpacking(b,this->Priority);
     doParsimUnpacking(b,this->PacketId);
     doParsimUnpacking(b,this->FirstRttPcks);
     doParsimUnpacking(b,this->FlowId);
     doParsimUnpacking(b,this->FlowSize);
     doParsimUnpacking(b,this->PacketSize);
-    doParsimUnpacking(b,this->IsLossless);
-    doParsimUnpacking(b,this->STT);
-    doParsimUnpacking(b,this->recirculat);
-    doParsimUnpacking(b,this->gate);
     doParsimUnpacking(b,this->reverse);
     doParsimUnpacking(b,this->creationtime);
     doParsimUnpacking(b,this->op);
     doParsimUnpacking(b,this->interfaceId);
-}
-
-uint32_t HiTag::getPathID() const
-{
-    return this->PathID;
-}
-
-void HiTag::setPathID(uint32_t PathID)
-{
-    this->PathID = PathID;
 }
 
 uint32_t HiTag::getPriority() const
@@ -304,46 +279,6 @@ void HiTag::setPacketSize(uint64_t PacketSize)
     this->PacketSize = PacketSize;
 }
 
-bool HiTag::getIsLossless() const
-{
-    return this->IsLossless;
-}
-
-void HiTag::setIsLossless(bool IsLossless)
-{
-    this->IsLossless = IsLossless;
-}
-
-::omnetpp::simtime_t HiTag::getSTT() const
-{
-    return this->STT;
-}
-
-void HiTag::setSTT(::omnetpp::simtime_t STT)
-{
-    this->STT = STT;
-}
-
-int HiTag::getRecirculat() const
-{
-    return this->recirculat;
-}
-
-void HiTag::setRecirculat(int recirculat)
-{
-    this->recirculat = recirculat;
-}
-
-int HiTag::getGate() const
-{
-    return this->gate;
-}
-
-void HiTag::setGate(int gate)
-{
-    this->gate = gate;
-}
-
 bool HiTag::getReverse() const
 {
     return this->reverse;
@@ -389,17 +324,12 @@ class HiTagDescriptor : public omnetpp::cClassDescriptor
   private:
     mutable const char **propertyNames;
     enum FieldConstants {
-        FIELD_PathID,
         FIELD_Priority,
         FIELD_PacketId,
         FIELD_FirstRttPcks,
         FIELD_FlowId,
         FIELD_FlowSize,
         FIELD_PacketSize,
-        FIELD_IsLossless,
-        FIELD_STT,
-        FIELD_recirculat,
-        FIELD_gate,
         FIELD_reverse,
         FIELD_creationtime,
         FIELD_op,
@@ -470,7 +400,7 @@ const char *HiTagDescriptor::getProperty(const char *propertyName) const
 int HiTagDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
-    return base ? 15+base->getFieldCount() : 15;
+    return base ? 10+base->getFieldCount() : 10;
 }
 
 unsigned int HiTagDescriptor::getFieldTypeFlags(int field) const
@@ -482,23 +412,18 @@ unsigned int HiTagDescriptor::getFieldTypeFlags(int field) const
         field -= base->getFieldCount();
     }
     static unsigned int fieldTypeFlags[] = {
-        FD_ISEDITABLE,    // FIELD_PathID
         FD_ISEDITABLE,    // FIELD_Priority
         FD_ISEDITABLE,    // FIELD_PacketId
         FD_ISEDITABLE,    // FIELD_FirstRttPcks
         FD_ISEDITABLE,    // FIELD_FlowId
         FD_ISEDITABLE,    // FIELD_FlowSize
         FD_ISEDITABLE,    // FIELD_PacketSize
-        FD_ISEDITABLE,    // FIELD_IsLossless
-        FD_ISEDITABLE,    // FIELD_STT
-        FD_ISEDITABLE,    // FIELD_recirculat
-        FD_ISEDITABLE,    // FIELD_gate
         FD_ISEDITABLE,    // FIELD_reverse
         FD_ISEDITABLE,    // FIELD_creationtime
         FD_ISEDITABLE,    // FIELD_op
         FD_ISEDITABLE,    // FIELD_interfaceId
     };
-    return (field >= 0 && field < 15) ? fieldTypeFlags[field] : 0;
+    return (field >= 0 && field < 10) ? fieldTypeFlags[field] : 0;
 }
 
 const char *HiTagDescriptor::getFieldName(int field) const
@@ -510,44 +435,34 @@ const char *HiTagDescriptor::getFieldName(int field) const
         field -= base->getFieldCount();
     }
     static const char *fieldNames[] = {
-        "PathID",
         "Priority",
         "PacketId",
         "FirstRttPcks",
         "FlowId",
         "FlowSize",
         "PacketSize",
-        "IsLossless",
-        "STT",
-        "recirculat",
-        "gate",
         "reverse",
         "creationtime",
         "op",
         "interfaceId",
     };
-    return (field >= 0 && field < 15) ? fieldNames[field] : nullptr;
+    return (field >= 0 && field < 10) ? fieldNames[field] : nullptr;
 }
 
 int HiTagDescriptor::findField(const char *fieldName) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     int baseIndex = base ? base->getFieldCount() : 0;
-    if (strcmp(fieldName, "PathID") == 0) return baseIndex + 0;
-    if (strcmp(fieldName, "Priority") == 0) return baseIndex + 1;
-    if (strcmp(fieldName, "PacketId") == 0) return baseIndex + 2;
-    if (strcmp(fieldName, "FirstRttPcks") == 0) return baseIndex + 3;
-    if (strcmp(fieldName, "FlowId") == 0) return baseIndex + 4;
-    if (strcmp(fieldName, "FlowSize") == 0) return baseIndex + 5;
-    if (strcmp(fieldName, "PacketSize") == 0) return baseIndex + 6;
-    if (strcmp(fieldName, "IsLossless") == 0) return baseIndex + 7;
-    if (strcmp(fieldName, "STT") == 0) return baseIndex + 8;
-    if (strcmp(fieldName, "recirculat") == 0) return baseIndex + 9;
-    if (strcmp(fieldName, "gate") == 0) return baseIndex + 10;
-    if (strcmp(fieldName, "reverse") == 0) return baseIndex + 11;
-    if (strcmp(fieldName, "creationtime") == 0) return baseIndex + 12;
-    if (strcmp(fieldName, "op") == 0) return baseIndex + 13;
-    if (strcmp(fieldName, "interfaceId") == 0) return baseIndex + 14;
+    if (strcmp(fieldName, "Priority") == 0) return baseIndex + 0;
+    if (strcmp(fieldName, "PacketId") == 0) return baseIndex + 1;
+    if (strcmp(fieldName, "FirstRttPcks") == 0) return baseIndex + 2;
+    if (strcmp(fieldName, "FlowId") == 0) return baseIndex + 3;
+    if (strcmp(fieldName, "FlowSize") == 0) return baseIndex + 4;
+    if (strcmp(fieldName, "PacketSize") == 0) return baseIndex + 5;
+    if (strcmp(fieldName, "reverse") == 0) return baseIndex + 6;
+    if (strcmp(fieldName, "creationtime") == 0) return baseIndex + 7;
+    if (strcmp(fieldName, "op") == 0) return baseIndex + 8;
+    if (strcmp(fieldName, "interfaceId") == 0) return baseIndex + 9;
     return base ? base->findField(fieldName) : -1;
 }
 
@@ -560,23 +475,18 @@ const char *HiTagDescriptor::getFieldTypeString(int field) const
         field -= base->getFieldCount();
     }
     static const char *fieldTypeStrings[] = {
-        "uint32_t",    // FIELD_PathID
         "uint32_t",    // FIELD_Priority
         "uint64_t",    // FIELD_PacketId
         "uint64_t",    // FIELD_FirstRttPcks
         "uint32_t",    // FIELD_FlowId
         "uint64_t",    // FIELD_FlowSize
         "uint64_t",    // FIELD_PacketSize
-        "bool",    // FIELD_IsLossless
-        "omnetpp::simtime_t",    // FIELD_STT
-        "int",    // FIELD_recirculat
-        "int",    // FIELD_gate
         "bool",    // FIELD_reverse
         "omnetpp::simtime_t",    // FIELD_creationtime
         "int16_t",    // FIELD_op
         "int16_t",    // FIELD_interfaceId
     };
-    return (field >= 0 && field < 15) ? fieldTypeStrings[field] : nullptr;
+    return (field >= 0 && field < 10) ? fieldTypeStrings[field] : nullptr;
 }
 
 const char **HiTagDescriptor::getFieldPropertyNames(int field) const
@@ -659,17 +569,12 @@ std::string HiTagDescriptor::getFieldValueAsString(omnetpp::any_ptr object, int 
     }
     HiTag *pp = omnetpp::fromAnyPtr<HiTag>(object); (void)pp;
     switch (field) {
-        case FIELD_PathID: return ulong2string(pp->getPathID());
         case FIELD_Priority: return ulong2string(pp->getPriority());
         case FIELD_PacketId: return uint642string(pp->getPacketId());
         case FIELD_FirstRttPcks: return uint642string(pp->getFirstRttPcks());
         case FIELD_FlowId: return ulong2string(pp->getFlowId());
         case FIELD_FlowSize: return uint642string(pp->getFlowSize());
         case FIELD_PacketSize: return uint642string(pp->getPacketSize());
-        case FIELD_IsLossless: return bool2string(pp->getIsLossless());
-        case FIELD_STT: return simtime2string(pp->getSTT());
-        case FIELD_recirculat: return long2string(pp->getRecirculat());
-        case FIELD_gate: return long2string(pp->getGate());
         case FIELD_reverse: return bool2string(pp->getReverse());
         case FIELD_creationtime: return simtime2string(pp->getCreationtime());
         case FIELD_op: return long2string(pp->getOp());
@@ -690,17 +595,12 @@ void HiTagDescriptor::setFieldValueAsString(omnetpp::any_ptr object, int field, 
     }
     HiTag *pp = omnetpp::fromAnyPtr<HiTag>(object); (void)pp;
     switch (field) {
-        case FIELD_PathID: pp->setPathID(string2ulong(value)); break;
         case FIELD_Priority: pp->setPriority(string2ulong(value)); break;
         case FIELD_PacketId: pp->setPacketId(string2uint64(value)); break;
         case FIELD_FirstRttPcks: pp->setFirstRttPcks(string2uint64(value)); break;
         case FIELD_FlowId: pp->setFlowId(string2ulong(value)); break;
         case FIELD_FlowSize: pp->setFlowSize(string2uint64(value)); break;
         case FIELD_PacketSize: pp->setPacketSize(string2uint64(value)); break;
-        case FIELD_IsLossless: pp->setIsLossless(string2bool(value)); break;
-        case FIELD_STT: pp->setSTT(string2simtime(value)); break;
-        case FIELD_recirculat: pp->setRecirculat(string2long(value)); break;
-        case FIELD_gate: pp->setGate(string2long(value)); break;
         case FIELD_reverse: pp->setReverse(string2bool(value)); break;
         case FIELD_creationtime: pp->setCreationtime(string2simtime(value)); break;
         case FIELD_op: pp->setOp(string2long(value)); break;
@@ -719,17 +619,12 @@ omnetpp::cValue HiTagDescriptor::getFieldValue(omnetpp::any_ptr object, int fiel
     }
     HiTag *pp = omnetpp::fromAnyPtr<HiTag>(object); (void)pp;
     switch (field) {
-        case FIELD_PathID: return (omnetpp::intval_t)(pp->getPathID());
         case FIELD_Priority: return (omnetpp::intval_t)(pp->getPriority());
         case FIELD_PacketId: return (omnetpp::intval_t)(pp->getPacketId());
         case FIELD_FirstRttPcks: return (omnetpp::intval_t)(pp->getFirstRttPcks());
         case FIELD_FlowId: return (omnetpp::intval_t)(pp->getFlowId());
         case FIELD_FlowSize: return (omnetpp::intval_t)(pp->getFlowSize());
         case FIELD_PacketSize: return (omnetpp::intval_t)(pp->getPacketSize());
-        case FIELD_IsLossless: return pp->getIsLossless();
-        case FIELD_STT: return pp->getSTT().dbl();
-        case FIELD_recirculat: return pp->getRecirculat();
-        case FIELD_gate: return pp->getGate();
         case FIELD_reverse: return pp->getReverse();
         case FIELD_creationtime: return pp->getCreationtime().dbl();
         case FIELD_op: return pp->getOp();
@@ -750,17 +645,12 @@ void HiTagDescriptor::setFieldValue(omnetpp::any_ptr object, int field, int i, c
     }
     HiTag *pp = omnetpp::fromAnyPtr<HiTag>(object); (void)pp;
     switch (field) {
-        case FIELD_PathID: pp->setPathID(omnetpp::checked_int_cast<uint32_t>(value.intValue())); break;
         case FIELD_Priority: pp->setPriority(omnetpp::checked_int_cast<uint32_t>(value.intValue())); break;
         case FIELD_PacketId: pp->setPacketId(omnetpp::checked_int_cast<uint64_t>(value.intValue())); break;
         case FIELD_FirstRttPcks: pp->setFirstRttPcks(omnetpp::checked_int_cast<uint64_t>(value.intValue())); break;
         case FIELD_FlowId: pp->setFlowId(omnetpp::checked_int_cast<uint32_t>(value.intValue())); break;
         case FIELD_FlowSize: pp->setFlowSize(omnetpp::checked_int_cast<uint64_t>(value.intValue())); break;
         case FIELD_PacketSize: pp->setPacketSize(omnetpp::checked_int_cast<uint64_t>(value.intValue())); break;
-        case FIELD_IsLossless: pp->setIsLossless(value.boolValue()); break;
-        case FIELD_STT: pp->setSTT(value.doubleValue()); break;
-        case FIELD_recirculat: pp->setRecirculat(omnetpp::checked_int_cast<int>(value.intValue())); break;
-        case FIELD_gate: pp->setGate(omnetpp::checked_int_cast<int>(value.intValue())); break;
         case FIELD_reverse: pp->setReverse(value.boolValue()); break;
         case FIELD_creationtime: pp->setCreationtime(value.doubleValue()); break;
         case FIELD_op: pp->setOp(omnetpp::checked_int_cast<int16_t>(value.intValue())); break;

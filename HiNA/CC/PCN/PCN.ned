@@ -23,7 +23,7 @@ import inet.HiNA.CC.UdpCC;
 simple PCN like UdpCC
 {
     parameters:     
-        double linkspeed @unit(bps) = default (40Gbps);
+        double linkspeed @unit(bps) = default (1Gbps);
         double min_cnp_interval @unit(s) = default(50us);
  		double periodTime @unit(s) = default(50us);
  		double omega_min = default(0.01);

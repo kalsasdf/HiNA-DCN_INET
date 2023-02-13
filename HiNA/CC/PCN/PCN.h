@@ -76,6 +76,7 @@ protected:
 
     // The destinations addresses of the flows at sender, The flow information at sender
     std::map<uint32_t, sender_flowinfo> sender_flowMap;
+    std::map<uint32_t, sender_flowinfo>::iterator iter;
 
     // The destinations addresses of the flows at receiver, The flow information at receiver
     std::map<uint32_t, receiver_flowinfo> receiver_flowMap;

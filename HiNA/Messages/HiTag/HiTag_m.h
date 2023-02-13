@@ -48,19 +48,16 @@ namespace inet {
  * <pre>
  * class HiTag extends TagBase
  * {
- *     uint32_t PathID;
  *     uint32_t Priority = -1;//防止没设置优先级的包进入优先级队列
  *     uint64_t PacketId;
  *     uint64_t FirstRttPcks;
  *     uint32_t FlowId;
  *     uint64_t FlowSize;
  *     uint64_t PacketSize;
- *     bool IsLossless;
- *     simtime_t STT; // Single Trip Time
- *     int recirculat;
- *     int gate;
  *     bool reverse = false;//信用协议反向路由用
  *     simtime_t creationtime;
+ * 
+ *     //for PFC
  *     int16_t op;
  *     int16_t interfaceId;
  * }
@@ -69,17 +66,12 @@ namespace inet {
 class INET_API HiTag : public ::inet::TagBase
 {
   protected:
-    uint32_t PathID = 0;
     uint32_t Priority = -1;
     uint64_t PacketId = 0;
     uint64_t FirstRttPcks = 0;
     uint32_t FlowId = 0;
     uint64_t FlowSize = 0;
     uint64_t PacketSize = 0;
-    bool IsLossless = false;
-    ::omnetpp::simtime_t STT = SIMTIME_ZERO;
-    int recirculat = 0;
-    int gate = 0;
     bool reverse = false;
     ::omnetpp::simtime_t creationtime = SIMTIME_ZERO;
     int16_t op = 0;
@@ -100,9 +92,6 @@ class INET_API HiTag : public ::inet::TagBase
     virtual void parsimPack(omnetpp::cCommBuffer *b) const override;
     virtual void parsimUnpack(omnetpp::cCommBuffer *b) override;
 
-    virtual uint32_t getPathID() const;
-    virtual void setPathID(uint32_t PathID);
-
     virtual uint32_t getPriority() const;
     virtual void setPriority(uint32_t Priority);
 
@@ -120,18 +109,6 @@ class INET_API HiTag : public ::inet::TagBase
 
     virtual uint64_t getPacketSize() const;
     virtual void setPacketSize(uint64_t PacketSize);
-
-    virtual bool getIsLossless() const;
-    virtual void setIsLossless(bool IsLossless);
-
-    virtual ::omnetpp::simtime_t getSTT() const;
-    virtual void setSTT(::omnetpp::simtime_t STT);
-
-    virtual int getRecirculat() const;
-    virtual void setRecirculat(int recirculat);
-
-    virtual int getGate() const;
-    virtual void setGate(int gate);
 
     virtual bool getReverse() const;
     virtual void setReverse(bool reverse);

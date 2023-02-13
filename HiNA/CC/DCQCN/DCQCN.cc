@@ -114,7 +114,12 @@ void DCQCN::processUpperpck(Packet *pck)
         snd_info.targetRate = linkspeed;
         snd_info.rateTimer =  new TimerMsg("rateTimer");
         snd_info.alphaTimer = new TimerMsg("alphaTimer");
-        sender_flowMap[snd_info.flowid] =snd_info;
+        if(sender_flowMap.empty()){
+            sender_flowMap[snd_info.flowid]=snd_info;
+            iter=sender_flowMap.begin();
+        }else{
+            sender_flowMap[snd_info.flowid]=snd_info;
+        }
         // send packet timer
         delete pck;
         if(SenderState==STOPPING){
@@ -131,7 +136,7 @@ void DCQCN::processUpperpck(Packet *pck)
 
 void DCQCN::send_data()
 {
-    sender_flowinfo snd_info = sender_flowMap.begin()->second;
+    sender_flowinfo snd_info = iter->second;
     std::ostringstream str;
     str << packetName << "-" <<snd_info.flowid<<"-" <<snd_info.pckseq;
     Packet *packet = new Packet(str.str().c_str());
@@ -174,23 +179,8 @@ void DCQCN::send_data()
     packet->setKind(0);
 
     EV<<"packet length = "<<packet->getByteLength()<<", current rate = "<<snd_info.currentRate<<endl;
-    simtime_t nxtSendTime = simtime_t((packet->getByteLength()+58)*8/snd_info.currentRate) + simTime();
-    //58=20(IP)+14(EthernetMac)+8(EthernetPhy)+4(EthernetFcs)+12(interframe gap,IFG)
     EV << "prepare to send packet, remaining data size = " << snd_info.remainLength <<endl;
-    if (snd_info.SenderAcceleratingState != Normal)
-    {
-        snd_info.ByteCounter += packet->getByteLength();
-        if (snd_info.ByteCounter >= ByteCounter_th)
-        {
-            snd_info.ByteFrSteps++;
-            snd_info.ByteCounter = 0;
-            EV<<"byte counter expired, byte fr steps = "<<snd_info.ByteFrSteps<<endl;
-            increaseTxRate(snd_info.flowid);
-        }
-    }
-    sender_flowMap[snd_info.flowid] =snd_info;
-    scheduleAt(nxtSendTime,senddata);
-    sendDown(packet);
+
     if (snd_info.remainLength == 0)
     {
         cancelEvent(snd_info.rateTimer);
@@ -198,8 +188,25 @@ void DCQCN::send_data()
         cancelEvent(snd_info.alphaTimer);
         delete snd_info.alphaTimer;
         sender_flowMap.erase(snd_info.flowid);
+        iter++;
+    }else{
+        if (snd_info.SenderAcceleratingState != Normal)
+        {
+            snd_info.ByteCounter += packet->getByteLength();
+            if (snd_info.ByteCounter >= ByteCounter_th)
+            {
+                snd_info.ByteFrSteps++;
+                snd_info.ByteCounter = 0;
+                EV<<"byte counter expired, byte fr steps = "<<snd_info.ByteFrSteps<<endl;
+                increaseTxRate(snd_info.flowid);
+            }
+        }
+        sender_flowMap[snd_info.flowid] =snd_info;
     }
-
+    simtime_t nxtSendTime = simtime_t((packet->getByteLength()+58)*8/snd_info.currentRate) + simTime();
+    //58=20(IP)+14(EthernetMac)+8(EthernetPhy)+4(EthernetFcs)+12(interframe gap,IFG)
+    scheduleAt(nxtSendTime,senddata);
+    sendDown(packet);
 }
 
 void DCQCN::processLowerpck(Packet *pck)
@@ -249,31 +256,34 @@ void DCQCN::receive_cnp(Packet *pck)
     for (auto& region : pck->peekData()->getAllTags<HiTag>()){
         flowid = region.getTag()->getFlowId();
     }
-    sender_flowinfo sndinfo = sender_flowMap.find(flowid)->second;
-    // cut rate
-    sndinfo.targetRate = sndinfo.currentRate;
-    sndinfo.currentRate = sndinfo.currentRate * (1 - sndinfo.alpha/2);
-    sndinfo.alpha = (1 - gamma) * sndinfo.alpha + gamma;
-    EV<<"after cutting, the current rate = "<<sndinfo.currentRate<<
-            ", target rate = "<<sndinfo.targetRate<<endl;
+    if(sender_flowMap.find(flowid)!=sender_flowMap.end()){
+        sender_flowinfo sndinfo = sender_flowMap.find(flowid)->second;
+        // cut rate
+        sndinfo.targetRate = sndinfo.currentRate;
+        sndinfo.currentRate = sndinfo.currentRate * (1 - sndinfo.alpha/2);
+        sndinfo.alpha = (1 - gamma) * sndinfo.alpha + gamma;
+        EV<<"after cutting, the current rate = "<<sndinfo.currentRate<<
+                ", target rate = "<<sndinfo.targetRate<<endl;
 
-    // reset timers and counter
-    sndinfo.ByteCounter = 0;
-    sndinfo.ByteFrSteps = 0;
-    sndinfo.TimeFrSteps = 0;
-    sndinfo.iRhai = 0;
-    cancelEvent(sndinfo.alphaTimer);
-    cancelEvent(sndinfo.rateTimer);
+        // reset timers and counter
+        sndinfo.ByteCounter = 0;
+        sndinfo.ByteFrSteps = 0;
+        sndinfo.TimeFrSteps = 0;
+        sndinfo.iRhai = 0;
+        cancelEvent(sndinfo.alphaTimer);
+        cancelEvent(sndinfo.rateTimer);
 
-    sndinfo.alphaTimer->setKind(ALPHATIMER);
+        sndinfo.alphaTimer->setKind(ALPHATIMER);
 
-    sndinfo.rateTimer->setKind(RATETIMER);
-    sndinfo.rateTimer->setFlowId(flowid);
-    // update alpha
-    scheduleAt(simTime()+AlphaTimer_th,sndinfo.alphaTimer);
+        sndinfo.rateTimer->setKind(RATETIMER);
+        sndinfo.rateTimer->setFlowId(flowid);
+        // update alpha
+        scheduleAt(simTime()+AlphaTimer_th,sndinfo.alphaTimer);
 
-    // schedule to rate increase event
-    scheduleAt(simTime()+RateTimer_th,sndinfo.rateTimer);
+        // schedule to rate increase event
+        scheduleAt(simTime()+RateTimer_th,sndinfo.rateTimer);
+    }
+    delete pck;
 }
 
 void DCQCN::increaseTxRate(uint32_t flowid)

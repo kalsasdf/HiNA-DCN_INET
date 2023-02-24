@@ -11,6 +11,8 @@
 #include "inet/linklayer/ethernet/base/EthernetMacBase.h"
 #include "inet/HiNA/Messages/HiTag/HiTag_m.h"
 #include "inet/HiNA/Messages/PfcFrame/EthernetPfcFrame_m.h"
+#include "inet/networklayer/ipv4/Ipv4Header_m.h"
+#include "inet/transportlayer/udp/UdpHeader_m.h"
 
 namespace inet {
 
@@ -48,6 +50,12 @@ class INET_API HiEthernetMac : public EthernetMacBase
     // statistics
     cOutVector bitpersecVector;
     cOutVector pkpersecVector;
+
+    //for TIMELY
+    bool TIMELY;
+    int TIMELYseg;
+    std::map<Ipv4Address, int> TIMELY_Map;
+    //for TIMELY
 
     // IActivePacketSink:
     virtual void handleCanPullPacketChanged(cGate *gate) override;

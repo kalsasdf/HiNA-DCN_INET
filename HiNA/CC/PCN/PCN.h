@@ -67,7 +67,6 @@ protected:
     double omega_max;
     int64_t max_pck_size;
 
-
     const char *packetName = "PCNData";
     cGate *lowerOutGate;
     cGate *lowerInGate;

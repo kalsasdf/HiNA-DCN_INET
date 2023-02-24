@@ -133,6 +133,8 @@ simple HiEthernetMac like IEtherMac
         double stopOperationTimeout @unit(s) = default(2s);    // timeout value for lifecycle stop operation
         int batchSize = default(50);
         double maxInterval @unit(s) = default(1s);
+        bool TIMELY = default(false);
+        int TIMELYseg @unit(B)= default(16kB);
         @class(HiEthernetMac);
         @display("i=block/rxtx");
 

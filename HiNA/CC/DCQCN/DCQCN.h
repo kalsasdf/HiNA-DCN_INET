@@ -29,7 +29,6 @@ protected:
         Hyper_Increase
     };
 
-
     enum SelfpckKindValues {
         SENDDATA,
         ALPHATIMER,
@@ -88,7 +87,6 @@ protected:
     // The destinations addresses of the flows at sender, The flow information at sender
     map<uint32_t, sender_flowinfo> sender_flowMap;
     std::map<uint32_t, sender_flowinfo>::iterator iter;
-
 
 protected:
     virtual void initialize() override;

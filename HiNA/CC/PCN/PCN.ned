@@ -33,7 +33,7 @@ simple PCN like UdpCC
         // If unschedPrioResolutionMode is set to EXPLICIT,
         // then this string defines the priority cutoff points of unsched
         // bytes for the remaining message sizes. Example would be "100 1500 9000"
-        string explicitUnschedPrioCutoff = default("");
+        //string explicitUnschedPrioCutoff = default("");
         
         @display("i=block/downarrow,grey80;is=s;i2=status/down");
 

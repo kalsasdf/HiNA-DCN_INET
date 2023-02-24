@@ -13,35 +13,23 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package inet.HiNA.CC.DCQCN;
+package inet.HiNA.CC.TIMELY;
 
 import inet.HiNA.CC.UdpCC;
-// TODO documentation
 //
-//import inet.common.queue.IOutputQueue;
-
+// TODO auto-generated type
 //
-// Drop-tail queue, to be used in network interfaces.
-// Conforms to the ~IOutputQueue interface.
-//
-simple DCQCN like UdpCC
+simple TIMELY like UdpCC
 {
     parameters:
-        double linkspeed @unit(bps) = default (1Gbps);
- 		double min_cnp_interval @unit(s) = default(50us);
- 		double AlphaTimer_th @unit(s) = default(55us);
- 		double RateTimer_th @unit(s) = default(55us);
- 		int ByteCounter_th @unit(B) = default(10MiB);
- 		double Rai @unit(bps) = default(4e7bps);
- 		double Rhai @unit(bps) = default(4e8bps);
- 		int frSteps_th = default(5);
- 		double gamma = default(1/256);
+        double linkspeed @unit(bps) = default (10Gbps);
+        double Rai @unit(bps) = default(10Mbps);  // 最大速率的 1 / 50
+ 		double baseRTT @unit(s)= default(20us);
+ 		double Tlow @unit(s)= default(50us);  // 修改Tlow
+ 		double Thigh @unit(s)= default(500us);
+ 		double alpha = default(0.875);
+ 		double beta = default(0.8);
  		int max_pck_size = default(1472);
-        
-        // If unschedPrioResolutionMode is set to EXPLICIT,
-        // then this string defines the priority cutoff points of unsched
-        // bytes for the remaining message sizes. Example would be "100 1500 9000"
-        //string explicitUnschedPrioCutoff = default("");
         
         @display("i=block/downarrow,grey80;is=s;i2=status/down");
     gates:
@@ -50,5 +38,3 @@ simple DCQCN like UdpCC
         output lowerOut @labels(UdpHeader,IPv4ControlInfo/down,IPv6ControlInfo/down);
         input lowerIn @labels(UdpHeader,IPv4ControlInfo/up,IPv6ControlInfo/up);
 }
-
-

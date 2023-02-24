@@ -60,6 +60,9 @@ void HiEthernetMac::initialize(int stage)
         radioModule->subscribe(REDPFCQueue::pfcPausedSignal,this);
         radioModule->subscribe(REDPFCQueue::pfcResumeSignal,this);
 
+        TIMELY=par("TIMELY");
+        TIMELYseg=par("TIMELYseg");
+
         if (!par("duplexMode"))
             throw cRuntimeError("Half duplex operation is not supported by HiEthernetMac, use the EthernetCsmaMac module for that! (Please enable csmacdSupport on EthernetInterface)");
     }
@@ -126,6 +129,13 @@ void HiEthernetMac::startFrameTransmission()
 
     // add preamble and SFD (Starting Frame Delimiter), then send out
     encapsulate(frame);
+
+    //for TIMELY
+    if(TIMELY&&std::string(frame->getFullName()).find("TIMELYData") != std::string::npos){
+        frame->setTimestamp(simTime());
+        EV<<"TIMELY tsend = "<<simTime()<<endl;
+    }
+    //for TIMELY
 
     // send
     auto& oldPacketProtocolTag = frame->removeTag<PacketProtocolTag>();
@@ -288,6 +298,63 @@ void HiEthernetMac::processMsgFromNetwork(EthernetSignalBase *signal)
         delete packet;
         return;
     }
+
+    //for TIMELY
+    if(TIMELY){
+        if (std::string(packet->getFullName()).find("TIMELYACK") != std::string::npos)
+        {
+            simtime_t nowRTT = simTime() - packet->getTimestamp() - packet->getByteLength()/ curEtherDescr->txrate;  // 10*1e9 是测试所使用的链路速率
+            EV <<"tsend = " << packet->getTimestamp() << ", tcompletion = " << simTime() << ", nowRTT = " << nowRTT <<endl;
+
+            packet->setTimestamp(nowRTT);
+        }
+        else if((std::string(packet->getFullName()).find("TIMELYData") != std::string::npos))
+        {
+            auto& eth_hdr = packet->popAtFront<EthernetMacHeader>();
+            auto& ip_hdr = packet->popAtFront<Ipv4Header>();
+            TIMELY_Map[ip_hdr->getSrcAddress()]+=packet->getByteLength();
+            packet->insertAtFront(ip_hdr);
+            packet->insertAtFront(eth_hdr);
+
+            if(TIMELY_Map[ip_hdr->getSrcAddress()]>=TIMELYseg){
+                TIMELY_Map[ip_hdr->getSrcAddress()]=0;
+                Packet *ack = packet->dup();
+                auto ack_eth = ack->removeAtFront<EthernetMacHeader>();
+                auto ack_ip = ack->removeAtFront<Ipv4Header>();
+                auto ack_udp = ack->removeAtFront<UdpHeader>();
+
+                const auto& payload = makeShared<ByteCountChunk>(B(1));
+                auto tag = payload->addTag<HiTag>();
+                tag->setPriority(-1);
+                Packet *ack1 = new Packet("TIMELYACK",payload);
+
+                ack1->insertAtFront(ack_udp);
+
+                auto ip_srcaddr = ack_ip->getSrcAddress();
+                auto ip_destaddr = ack_ip->getDestAddress();
+                ack_ip->setDestAddress(ip_srcaddr);
+                ack_ip->setSrcAddress(ip_destaddr);
+                ack_ip->setTotalLengthField(ack_ip->getChunkLength()+ack1->getDataLength());
+                ack1->insertAtFront(ack_ip);
+
+                ack_eth->setSrc(getMacAddress());
+                ack_eth->setDest(MacAddress::BROADCAST_ADDRESS);
+                ack1->insertAtFront(ack_eth);
+                const auto& ethernetFcs = makeShared<EthernetFcs>();
+                ethernetFcs->setFcsMode(fcsMode);
+                ack1->insertAtBack(ethernetFcs);
+                addPaddingAndSetFcs(ack1, MIN_ETHERNET_FRAME_BYTES);
+
+                while(currentTxFrame==nullptr&& transmitState == TX_IDLE_STATE){
+                    currentTxFrame = ack1;
+                    EV_DETAIL << "Send an ACK" << endl;
+                    startFrameTransmission();
+                }
+                delete ack;
+            }
+        }
+    }
+    //for TIMELY
 
     const auto& frame = packet->peekAtFront<EthernetMacHeader>();
     if (dropFrameNotForUs(packet, frame))

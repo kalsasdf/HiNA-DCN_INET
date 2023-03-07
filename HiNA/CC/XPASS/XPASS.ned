@@ -21,6 +21,7 @@ import inet.HiNA.CC.UdpCC;
 simple XPASS like UdpCC
 {
     parameters:
+        bool activate = default(true);
         double linkspeed @unit(bps) = default (1Gbps);
         bool ratecontrol = default(true);
         double wmax=default(0.5);

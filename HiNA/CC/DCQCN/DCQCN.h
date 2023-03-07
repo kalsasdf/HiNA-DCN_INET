@@ -64,9 +64,12 @@ protected:
 
     L3Address srcAddr;
     TimerMsg *senddata = nullptr;
+    simtime_t stopTime;
 
     // configuration for .ned file
+    bool activate;
     double linkspeed;
+    double initialrate;
     double gamma;
     simtime_t min_cnp_interval;
     simtime_t AlphaTimer_th;

@@ -41,7 +41,6 @@ protected:
         int64_t remainLength;
 
         double currentRate;
-        double targetRate;
         double omega;
     };
 
@@ -61,6 +60,7 @@ protected:
 
     L3Address srcAddr;
     // configuration for .ned file
+    bool activate;
     double linkspeed;
     simtime_t min_cnp_interval;
     double omega_min;
@@ -82,6 +82,7 @@ protected:
 
     // The temporary parameters used for transfer values
     TimerMsg *senddata = nullptr;
+    simtime_t stopTime;
 
 protected:
     virtual void initialize() override;

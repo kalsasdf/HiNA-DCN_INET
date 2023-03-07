@@ -51,13 +51,14 @@ class INET_API REDPFCQueue : public PacketQueueBase, public IPacketBuffer::ICall
     NetworkInterface *eth;
     int Kmax;
     int Kmin;
-    double Pmax = NaN;
-    bool useEcn = false;
+    double Pmax;
+    bool useEcn;
     bool markNext = false;
     double count = NaN;
     enum RedResult { RANDOMLY_ABOVE_LIMIT, RANDOMLY_BELOW_LIMIT, ABOVE_MAX_LIMIT, BELOW_MIN_LIMIT };
     mutable RedResult lastResult;
 
+    cOutVector queuelengthVector;
 
   protected:
     virtual void initialize(int stage) override;

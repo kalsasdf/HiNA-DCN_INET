@@ -11,12 +11,14 @@ namespace inet {
 Define_Module(TIMELY);
 
 void TIMELY::initialize(){
-    //statistics
+    //gates
     lowerOutGate = gate("lowerOut");
     lowerInGate = gate("lowerIn");
     upperOutGate = gate("upperOut");
     upperInGate = gate("upperIn");
     // configuration
+    stopTime = par("stopTime");
+    activate = par("activate");
     baseRTT = par("baseRTT");
     Tlow = par("Tlow");
     Thigh = par("Thigh");
@@ -62,7 +64,7 @@ void TIMELY::handleSelfMessage(cMessage *pck)
     switch (timer->getKind()) {
         case SENDDATA:
         {
-            if(sender_flowMap.empty()){
+            if(sender_flowMap.empty()||simTime()>=stopTime){
                 SenderState=STOPPING;
                 break;
             }else{
@@ -75,7 +77,7 @@ void TIMELY::handleSelfMessage(cMessage *pck)
 
 void TIMELY::processUpperpck(Packet *pck)
 {
-    if (string(pck->getFullName()).find("Data") != string::npos){
+    if (string(pck->getFullName()).find("Data") != string::npos&&activate==true){
         sender_flowinfo snd_info;
         for (auto& region : pck->peekData()->getAllTags<HiTag>()){
             snd_info.flowid = region.getTag()->getFlowId();
@@ -99,7 +101,7 @@ void TIMELY::processUpperpck(Packet *pck)
         snd_info.crc = udpHeader->getCrc();
         if(sender_flowMap.empty()){
             sender_flowMap[snd_info.flowid]=snd_info;
-            iter=sender_flowMap.begin();
+            iter=sender_flowMap.begin();//iter needs to be assigned after snd_info is inserted
         }else{
             sender_flowMap[snd_info.flowid]=snd_info;
         }

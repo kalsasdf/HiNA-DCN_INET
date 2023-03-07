@@ -18,17 +18,15 @@ package inet.HiNA.CC.DCQCN;
 import inet.HiNA.CC.UdpCC;
 // TODO documentation
 //
-//import inet.common.queue.IOutputQueue;
 
-//
-// Drop-tail queue, to be used in network interfaces.
-// Conforms to the ~IOutputQueue interface.
-//
 simple DCQCN like UdpCC
 {
     parameters:
+        bool activate = default(true);
         double linkspeed @unit(bps) = default (1Gbps);
+        double stopTime @unit(s) = default(10s);
  		double min_cnp_interval @unit(s) = default(50us);
+ 		double initialrate=default(1);
  		double AlphaTimer_th @unit(s) = default(55us);
  		double RateTimer_th @unit(s) = default(55us);
  		int ByteCounter_th @unit(B) = default(10MiB);

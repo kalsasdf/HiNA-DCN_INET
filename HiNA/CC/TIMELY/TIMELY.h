@@ -43,7 +43,9 @@ protected:
 
     L3Address srcAddr;
     TimerMsg *senddata = nullptr;
+    simtime_t stopTime;
     // configuration for .ned file
+    bool activate;
     simtime_t baseRTT;
     simtime_t Tlow;
     simtime_t Thigh;

@@ -63,8 +63,8 @@ simple ECNQueue extends PacketQueueBase like IPacketQueue
         string comparatorClass = default(""); // determines the order of packets in the queue, insertion order by default; the parameter must be the name of a C++ class which implements the IPacketComparatorFunction C++ interface and is registered via Register_Class
         string bufferModule = default(""); // relative module path to the IPacketBuffer module used by this queue, implicit buffer by default
         displayStringTextFormat = default("contains %p pk (%l) pushed %u\npulled %o removed %r dropped %d");
-        int K @unit(B);
-        bool useEcn;
+        int K @unit(B) = default(0B);
+        bool useEcn = default(false);
         @class(ECNQueue);
         @signal[packetPushStarted](type=inet::Packet);
         @signal[packetPushEnded](type=inet::Packet?);

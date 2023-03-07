@@ -20,6 +20,7 @@ void XPASS::initialize()
     upGate = gate("upperOut");
     downGate = gate("upperIn");
     // configuration
+    activate = par("activate");
     linkspeed = par("linkspeed");
     targetratio = par("targetratio");
     initialrate = par("initialrate");
@@ -110,7 +111,7 @@ void XPASS::handleSelfMessage(cMessage *pck)
 
 void XPASS::processUpperpck(Packet *pck)
 {
-    if (string(pck->getFullName()).find("Data") != string::npos)
+    if (string(pck->getFullName()).find("Data") != string::npos&&activate==true)
     {
         auto addressReq = pck->addTagIfAbsent<L3AddressReq>();
         auto udpHeader = pck->peekAtFront<UdpHeader>();

@@ -35,8 +35,10 @@ class INET_API ECNQueue : public PacketQueueBase, public IPacketBuffer::ICallbac
     IPacketComparatorFunction *packetComparatorFunction = nullptr;
 
     bool markNext = false;
-    bool useEcn = false;
+    bool useEcn;
     int K;
+
+    cOutVector queuelengthVector;
 
   protected:
     virtual void initialize(int stage) override;

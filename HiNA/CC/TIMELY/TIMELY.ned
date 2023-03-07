@@ -22,7 +22,9 @@ import inet.HiNA.CC.UdpCC;
 simple TIMELY like UdpCC
 {
     parameters:
+        bool activate = default(true);
         double linkspeed @unit(bps) = default (10Gbps);
+        double stopTime @unit(s) = default(10s);
         double Rai @unit(bps) = default(10Mbps);  // 最大速率的 1 / 50
  		double baseRTT @unit(s)= default(20us);
  		double Tlow @unit(s)= default(50us);  // 修改Tlow

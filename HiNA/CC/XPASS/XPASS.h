@@ -45,7 +45,7 @@ class XPASS : public cSimpleModule
     cGate *upGate;
     cGate *downGate;
     const char *packetName = "XPASSData";
-
+    bool activate;
     double linkspeed;
     int credit_size;
     double targetratio;

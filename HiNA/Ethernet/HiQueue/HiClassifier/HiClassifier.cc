@@ -31,7 +31,7 @@ void HiClassifier::initialize(int stage)
     for (int i = 0; i < numOutGates; ++i)
     {
         priorityToGateIndexMap[i] = priorities[i];
-        EV_INFO<<"priorityToGate["<<i<<"] = "<<priorities[i]<<endl;
+//        EV_INFO<<"priorityToGate["<<i<<"] = "<<priorities[i]<<endl;
     }
 
     numRcvd = 0;

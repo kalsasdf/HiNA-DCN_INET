@@ -10,13 +10,16 @@ namespace inet {
 
 Define_Module(PCN);
 
-void PCN::initialize(){
-    //statistics
+void PCN::initialize()
+{
+    //gates
     lowerOutGate = gate("lowerOut");
     lowerInGate = gate("lowerIn");
     upperOutGate = gate("upperOut");
     upperInGate = gate("upperIn");
     // configuration
+    stopTime = par("stopTime");
+    activate = par("activate");
     omega_min = par("omega_min");
     omega_max = par("omega_max");
     linkspeed = par("linkspeed");
@@ -54,7 +57,7 @@ void PCN::handleSelfMessage(cMessage *pck)
     switch (timer->getKind()) {
         case SENDDATA:
         {
-            if(sender_flowMap.empty()){
+            if(sender_flowMap.empty()||simTime()>=stopTime){
                 SenderState=STOPPING;
                 break;
             }else{
@@ -68,7 +71,7 @@ void PCN::handleSelfMessage(cMessage *pck)
 // Record the packet from udp to transmit it to the dest
 void PCN::processUpperpck(Packet *pck)
 {
-    if (string(pck->getFullName()).find("Data") != string::npos){
+    if (string(pck->getFullName()).find("Data") != string::npos&&activate==true){
         sender_flowinfo snd_info;
         for (auto& region : pck->peekData()->getAllTags<HiTag>()){
             snd_info.flowid = region.getTag()->getFlowId();
@@ -90,12 +93,11 @@ void PCN::processUpperpck(Packet *pck)
         snd_info.pckseq = 0;
         snd_info.crcMode = udpHeader->getCrcMode();
         snd_info.crc = udpHeader->getCrc();
-        snd_info.currentRate = linkspeed;EV<<"currentRate = "<<snd_info.currentRate<<endl;
-        snd_info.targetRate = linkspeed;
+        snd_info.currentRate = linkspeed;
         snd_info.omega = omega_min;
         if(sender_flowMap.empty()){
             sender_flowMap[snd_info.flowid]=snd_info;
-            iter=sender_flowMap.begin();
+            iter=sender_flowMap.begin();//iter needs to be assigned after snd_info is inserted
         }else{
             sender_flowMap[snd_info.flowid]=snd_info;
         }

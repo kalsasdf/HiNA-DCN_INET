@@ -2,8 +2,8 @@
 // Generated file, do not edit! Created by opp_msgtool 6.0 from inet/HiNA/Messages/TimerMsg/TimerMsg.msg.
 //
 
-#ifndef __INET_TIMERMSG_M_H
-#define __INET_TIMERMSG_M_H
+#ifndef __INET_INET_HINA_MESSAGES_TIMERMSG_TIMERMSG_M_H
+#define __INET_INET_HINA_MESSAGES_TIMERMSG_TIMERMSG_M_H
 
 #if defined(__clang__)
 #  pragma clang diagnostic ignored "-Wreserved-id-macro"
@@ -44,13 +44,14 @@ class TimerMsg;
 namespace inet {
 
 /**
- * Class generated from <tt>inet/HiNA/Messages/TimerMsg/TimerMsg.msg:20</tt> by opp_msgtool.
+ * Class generated from <tt>inet\HiNA\Messages\TimerMsg\TimerMsg.msg:20</tt> by opp_msgtool.
  * <pre>
  * class TimerMsg extends cMessage
  * {
  *     inet::L3Address destAddr;
  *     inet::L3Address srcAddr;
  *     uint32_t FlowId;
+ *     int PacketId;
  *     uint32_t Priority;
  * }
  * </pre>
@@ -61,6 +62,7 @@ class INET_API TimerMsg : public ::omnetpp::cMessage
     L3Address destAddr;
     L3Address srcAddr;
     uint32_t FlowId = 0;
+    int PacketId = 0;
     uint32_t Priority = 0;
 
   private:
@@ -89,6 +91,9 @@ class INET_API TimerMsg : public ::omnetpp::cMessage
     virtual uint32_t getFlowId() const;
     virtual void setFlowId(uint32_t FlowId);
 
+    virtual int getPacketId() const;
+    virtual void setPacketId(int PacketId);
+
     virtual uint32_t getPriority() const;
     virtual void setPriority(uint32_t Priority);
 };
@@ -106,5 +111,5 @@ template<> inline inet::TimerMsg *fromAnyPtr(any_ptr ptr) { return check_and_cas
 
 }  // namespace omnetpp
 
-#endif // ifndef __INET_TIMERMSG_M_H
+#endif // ifndef __INET_INET_HINA_MESSAGES_TIMERMSG_TIMERMSG_M_H
 

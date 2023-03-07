@@ -11,14 +11,17 @@ Define_Module(DCQCN);
 
 void DCQCN::initialize()
 {
-    //statistics
+    //gates
     lowerOutGate = gate("lowerOut");
     lowerInGate = gate("lowerIn");
     upperOutGate = gate("upperOut");
     upperInGate = gate("upperIn");
     // configuration
+    stopTime = par("stopTime");
+    activate = par("activate");
     gamma = par("gamma");
     linkspeed = par("linkspeed");
+    initialrate = par("initialrate");
     min_cnp_interval = par("min_cnp_interval");
     AlphaTimer_th = par("AlphaTimer_th");
     RateTimer_th = par("RateTimer_th");
@@ -59,7 +62,7 @@ void DCQCN::handleSelfMessage(cMessage *pck)
     switch (timer->getKind()) {
         case SENDDATA:
         {
-            if(sender_flowMap.empty()){
+            if(sender_flowMap.empty()||simTime()>=stopTime){
                 SenderState=STOPPING;
                 break;
             }else{
@@ -88,7 +91,7 @@ void DCQCN::handleSelfMessage(cMessage *pck)
 // Record the packet from app to transmit it to the dest
 void DCQCN::processUpperpck(Packet *pck)
 {
-    if (string(pck->getFullName()).find("Data") != string::npos){
+    if (string(pck->getFullName()).find("Data") != string::npos&&activate==true){
         sender_flowinfo snd_info;
         for (auto& region : pck->peekData()->getAllTags<HiTag>()){
             snd_info.flowid = region.getTag()->getFlowId();
@@ -110,13 +113,13 @@ void DCQCN::processUpperpck(Packet *pck)
         snd_info.pckseq = 0;
         snd_info.crcMode = udpHeader->getCrcMode();
         snd_info.crc = udpHeader->getCrc();
-        snd_info.currentRate = linkspeed;
-        snd_info.targetRate = linkspeed;
+        snd_info.currentRate = linkspeed*initialrate;
+        snd_info.targetRate = snd_info.currentRate;
         snd_info.rateTimer =  new TimerMsg("rateTimer");
         snd_info.alphaTimer = new TimerMsg("alphaTimer");
         if(sender_flowMap.empty()){
             sender_flowMap[snd_info.flowid]=snd_info;
-            iter=sender_flowMap.begin();
+            iter=sender_flowMap.begin();//iter needs to be assigned after snd_info is inserted
         }else{
             sender_flowMap[snd_info.flowid]=snd_info;
         }

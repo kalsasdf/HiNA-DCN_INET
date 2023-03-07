@@ -13,30 +13,20 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package inet.HiNA.CC.PCN;
+package inet.HiNA.CC.HPCC;
 
 import inet.HiNA.CC.UdpCC;
 
-//
-// TODO auto-generated type
-//
-simple PCN like UdpCC
+simple HPCC like UdpCC
 {
-    parameters:     
+    parameters:
         bool activate = default(true);
         double linkspeed @unit(bps) = default (1Gbps);
         double stopTime @unit(s) = default(10s);
-        double min_cnp_interval @unit(s) = default(50us);
- 		double periodTime @unit(s) = default(50us);
- 		double omega_min = default(0.01);
- 		double omega_max = default(0.5);
- 		int max_pck_size = default(1468);
-        
-        // If unschedPrioResolutionMode is set to EXPLICIT,
-        // then this string defines the priority cutoff points of unsched
-        // bytes for the remaining message sizes. Example would be "100 1500 9000"
-        //string explicitUnschedPrioCutoff = default("");
-        
+ 		double baseRTT @unit(s) = default(1s);
+ 		int expectedFlows = default(2);
+ 		int max_pck_size = default(1430);
+      
         @display("i=block/downarrow,grey80;is=s;i2=status/down");
 
     gates:

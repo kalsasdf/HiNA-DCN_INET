@@ -64,13 +64,13 @@ simple REDPFCQueue extends PacketQueueBase like IPacketQueue
         string bufferModule = default(""); // relative module path to the IPacketBuffer module used by this queue, implicit buffer by default
         displayStringTextFormat = default("contains %p pk (%l) pushed %u\npulled %o removed %r dropped %d");
         int priority = default(-1);
-        bool usePfc;
-        int XON @unit(B);
-        int XOFF @unit(B);
-        bool useEcn;
-        int Kmax @unit(B);
-        int Kmin @unit(B);
-        double Pmax;
+        bool usePfc = default(false);
+        int XON @unit(B) = default(0B);
+        int XOFF @unit(B) = default(0B);
+        bool useEcn = default(false);
+        int Kmax @unit(B) = default(0B);
+        int Kmin @unit(B) = default(0B);
+        double Pmax = default(0);
         @class(REDPFCQueue);
         @signal[packetPushStarted](type=inet::Packet);
         @signal[packetPushEnded](type=inet::Packet?);//A question mark after the class name means that the signal is allowed to emit nullptr pointers.

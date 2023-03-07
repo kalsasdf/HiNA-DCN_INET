@@ -13,6 +13,8 @@
 #include "inet/HiNA/Messages/PfcFrame/EthernetPfcFrame_m.h"
 #include "inet/networklayer/ipv4/Ipv4Header_m.h"
 #include "inet/transportlayer/udp/UdpHeader_m.h"
+#include "inet/HiNA/Messages/HPCC/INTHeader_m.h"
+#include "inet/HiNA/Ethernet/HiQueue/HiScheduler/WrrScheduler.h"
 
 namespace inet {
 
@@ -56,6 +58,11 @@ class INET_API HiEthernetMac : public EthernetMacBase
     int TIMELYseg;
     std::map<Ipv4Address, int> TIMELY_Map;
     //for TIMELY
+
+    //for HPCC
+    bool HPCC;
+    uint64_t txBytes = 0;
+    //for HPCC
 
     // IActivePacketSink:
     virtual void handleCanPullPacketChanged(cGate *gate) override;

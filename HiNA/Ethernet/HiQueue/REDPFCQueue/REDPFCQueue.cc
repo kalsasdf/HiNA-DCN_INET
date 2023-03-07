@@ -40,6 +40,7 @@ void REDPFCQueue::initialize(int stage)
         Pmax=par("Pmax");
         useEcn=par("useEcn");
         count = -1;
+        queuelengthVector.setName("queuelength (b)");
         cModule *radioModule = getParentModule()->getParentModule();EV<<"parentmodule = "<<radioModule<<endl;
         eth = check_and_cast<NetworkInterface *>(radioModule);EV<<"eth = "<<eth<<endl;
         buffer = findModuleFromPar<IPacketBuffer>(par("bufferModule"), this);
@@ -148,6 +149,7 @@ Packet *REDPFCQueue::pullPacket(cGate *gate)
     Enter_Method("pullPacket");
     auto packet = check_and_cast<Packet *>(queue.front());
     EV_INFO << "Pulling packet" << EV_FIELD(packet) << EV_ENDL;
+    EV<<"queuelength = "<<queue.getBitLength()<<endl;
     if (buffer != nullptr) {
         queue.remove(packet);
         buffer->removePacket(packet);
@@ -155,6 +157,7 @@ Packet *REDPFCQueue::pullPacket(cGate *gate)
     else
         queue.pop();
 
+    queuelengthVector.recordWithTimestamp(simTime(), queue.getBitLength());
     auto queueingTime = simTime() - packet->getArrivalTime();
     auto packetEvent = new PacketQueuedEvent();
     packetEvent->setQueuePacketLength(getNumPackets());
@@ -198,7 +201,7 @@ Packet *REDPFCQueue::pullPacket(cGate *gate)
 
 REDPFCQueue::RedResult REDPFCQueue::doRandomEarlyDetection(const Packet *packet)
 {
-     int64_t queueLength = queue.getByteLength();
+    int64_t queueLength = queue.getByteLength();
     if (Kmin <= queueLength && queueLength < Kmax) {
         count++;
         const double pb = Pmax * (queueLength - Kmin) / (Kmax - Kmin);

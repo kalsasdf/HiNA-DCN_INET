@@ -1,0 +1,1213 @@
+file 59118 1678365062                                           
+version 3
+run General-0-20230309-20:30:42-27244
+attr configname General
+attr datetime 20230309-20:30:42
+attr datetimef 20230309-203042
+attr experiment General
+attr inifile testdumbbell.ini
+attr iterationvars ""
+attr iterationvarsd ""
+attr iterationvarsf ""
+attr measurement ""
+attr network testdumbbell
+attr processid 27244
+attr repetition 0
+attr replication #0
+attr resultdir results
+attr runnumber 0
+attr seedset 0
+config image-path ../../../images
+config network testdumbbell
+config warnings true
+config sim-time-limit 10s
+config **.*.vector-recording true
+config **.s*.numApps 1
+config **.s*.app[0].typename HiUdpApp
+config **.s*.app[0].trafficMode "\"LongFlow\""
+config **.s*.app[0].workLoad 1
+config **.s*.app[0].linkSpeed 10Gbps
+config **.s*.app[0].AppPriority 1
+config **.s*.app[0].packetName default
+config **.s1.app[0].connectAddresses "\"r1\""
+config **.s1.app[0].startTime 0s
+config **.s1.app[0].stopTime 0.7s
+config **.s1.UdpCC.stopTime 0.7s
+config **.s2.app[0].connectAddresses "\"r1\""
+config **.s2.app[0].startTime 0.1s
+config **.s2.app[0].stopTime 0.6s
+config **.s2.UdpCC.stopTime 0.6s
+config **.s3.app[0].connectAddresses "\"r1\""
+config **.s3.app[0].startTime 0.2s
+config **.s3.app[0].stopTime 0.5s
+config **.s3.UdpCC.stopTime 0.5s
+config **.s4.app[0].connectAddresses "\"r1\""
+config **.s4.app[0].startTime 0.3s
+config **.s4.app[0].stopTime 0.4s
+config **.s4.UdpCC.stopTime 0.4s
+config **.s5.app[0].connectAddresses "\"r1\""
+config **.s5.app[0].startTime 10s
+config **.s5.app[0].stopTime 10.25s
+config **.s6.app[0].connectAddresses "\"r6\""
+config **.s6.app[0].startTime 11s
+config **.s6.app[0].stopTime 12s
+config **.s7.app[0].connectAddresses "\"r7\""
+config **.s7.app[0].startTime 11s
+config **.s7.app[0].stopTime 12s
+config **.s8.app[0].connectAddresses "\"r8\""
+config **.s8.app[0].startTime 11s
+config **.s8.app[0].stopTime 12s
+config **.s9.app[0].connectAddresses "\"r9\""
+config **.s9.app[0].startTime 11s
+config **.s9.app[0].stopTime 12s
+config **.s10.app[0].connectAddresses "\"r10\""
+config **.s10.app[0].startTime 11s
+config **.s10.app[0].stopTime 12s
+config **.r*.numApps 1
+config **.r*.app[0].typename HiUdpApp
+config **.s*.UdpCC.typename HPCC
+config **.r*.UdpCC.typename HPCC
+config **.s*.UdpCC.linkspeed 10Gbps
+config **.s*.UdpCC.activate false
+config **.s*.UdpCC.baseRTT 60us
+config **.s*.UdpCC.expectedFlows 5
+config **.Router*.eth[*].mac.HPCC true
+config **.Router*.eth[*].usePfc true
+config **.Router*.eth[*].Hiqueue.*.XOFF 300000B
+config **.Router*.eth[*].Hiqueue.*.XON 297000B
+config **.*.mac.maxInterval 0.001s
+config **.*.mac.batchSize 50
+config **.s1.app[0].localAddress "\"s1\""
+config **.s2.app[0].localAddress "\"s2\""
+config **.s3.app[0].localAddress "\"s3\""
+config **.s4.app[0].localAddress "\"s4\""
+config **.s5.app[0].localAddress "\"s5\""
+config **.s6.app[0].localAddress "\"s6\""
+config **.s7.app[0].localAddress "\"s7\""
+config **.s8.app[0].localAddress "\"s8\""
+config **.s9.app[0].localAddress "\"s9\""
+config **.s10.app[0].localAddress "\"s10\""
+config **.r1.app[0].localAddress "\"r1\""
+config **.r2.app[0].localAddress "\"r2\""
+config **.r3.app[0].localAddress "\"r3\""
+config **.r4.app[0].localAddress "\"r4\""
+config **.r5.app[0].localAddress "\"r5\""
+config **.r6.app[0].localAddress "\"r6\""
+config **.r7.app[0].localAddress "\"r7\""
+config **.r8.app[0].localAddress "\"r8\""
+config **.r9.app[0].localAddress "\"r9\""
+config **.r10.app[0].localAddress "\"r10\""
+
+vector 0 testdumbbell.r1.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 1 testdumbbell.r1.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 2 testdumbbell.r1.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 3 testdumbbell.s1.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 4 testdumbbell.s1.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 5 testdumbbell.s1.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 6 testdumbbell.s2.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 7 testdumbbell.s2.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 8 testdumbbell.s2.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 9 testdumbbell.s3.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 10 testdumbbell.s3.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 11 testdumbbell.s3.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 12 testdumbbell.s4.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 13 testdumbbell.s4.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 14 testdumbbell.s4.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 15 testdumbbell.s5.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 16 testdumbbell.s5.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 17 testdumbbell.s5.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 18 testdumbbell.r2.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 19 testdumbbell.r2.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 20 testdumbbell.r2.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 21 testdumbbell.r3.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 22 testdumbbell.r3.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 23 testdumbbell.r3.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 24 testdumbbell.r4.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 25 testdumbbell.r4.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 26 testdumbbell.r4.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 27 testdumbbell.r5.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 28 testdumbbell.r5.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 29 testdumbbell.r5.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 30 testdumbbell.s6.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 31 testdumbbell.s6.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 32 testdumbbell.s6.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 33 testdumbbell.s7.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 34 testdumbbell.s7.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 35 testdumbbell.s7.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 36 testdumbbell.s8.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 37 testdumbbell.s8.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 38 testdumbbell.s8.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 39 testdumbbell.s9.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 40 testdumbbell.s9.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 41 testdumbbell.s9.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 42 testdumbbell.s10.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 43 testdumbbell.s10.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 44 testdumbbell.s10.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 45 testdumbbell.r6.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 46 testdumbbell.r6.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 47 testdumbbell.r6.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 48 testdumbbell.r7.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 49 testdumbbell.r7.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 50 testdumbbell.r7.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 51 testdumbbell.r8.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 52 testdumbbell.r8.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 53 testdumbbell.r8.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 54 testdumbbell.r9.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 55 testdumbbell.r9.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 56 testdumbbell.r9.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 57 testdumbbell.r10.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 58 testdumbbell.r10.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 59 testdumbbell.r10.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 60 testdumbbell.s1.app[0] packetSent:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetSent
+attr title "packets sent, packetBytes"
+vector 61 testdumbbell.s1.udp packetSent:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetSent
+attr title "packets sent, packetBytes"
+vector 62 testdumbbell.s1.ipv4.arp arpRequestSent:vector(packetBytes) ETV
+attr recordingmode vector(packetBytes)
+attr source arpRequestSent
+attr title "ARP request sent, packetBytes"
+vector 63 testdumbbell.s1.ethernet encapPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source encapPk
+attr title "packets encapsulated, packetBytes"
+vector 64 testdumbbell.s1.eth[0].Hostqueue incomingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPushStarted)
+attr title "incoming packet lengths"
+attr unit b
+vector 65 testdumbbell.s1.eth[0].Hostqueue queueingTime:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source queueingTime(packetPulled)
+attr title "queueing times"
+attr unit s
+vector 66 testdumbbell.s1.eth[0].Hostqueue outgoingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "outgoing packet lengths"
+attr unit b
+vector 67 testdumbbell.s1.eth[0].mac packetReceivedFromUpper:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetReceivedFromUpper
+attr title "packet bytes from higher layer, packetBytes"
+vector 68 testdumbbell.s1.eth[0].Hostqueue queueLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + count(packetPushStarted) - count(packetPulled) - count(packetRemoved) - count(packetDropped)))"
+attr title "queue length"
+attr unit pk
+vector 69 testdumbbell.s1.eth[0].Hostqueue queueBitLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + sum(packetLength(packetPushStarted)) - sum(packetLength(packetPulled)) - sum(packetLength(packetRemoved)) - sum(packetLength(packetDropped))))"
+attr title "queue bit length"
+attr unit b
+vector 70 testdumbbell.s1.eth[0].mac txPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetSentToLower
+attr title "packets transmitted, packetBytes"
+vector 71 testdumbbell.Router1.eth[0].mac rxPkOk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source rxPkOk
+attr title "packets received OK, packetBytes"
+vector 72 testdumbbell.Router1.eth[0].mac passedUpPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetSentToUpper
+attr title "packets passed to higher layer, packetBytes"
+vector 73 testdumbbell.Router1.ethernet decapPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source decapPk
+attr title "packets decapsulated, packetBytes"
+vector 74 testdumbbell.Router1.ipv4.arp arpReplySent:vector(packetBytes) ETV
+attr recordingmode vector(packetBytes)
+attr source arpReplySent
+attr title "ARP replies sent, packetBytes"
+vector 75 testdumbbell.Router1.ethernet encapPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source encapPk
+attr title "packets encapsulated, packetBytes"
+vector 76 testdumbbell.Router1.eth[0].Hiqueue.beQueue incomingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPushStarted)
+attr title "incoming packet lengths"
+attr unit b
+vector 77 testdumbbell.Router1.eth[0].Hiqueue.beQueue "queuelength (b)" ETV
+vector 78 testdumbbell.Router1.eth[0].Hiqueue.beQueue queueingTime:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source queueingTime(packetPulled)
+attr title "queueing times"
+attr unit s
+vector 79 testdumbbell.Router1.eth[0].Hiqueue.beQueue outgoingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "outgoing packet lengths"
+attr unit b
+vector 80 testdumbbell.Router1.eth[0].Hiqueue.WrrScheduler "bufferOccupancy (byte)" ETV
+vector 81 testdumbbell.Router1.eth[0].Hiqueue.WrrScheduler packetLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "packet lengths"
+attr unit b
+vector 82 testdumbbell.Router1.eth[0].Switchqueue incomingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPushStarted)
+attr title "incoming packet lengths"
+attr unit b
+vector 83 testdumbbell.Router1.eth[0].Switchqueue queueLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + count(packetPushStarted) - count(packetPulled) - count(packetRemoved) - count(packetDropped)))"
+attr title "queue length"
+attr unit pk
+vector 84 testdumbbell.Router1.eth[0].Switchqueue queueBitLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + sum(packetLength(packetPushStarted)) - sum(packetLength(packetPulled)) - sum(packetLength(packetRemoved)) - sum(packetLength(packetDropped))))"
+attr title "queue bit length"
+attr unit b
+vector 85 testdumbbell.Router1.eth[0].Switchqueue queueingTime:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source queueingTime(packetPulled)
+attr title "queueing times"
+attr unit s
+vector 86 testdumbbell.Router1.eth[0].Switchqueue outgoingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "outgoing packet lengths"
+attr unit b
+vector 87 testdumbbell.Router1.eth[0].mac packetReceivedFromUpper:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetReceivedFromUpper
+attr title "packet bytes from higher layer, packetBytes"
+vector 88 testdumbbell.Router1.eth[0].Hiqueue.beQueue queueLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + count(packetPushStarted) - count(packetPulled) - count(packetRemoved) - count(packetDropped)))"
+attr title "queue length"
+attr unit pk
+vector 89 testdumbbell.Router1.eth[0].Hiqueue.beQueue queueBitLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + sum(packetLength(packetPushStarted)) - sum(packetLength(packetPulled)) - sum(packetLength(packetRemoved)) - sum(packetLength(packetDropped))))"
+attr title "queue bit length"
+attr unit b
+0	24528 9 0 0 0 0 1 0 0 0 0
+1	24537 9 0 0 0 0 1 0 0 0 0
+2	24546 9 0 0 0 0 1 0 0 0 0
+3	24555 9 0 0 0 0 1 0 0 0 0
+4	24564 9 0 0 0 0 1 0 0 0 0
+5	24573 9 0 0 0 0 1 0 0 0 0
+6	24582 9 0 0 0 0 1 0 0 0 0
+7	24591 9 0 0 0 0 1 0 0 0 0
+8	24600 9 0 0 0 0 1 0 0 0 0
+9	24609 9 0 0 0 0 1 0 0 0 0
+10	24618 10 0 0 0 0 1 0 0 0 0
+11	24628 10 0 0 0 0 1 0 0 0 0
+12	24638 10 0 0 0 0 1 0 0 0 0
+13	24648 10 0 0 0 0 1 0 0 0 0
+14	24658 10 0 0 0 0 1 0 0 0 0
+15	24668 10 0 0 0 0 1 0 0 0 0
+16	24678 10 0 0 0 0 1 0 0 0 0
+17	24688 10 0 0 0 0 1 0 0 0 0
+18	24698 10 0 0 0 0 1 0 0 0 0
+19	24708 10 0 0 0 0 1 0 0 0 0
+20	24718 10 0 0 0 0 1 0 0 0 0
+21	24728 10 0 0 0 0 1 0 0 0 0
+22	24738 10 0 0 0 0 1 0 0 0 0
+23	24748 10 0 0 0 0 1 0 0 0 0
+24	24758 10 0 0 0 0 1 0 0 0 0
+25	24768 10 0 0 0 0 1 0 0 0 0
+26	24778 10 0 0 0 0 1 0 0 0 0
+27	24788 10 0 0 0 0 1 0 0 0 0
+28	24798 10 0 0 0 0 1 0 0 0 0
+29	24808 10 0 0 0 0 1 0 0 0 0
+30	24818 10 0 0 0 0 1 0 0 0 0
+31	24828 10 0 0 0 0 1 0 0 0 0
+32	24838 10 0 0 0 0 1 0 0 0 0
+33	24848 10 0 0 0 0 1 0 0 0 0
+34	24858 10 0 0 0 0 1 0 0 0 0
+35	24868 10 0 0 0 0 1 0 0 0 0
+36	24878 10 0 0 0 0 1 0 0 0 0
+37	24888 10 0 0 0 0 1 0 0 0 0
+38	24898 10 0 0 0 0 1 0 0 0 0
+39	24908 10 0 0 0 0 1 0 0 0 0
+40	24918 10 0 0 0 0 1 0 0 0 0
+41	24928 10 0 0 0 0 1 0 0 0 0
+42	24938 10 0 0 0 0 1 0 0 0 0
+43	24948 10 0 0 0 0 1 0 0 0 0
+44	24958 10 0 0 0 0 1 0 0 0 0
+45	24968 10 0 0 0 0 1 0 0 0 0
+46	24978 10 0 0 0 0 1 0 0 0 0
+47	24988 10 0 0 0 0 1 0 0 0 0
+48	24998 10 0 0 0 0 1 0 0 0 0
+49	25008 10 0 0 0 0 1 0 0 0 0
+50	25018 10 0 0 0 0 1 0 0 0 0
+51	25028 10 0 0 0 0 1 0 0 0 0
+52	25038 10 0 0 0 0 1 0 0 0 0
+53	25048 10 0 0 0 0 1 0 0 0 0
+54	25058 10 0 0 0 0 1 0 0 0 0
+55	25068 10 0 0 0 0 1 0 0 0 0
+56	25078 10 0 0 0 0 1 0 0 0 0
+57	25088 10 0 0 0 0 1 0 0 0 0
+58	25098 10 0 0 0 0 1 0 0 0 0
+59	25108 10 0 0 0 0 1 0 0 0 0
+60	25118 15 22 22 0 0 1 10000 10000 10000 100000000
+61	25133 15 23 23 0 0 1 10008 10008 10008 100160064
+62	25148 12 25 25 0 0 1 28 28 28 784
+63	25160 12 26 26 0 0 1 28 28 28 784
+64	25172 13 27 27 0 0 1 368 368 368 135424
+65	25185 11 27 27 0 0 1 0 0 0 0
+66	25196 13 27 27 0 0 1 368 368 368 135424
+67	25209 12 27 27 0 0 1 46 46 46 2116
+68	25221 11 27 27 0 0 1 0 0 0 0
+69	25232 11 27 27 0 0 1 0 0 0 0
+70	25243 23 28 28 0.0000000576 0.0000000576 1 64 64 64 4096
+71	25266 23 30 30 0.0000020576 0.0000020576 1 64 64 64 4096
+72	25289 23 30 30 0.0000020576 0.0000020576 1 64 64 64 4096
+73	25312 23 31 31 0.0000020576 0.0000020576 1 46 46 46 2116
+74	25335 23 32 32 0.0000020576 0.0000020576 1 28 28 28 784
+75	25358 23 33 33 0.0000020576 0.0000020576 1 28 28 28 784
+76	25381 24 35 35 0.0000020576 0.0000020576 1 368 368 368 135424
+77	25405 22 35 35 0.0000020576 0.0000020576 1 0 0 0 0
+78	25427 22 35 35 0.0000020576 0.0000020576 1 0 0 0 0
+79	25449 24 35 35 0.0000020576 0.0000020576 1 368 368 368 135424
+80	25473 22 35 35 0.0000020576 0.0000020576 1 0 0 0 0
+81	25495 24 35 35 0.0000020576 0.0000020576 1 368 368 368 135424
+82	25519 24 35 35 0.0000020576 0.0000020576 1 368 368 368 135424
+83	25543 44 35 35 0.0000020576 0.0000020576 2 0 1 1 1
+84	25587 46 35 35 0.0000020576 0.0000020576 2 0 368 368 135424
+85	25633 22 35 35 0.0000020576 0.0000020576 1 0 0 0 0
+86	25655 24 35 35 0.0000020576 0.0000020576 1 368 368 368 135424
+87	25679 23 35 35 0.0000020576 0.0000020576 1 46 46 46 2116
+88	25702 22 35 35 0.0000020576 0.0000020576 1 0 0 0 0
+89	25724 22 35 35 0.0000020576 0.0000020576 1 0 0 0 0
+vector 90 testdumbbell.Router1.eth[0].mac txPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetSentToLower
+attr title "packets transmitted, packetBytes"
+vector 91 testdumbbell.s1.eth[0].mac rxPkOk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source rxPkOk
+attr title "packets received OK, packetBytes"
+vector 92 testdumbbell.s1.eth[0].mac passedUpPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetSentToUpper
+attr title "packets passed to higher layer, packetBytes"
+vector 93 testdumbbell.s1.ethernet decapPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source decapPk
+attr title "packets decapsulated, packetBytes"
+vector 94 testdumbbell.Router1.ipv4.arp arpRequestSent:vector(packetBytes) ETV
+attr recordingmode vector(packetBytes)
+attr source arpRequestSent
+attr title "ARP request sent, packetBytes"
+vector 95 testdumbbell.Router1.eth[10].Hiqueue.beQueue incomingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPushStarted)
+attr title "incoming packet lengths"
+attr unit b
+vector 96 testdumbbell.Router1.eth[10].Hiqueue.beQueue "queuelength (b)" ETV
+vector 97 testdumbbell.Router1.eth[10].Hiqueue.beQueue queueingTime:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source queueingTime(packetPulled)
+attr title "queueing times"
+attr unit s
+vector 98 testdumbbell.Router1.eth[10].Hiqueue.beQueue outgoingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "outgoing packet lengths"
+attr unit b
+vector 99 testdumbbell.Router1.eth[10].Hiqueue.WrrScheduler "bufferOccupancy (byte)" ETV
+vector 100 testdumbbell.Router1.eth[10].Hiqueue.WrrScheduler packetLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "packet lengths"
+attr unit b
+vector 101 testdumbbell.Router1.eth[10].Switchqueue incomingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPushStarted)
+attr title "incoming packet lengths"
+attr unit b
+vector 102 testdumbbell.Router1.eth[10].Switchqueue queueLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + count(packetPushStarted) - count(packetPulled) - count(packetRemoved) - count(packetDropped)))"
+attr title "queue length"
+attr unit pk
+vector 103 testdumbbell.Router1.eth[10].Switchqueue queueBitLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + sum(packetLength(packetPushStarted)) - sum(packetLength(packetPulled)) - sum(packetLength(packetRemoved)) - sum(packetLength(packetDropped))))"
+attr title "queue bit length"
+attr unit b
+vector 104 testdumbbell.Router1.eth[10].Switchqueue queueingTime:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source queueingTime(packetPulled)
+attr title "queueing times"
+attr unit s
+vector 105 testdumbbell.Router1.eth[10].Switchqueue outgoingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "outgoing packet lengths"
+attr unit b
+vector 106 testdumbbell.Router1.eth[10].mac packetReceivedFromUpper:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetReceivedFromUpper
+attr title "packet bytes from higher layer, packetBytes"
+vector 107 testdumbbell.Router1.eth[10].Hiqueue.beQueue queueLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + count(packetPushStarted) - count(packetPulled) - count(packetRemoved) - count(packetDropped)))"
+attr title "queue length"
+attr unit pk
+vector 108 testdumbbell.Router1.eth[10].Hiqueue.beQueue queueBitLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + sum(packetLength(packetPushStarted)) - sum(packetLength(packetPulled)) - sum(packetLength(packetRemoved)) - sum(packetLength(packetDropped))))"
+attr title "queue bit length"
+attr unit b
+vector 109 testdumbbell.Router1.eth[10].mac txPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetSentToLower
+attr title "packets transmitted, packetBytes"
+vector 110 testdumbbell.Router2.eth[10].mac rxPkOk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source rxPkOk
+attr title "packets received OK, packetBytes"
+vector 111 testdumbbell.Router2.eth[10].mac passedUpPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetSentToUpper
+attr title "packets passed to higher layer, packetBytes"
+vector 112 testdumbbell.Router2.ethernet decapPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source decapPk
+attr title "packets decapsulated, packetBytes"
+vector 113 testdumbbell.Router2.ipv4.arp arpReplySent:vector(packetBytes) ETV
+attr recordingmode vector(packetBytes)
+attr source arpReplySent
+attr title "ARP replies sent, packetBytes"
+vector 114 testdumbbell.Router2.ethernet encapPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source encapPk
+attr title "packets encapsulated, packetBytes"
+vector 115 testdumbbell.Router2.eth[10].Hiqueue.beQueue incomingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPushStarted)
+attr title "incoming packet lengths"
+attr unit b
+vector 116 testdumbbell.Router2.eth[10].Hiqueue.beQueue "queuelength (b)" ETV
+vector 117 testdumbbell.Router2.eth[10].Hiqueue.beQueue queueingTime:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source queueingTime(packetPulled)
+attr title "queueing times"
+attr unit s
+vector 118 testdumbbell.Router2.eth[10].Hiqueue.beQueue outgoingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "outgoing packet lengths"
+attr unit b
+vector 119 testdumbbell.Router2.eth[10].Hiqueue.WrrScheduler "bufferOccupancy (byte)" ETV
+vector 120 testdumbbell.Router2.eth[10].Hiqueue.WrrScheduler packetLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "packet lengths"
+attr unit b
+vector 121 testdumbbell.Router2.eth[10].Switchqueue incomingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPushStarted)
+attr title "incoming packet lengths"
+attr unit b
+vector 122 testdumbbell.Router2.eth[10].Switchqueue queueLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + count(packetPushStarted) - count(packetPulled) - count(packetRemoved) - count(packetDropped)))"
+attr title "queue length"
+attr unit pk
+vector 123 testdumbbell.Router2.eth[10].Switchqueue queueBitLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + sum(packetLength(packetPushStarted)) - sum(packetLength(packetPulled)) - sum(packetLength(packetRemoved)) - sum(packetLength(packetDropped))))"
+attr title "queue bit length"
+attr unit b
+vector 124 testdumbbell.Router2.eth[10].Switchqueue queueingTime:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source queueingTime(packetPulled)
+attr title "queueing times"
+attr unit s
+vector 125 testdumbbell.Router2.eth[10].Switchqueue outgoingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "outgoing packet lengths"
+attr unit b
+vector 126 testdumbbell.Router2.eth[10].mac packetReceivedFromUpper:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetReceivedFromUpper
+attr title "packet bytes from higher layer, packetBytes"
+vector 127 testdumbbell.Router2.eth[10].Hiqueue.beQueue queueLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + count(packetPushStarted) - count(packetPulled) - count(packetRemoved) - count(packetDropped)))"
+attr title "queue length"
+attr unit pk
+vector 128 testdumbbell.Router2.eth[10].Hiqueue.beQueue queueBitLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + sum(packetLength(packetPushStarted)) - sum(packetLength(packetPulled)) - sum(packetLength(packetRemoved)) - sum(packetLength(packetDropped))))"
+attr title "queue bit length"
+attr unit b
+vector 129 testdumbbell.Router2.eth[10].mac txPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetSentToLower
+attr title "packets transmitted, packetBytes"
+vector 130 testdumbbell.Router1.eth[10].mac rxPkOk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source rxPkOk
+attr title "packets received OK, packetBytes"
+vector 131 testdumbbell.Router1.eth[10].mac passedUpPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetSentToUpper
+attr title "packets passed to higher layer, packetBytes"
+vector 132 testdumbbell.Router1.eth[10].Hiqueue.Priority_0 incomingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPushStarted)
+attr title "incoming packet lengths"
+attr unit b
+vector 133 testdumbbell.Router1.eth[10].Hiqueue.Priority_0 "queuelength (b)" ETV
+vector 134 testdumbbell.Router1.eth[10].Hiqueue.Priority_0 queueingTime:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source queueingTime(packetPulled)
+attr title "queueing times"
+attr unit s
+vector 135 testdumbbell.Router1.eth[10].Hiqueue.Priority_0 outgoingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "outgoing packet lengths"
+attr unit b
+vector 136 testdumbbell.Router1.eth[10].Hiqueue.PriorityScheduler packetLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "packet lengths"
+attr unit b
+vector 137 testdumbbell.Router1.eth[10].Hiqueue.Priority_0 queueLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + count(packetPushStarted) - count(packetPulled) - count(packetRemoved) - count(packetDropped)))"
+attr title "queue length"
+attr unit pk
+vector 138 testdumbbell.Router1.eth[10].Hiqueue.Priority_0 queueBitLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + sum(packetLength(packetPushStarted)) - sum(packetLength(packetPulled)) - sum(packetLength(packetRemoved)) - sum(packetLength(packetDropped))))"
+attr title "queue bit length"
+attr unit b
+vector 139 testdumbbell.Router2.ipv4.arp arpRequestSent:vector(packetBytes) ETV
+attr recordingmode vector(packetBytes)
+attr source arpRequestSent
+attr title "ARP request sent, packetBytes"
+vector 140 testdumbbell.Router2.eth[0].Hiqueue.beQueue incomingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPushStarted)
+attr title "incoming packet lengths"
+attr unit b
+vector 141 testdumbbell.Router2.eth[0].Hiqueue.beQueue "queuelength (b)" ETV
+vector 142 testdumbbell.Router2.eth[0].Hiqueue.beQueue queueingTime:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source queueingTime(packetPulled)
+attr title "queueing times"
+attr unit s
+vector 143 testdumbbell.Router2.eth[0].Hiqueue.beQueue outgoingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "outgoing packet lengths"
+attr unit b
+vector 144 testdumbbell.Router2.eth[0].Hiqueue.WrrScheduler "bufferOccupancy (byte)" ETV
+vector 145 testdumbbell.Router2.eth[0].Hiqueue.WrrScheduler packetLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "packet lengths"
+attr unit b
+vector 146 testdumbbell.Router2.eth[0].Switchqueue incomingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPushStarted)
+attr title "incoming packet lengths"
+attr unit b
+vector 147 testdumbbell.Router2.eth[0].Switchqueue queueLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + count(packetPushStarted) - count(packetPulled) - count(packetRemoved) - count(packetDropped)))"
+attr title "queue length"
+attr unit pk
+vector 148 testdumbbell.Router2.eth[0].Switchqueue queueBitLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + sum(packetLength(packetPushStarted)) - sum(packetLength(packetPulled)) - sum(packetLength(packetRemoved)) - sum(packetLength(packetDropped))))"
+attr title "queue bit length"
+attr unit b
+vector 149 testdumbbell.Router2.eth[0].Switchqueue queueingTime:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source queueingTime(packetPulled)
+attr title "queueing times"
+attr unit s
+vector 150 testdumbbell.Router2.eth[0].Switchqueue outgoingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "outgoing packet lengths"
+attr unit b
+vector 151 testdumbbell.Router2.eth[0].mac packetReceivedFromUpper:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetReceivedFromUpper
+attr title "packet bytes from higher layer, packetBytes"
+vector 152 testdumbbell.Router2.eth[0].Hiqueue.beQueue queueLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + count(packetPushStarted) - count(packetPulled) - count(packetRemoved) - count(packetDropped)))"
+attr title "queue length"
+attr unit pk
+vector 153 testdumbbell.Router2.eth[0].Hiqueue.beQueue queueBitLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + sum(packetLength(packetPushStarted)) - sum(packetLength(packetPulled)) - sum(packetLength(packetRemoved)) - sum(packetLength(packetDropped))))"
+attr title "queue bit length"
+attr unit b
+vector 154 testdumbbell.Router2.eth[0].mac txPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetSentToLower
+attr title "packets transmitted, packetBytes"
+vector 155 testdumbbell.r1.eth[0].mac rxPkOk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source rxPkOk
+attr title "packets received OK, packetBytes"
+vector 156 testdumbbell.r1.eth[0].mac passedUpPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetSentToUpper
+attr title "packets passed to higher layer, packetBytes"
+vector 157 testdumbbell.r1.ethernet decapPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source decapPk
+attr title "packets decapsulated, packetBytes"
+vector 158 testdumbbell.r1.ipv4.arp arpReplySent:vector(packetBytes) ETV
+attr recordingmode vector(packetBytes)
+attr source arpReplySent
+attr title "ARP replies sent, packetBytes"
+vector 159 testdumbbell.r1.ethernet encapPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source encapPk
+attr title "packets encapsulated, packetBytes"
+vector 160 testdumbbell.r1.eth[0].Hostqueue incomingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPushStarted)
+attr title "incoming packet lengths"
+attr unit b
+vector 161 testdumbbell.r1.eth[0].Hostqueue queueingTime:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source queueingTime(packetPulled)
+attr title "queueing times"
+attr unit s
+vector 162 testdumbbell.r1.eth[0].Hostqueue outgoingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "outgoing packet lengths"
+attr unit b
+vector 163 testdumbbell.r1.eth[0].mac packetReceivedFromUpper:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetReceivedFromUpper
+attr title "packet bytes from higher layer, packetBytes"
+vector 164 testdumbbell.r1.eth[0].Hostqueue queueLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + count(packetPushStarted) - count(packetPulled) - count(packetRemoved) - count(packetDropped)))"
+attr title "queue length"
+attr unit pk
+vector 165 testdumbbell.r1.eth[0].Hostqueue queueBitLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + sum(packetLength(packetPushStarted)) - sum(packetLength(packetPulled)) - sum(packetLength(packetRemoved)) - sum(packetLength(packetDropped))))"
+attr title "queue bit length"
+attr unit b
+vector 166 testdumbbell.r1.eth[0].mac txPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetSentToLower
+attr title "packets transmitted, packetBytes"
+vector 167 testdumbbell.Router2.eth[0].mac rxPkOk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source rxPkOk
+attr title "packets received OK, packetBytes"
+vector 168 testdumbbell.Router2.eth[0].mac passedUpPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetSentToUpper
+attr title "packets passed to higher layer, packetBytes"
+vector 169 testdumbbell.Router2.eth[0].Hiqueue.Priority_0 incomingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPushStarted)
+attr title "incoming packet lengths"
+attr unit b
+vector 170 testdumbbell.Router2.eth[0].Hiqueue.Priority_0 "queuelength (b)" ETV
+vector 171 testdumbbell.Router2.eth[0].Hiqueue.Priority_0 queueingTime:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source queueingTime(packetPulled)
+attr title "queueing times"
+attr unit s
+vector 172 testdumbbell.Router2.eth[0].Hiqueue.Priority_0 outgoingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "outgoing packet lengths"
+attr unit b
+vector 173 testdumbbell.Router2.eth[0].Hiqueue.PriorityScheduler packetLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "packet lengths"
+attr unit b
+vector 174 testdumbbell.Router2.eth[0].Hiqueue.Priority_0 queueLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + count(packetPushStarted) - count(packetPulled) - count(packetRemoved) - count(packetDropped)))"
+attr title "queue length"
+attr unit pk
+vector 175 testdumbbell.Router2.eth[0].Hiqueue.Priority_0 queueBitLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + sum(packetLength(packetPushStarted)) - sum(packetLength(packetPulled)) - sum(packetLength(packetRemoved)) - sum(packetLength(packetDropped))))"
+attr title "queue bit length"
+attr unit b
+63	46937 175 41 47 0.0000041152 0.0000041152 7 1148 1500 10148 14817904
+64	47112 181 48 54 0.0000041152 0.0000041152 7 9328 12144 82192 971872000
+65	47293 207 48 106 0.0000041152 0.0000114976 7 0 7.3824e-06 2.58384e-05 1.3776345856e-10
+66	47500 181 48 106 0.0000041152 0.0000114976 7 9328 12144 82192 971872000
+67	47681 175 48 106 0.0000041152 0.0000114976 7 1166 1518 10274 15185500
+68	47856 286 48 106 0.0000041152 0.0000114976 13 0 6 36 146
+69	48142 329 48 106 0.0000041152 0.0000114976 13 0 70048 420288 20142887424
+70	48471 175 55 113 0.000005336 0.0000124368 7 1166 1518 10274 15185500
+71	48646 176 59 125 0.000007336 0.0000144368 7 1166 1518 10274 15185500
+72	48822 176 59 125 0.000007336 0.0000144368 7 1166 1518 10274 15185500
+73	48998 199 60 126 0.000007336 0.0000144368 8 46 1500 10194 14820020
+75	49197 199 62 128 0.000007336 0.0000144368 8 28 1500 10176 14818688
+90	49396 23 36 36 0.0000021152 0.0000021152 1 64 64 64 4096
+91	49419 23 38 38 0.0000041152 0.0000041152 1 64 64 64 4096
+92	49442 23 38 38 0.0000041152 0.0000041152 1 64 64 64 4096
+93	49465 23 39 39 0.0000041152 0.0000041152 1 46 46 46 2116
+94	49488 22 61 61 0.000007336 0.000007336 1 28 28 28 784
+95	49510 23 64 64 0.000007336 0.000007336 1 368 368 368 135424
+96	49533 21 64 64 0.000007336 0.000007336 1 0 0 0 0
+97	49554 21 64 64 0.000007336 0.000007336 1 0 0 0 0
+98	49575 23 64 64 0.000007336 0.000007336 1 368 368 368 135424
+99	49598 196 64 177 0.000007336 0.0000188336 8 0 4554 17160 67698048
+100	49794 218 64 177 0.000007336 0.0000188336 8 368 12144 82560 972007424
+101	50012 218 64 177 0.000007336 0.0000188336 8 368 12144 82560 972007424
+102	50230 378 64 177 0.000007336 0.0000188336 16 0 1 8 8
+103	50608 407 64 177 0.000007336 0.0000188336 16 0 12144 82560 972007424
+104	51015 189 64 177 0.000007336 0.0000188336 8 0 0 0 0
+105	51204 218 64 177 0.000007336 0.0000188336 8 368 12144 82560 972007424
+106	51422 211 64 177 0.000007336 0.0000188336 8 46 1518 10320 15187616
+107	51633 22 64 64 0.000007336 0.000007336 1 0 0 0 0
+108	51655 22 64 64 0.000007336 0.000007336 1 0 0 0 0
+109	51677 211 65 184 0.0000073936 0.0000197728 8 64 1518 10338 15189596
+110	51888 211 74 196 0.0000093936 0.0000217728 8 64 1518 10338 15189596
+111	52099 211 74 196 0.0000093936 0.0000217728 8 64 1518 10338 15189596
+112	52310 236 75 197 0.0000093936 0.0000217728 9 46 1500 10240 14822136
+113	52546 24 76 76 0.0000093936 0.0000093936 1 28 28 28 784
+114	52570 236 77 199 0.0000093936 0.0000217728 9 28 1500 10204 14819472
+115	52806 25 79 79 0.0000093936 0.0000093936 1 368 368 368 135424
+116	52831 23 79 79 0.0000093936 0.0000093936 1 0 0 0 0
+117	52854 23 79 79 0.0000093936 0.0000093936 1 0 0 0 0
+118	52877 25 79 79 0.0000093936 0.0000093936 1 368 368 368 135424
+119	52902 23 79 79 0.0000093936 0.0000093936 1 0 0 0 0
+120	52925 25 79 79 0.0000093936 0.0000093936 1 368 368 368 135424
+121	52950 25 79 79 0.0000093936 0.0000093936 1 368 368 368 135424
+122	52975 46 79 79 0.0000093936 0.0000093936 2 0 1 1 1
+123	53021 48 79 79 0.0000093936 0.0000093936 2 0 368 368 135424
+124	53069 23 79 79 0.0000093936 0.0000093936 1 0 0 0 0
+125	53092 25 79 79 0.0000093936 0.0000093936 1 368 368 368 135424
+126	53117 24 79 79 0.0000093936 0.0000093936 1 46 46 46 2116
+127	53141 23 79 79 0.0000093936 0.0000093936 1 0 0 0 0
+128	53164 23 79 79 0.0000093936 0.0000093936 1 0 0 0 0
+129	53187 24 80 80 0.0000094512 0.0000094512 1 64 64 64 4096
+130	53211 24 90 90 0.0000114512 0.0000114512 1 64 64 64 4096
+131	53235 24 90 90 0.0000114512 0.0000114512 1 64 64 64 4096
+132	53259 194 101 130 0.0000114512 0.0000144368 7 9328 12144 82192 971872000
+133	53453 186 101 177 0.0000114512 0.0000188336 7 0 36432 137280 4332675072
+134	53639 221 101 177 0.0000114512 0.0000188336 7 0 4.3968e-06 2.00096e-05 7.439597056e-11
+135	53860 194 101 177 0.0000114512 0.0000188336 7 9328 12144 82192 971872000
+136	54054 194 101 177 0.0000114512 0.0000188336 7 9328 12144 82192 971872000
+137	54248 310 101 177 0.0000114512 0.0000188336 13 0 4 30 94
+138	54558 353 101 177 0.0000114512 0.0000188336 13 0 48576 353056 13210582528
+139	54911 24 133 133 0.000014672 0.000014672 1 28 28 28 784
+140	54935 25 136 136 0.000014672 0.000014672 1 368 368 368 135424
+141	54960 23 136 136 0.000014672 0.000014672 1 0 0 0 0
+142	54983 23 136 136 0.000014672 0.000014672 1 0 0 0 0
+143	55006 25 136 136 0.000014672 0.000014672 1 368 368 368 135424
+144	55031 181 136 216 0.000014672 0.0000249392 7 0 4554 17160 67698048
+145	55212 192 136 216 0.000014672 0.0000249392 7 368 12144 73232 884995840
+146	55404 192 136 216 0.000014672 0.0000249392 7 368 12144 73232 884995840
+147	55596 332 136 216 0.000014672 0.0000249392 14 0 1 7 7
+148	55928 358 136 216 0.000014672 0.0000249392 14 0 12144 73232 884995840
+149	56286 166 136 216 0.000014672 0.0000249392 7 0 0 0 0
+150	56452 192 136 216 0.000014672 0.0000249392 7 368 12144 73232 884995840
+151	56644 185 136 216 0.000014672 0.0000249392 7 46 1518 9154 13828060
+152	56829 23 136 136 0.000014672 0.000014672 1 0 0 0 0
+153	56852 23 136 136 0.000014672 0.000014672 1 0 0 0 0
+154	56875 159 137 215 0.0000147296 0.0000249296 6 64 1518 7654 11525716
+155	57034 105 146 212 0.0000167296 0.0000244688 4 64 1518 4618 6917068
+156	57139 105 146 212 0.0000167296 0.0000244688 4 64 1518 4618 6917068
+157	57244 105 147 213 0.0000167296 0.0000244688 4 46 1500 4546 6752116
+158	57349 25 148 148 0.0000167296 0.0000167296 1 28 28 28 784
+159	57374 25 149 149 0.0000167296 0.0000167296 1 28 28 28 784
+160	57399 26 150 150 0.0000167296 0.0000167296 1 368 368 368 135424
+161	57425 24 150 150 0.0000167296 0.0000167296 1 0 0 0 0
+162	57449 26 150 150 0.0000167296 0.0000167296 1 368 368 368 135424
+163	57475 25 150 150 0.0000167296 0.0000167296 1 46 46 46 2116
+164	57500 24 150 150 0.0000167296 0.0000167296 1 0 0 0 0
+165	57524 24 150 150 0.0000167296 0.0000167296 1 0 0 0 0
+166	57548 25 151 151 0.0000167872 0.0000167872 1 64 64 64 4096
+167	57573 25 161 161 0.0000187872 0.0000187872 1 64 64 64 4096
+168	57598 25 161 161 0.0000187872 0.0000187872 1 64 64 64 4096
+169	57623 194 172 201 0.0000187872 0.0000217728 7 9328 12144 82192 971872000
+170	57817 162 172 216 0.0000187872 0.0000249392 6 0 36432 137280 4332675072
+171	57979 188 172 216 0.0000187872 0.0000249392 6 0 4.1152e-06 1.56128e-05 5.506412032e-11
+172	58167 167 172 216 0.0000187872 0.0000249392 6 12144 12144 72864 884860416
+173	58334 167 172 216 0.0000187872 0.0000249392 6 12144 12144 72864 884860416
+174	58501 286 172 216 0.0000187872 0.0000249392 12 0 4 30 94
+175	58787 329 172 216 0.0000187872 0.0000249392 12 0 48576 353056 13210582528
+

@@ -21,6 +21,7 @@ void XPASS::initialize()
     downGate = gate("upperIn");
     // configuration
     activate = par("activate");
+    max_pck_size = par("max_pck_size");
     linkspeed = par("linkspeed");
     targetratio = par("targetratio");
     initialrate = par("initialrate");
@@ -28,7 +29,6 @@ void XPASS::initialize()
     currate = maxrate*initialrate;//initial sending rate
     wmax = par("wmax");
     wmin = par("wmin");
-    rate_control = par("ratecontrol");
     // for ecn based control;
     rtt_beta=par("rtt_beta");
     thigh=par("thigh");
@@ -51,13 +51,8 @@ void XPASS::initialize()
     ByteCounter_th=10000000;
     targetecnratio=0;
     credit_size = 672;
-    max_pck_size = 1480;
     max_idletime = 0.00002;
 
-    if (!rate_control)
-    {
-        currate = maxrate;
-    }
 }
 
 void XPASS::handleMessage(cMessage *msg)
@@ -272,8 +267,8 @@ void XPASS::send_credit(L3Address destaddr)
         TimerMsg *sendcredit=new TimerMsg("sendcredit");
         sendcredit->setKind(SENDCRED);
         sendcredit->setDestAddr(destaddr);
-        scheduleAt(simTime() + (long)((credit_size+jitter_bytes*8)/rcvflow.current_speed),sendcredit);
-        EV<<"next time = "<<simTime() + (credit_size+jitter_bytes*8)/rcvflow.current_speed<<"s"<<endl;
+        scheduleAt(simTime() + (simtime_t)((credit_size+jitter_bytes*8)/rcvflow.current_speed),sendcredit);
+        EV<<"currate = "<<rcvflow.current_speed<<", next time = "<<simTime() + (credit_size+jitter_bytes*8)/rcvflow.current_speed<<"s"<<endl;
     }
 }
 

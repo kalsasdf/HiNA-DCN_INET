@@ -23,7 +23,7 @@ simple XPASS like UdpCC
     parameters:
         bool activate = default(true);
         double linkspeed @unit(bps) = default (1Gbps);
-        bool ratecontrol = default(true);
+        int max_pck_size = default(1472);
         double wmax=default(0.5);
         double wmin=default(0.01);
         double initialrate=default(1/16);

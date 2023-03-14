@@ -50,7 +50,6 @@ class XPASS : public cSimpleModule
     int credit_size;
     double targetratio;
     double wmax;
-    bool rate_control;
     uint64_t max_pck_size;
     double maxrate;
     double currate;
@@ -183,175 +182,162 @@ class XPASS : public cSimpleModule
 
     virtual receiver_flowinfo feedback_control(receiver_flowinfo tinfo)
     {
-        if (rate_control)
+
+        double nowrate = tinfo.current_speed;
+        int sumlost = tinfo.sumlost;
+        int sumcredits = tinfo.pck_in_rtt+tinfo.sumlost;
+        double w = tinfo.omega;
+        double lossratio = double(sumlost)/double(sumcredits);
+        if (lossratio<0||lossratio>1)
         {
-            double nowrate = tinfo.current_speed;
-            int sumlost = tinfo.sumlost;
-            int sumcredits = tinfo.pck_in_rtt+tinfo.sumlost;
-            double w = tinfo.omega;
-            double lossratio = double(sumlost)/double(sumcredits);
-            if (lossratio<0||lossratio>1)
+            lossratio = 1;
+        }
+        EV << "feedback_control(), sumlost = "<< sumlost << ", sumcredits = "<< sumcredits<<endl;
+        EV << "feedback_control(), loss ratio = "<< lossratio <<endl;
+        if(lossratio<=targetratio)
+        {
+            if(tinfo.previousincrease)
             {
-                lossratio = 1;
+                w = (w+wmax)/2;
             }
-            EV << "feedback_control(), sumlost = "<< sumlost << ", sumcredits = "<< sumcredits<<endl;
-            EV << "feedback_control(), loss ratio = "<< lossratio <<endl;
-            if(lossratio<=targetratio)
-            {
-                if(tinfo.previousincrease)
-                {
-                    w = (w+wmax)/2;
-                }
-                nowrate = (1-w)*nowrate + w*maxrate*(1+targetratio);
-                tinfo.previousincrease = true;
-            }
-            else
-            {
-                nowrate = nowrate*(1-lossratio)*(1+targetratio);
-                if (w/2>wmin)
-                    w = w/2;
-                else
-                    w = wmin;
-                tinfo.previousincrease = false;
-            }
-            tinfo.omega = w;
-            nowrate = (nowrate>maxrate) ? maxrate : nowrate;
-            tinfo.current_speed = nowrate;
-            EV<<"now speed = "<<nowrate<<endl;
-            return tinfo;
+            nowrate = (1-w)*nowrate + w*maxrate*(1+targetratio);
+            tinfo.previousincrease = true;
         }
         else
         {
-            tinfo.current_speed = maxrate;
-            return tinfo;
+            nowrate = nowrate*(1-lossratio)*(1+targetratio);
+            if (w/2>wmin)
+                w = w/2;
+            else
+                w = wmin;
+            tinfo.previousincrease = false;
         }
+        tinfo.omega = w;
+        nowrate = (nowrate>maxrate) ? maxrate : nowrate;
+        tinfo.current_speed = nowrate;
+        EV<<"now speed = "<<nowrate<<endl;
+        return tinfo;
     };
 
     virtual receiver_flowinfo ecnbased_control(receiver_flowinfo tinfo)
     {
-        if(rate_control){
-                double w = tinfo.omega;
-                double oldspeed=tinfo.current_speed;
-                double nowrate = tinfo.current_speed;
-                int sumlost = tinfo.sumlost;
-                int sumcredits = tinfo.pck_in_rtt+tinfo.sumlost;
-                double ECN_a=tinfo.alpha;
+        double w = tinfo.omega;
+        double oldspeed=tinfo.current_speed;
+        double nowrate = tinfo.current_speed;
+        int sumlost = tinfo.sumlost;
+        int sumcredits = tinfo.pck_in_rtt+tinfo.sumlost;
+        double ECN_a=tinfo.alpha;
 //                double MODEFLAG=tinfo.modeflag;
-                double g=gamma;
-                double lossratio = double(sumlost)/double(sumcredits);
-                double ecnratio = double(tinfo.ecn_in_rtt)/double(tinfo.pck_in_rtt);
-                EV<<"lossratio="<<lossratio<<", sumlost = "<<sumlost<<", sumcredits = "<<sumcredits<<endl;
-                if (lossratio<0||lossratio>1) lossratio = 1;
-                EV << "feedback_control(), nowRTT = "<< tinfo.nowRTT <<",gradient="<<tinfo.normalized_gradient<< ", ecnratio = "<< ecnratio<<",loss ratio="<<lossratio<<endl;
-                EV<<"------------------------------"<<endl;
-                EV<<"ecn functioning.old ECN_a="<<ECN_a<<",old speed="<<nowrate<<endl;
-                if(ecnratio>targetecnratio){
+        double g=gamma;
+        double lossratio = double(sumlost)/double(sumcredits);
+        double ecnratio = double(tinfo.ecn_in_rtt)/double(tinfo.pck_in_rtt);
+        EV<<"lossratio="<<lossratio<<", sumlost = "<<sumlost<<", sumcredits = "<<sumcredits<<endl;
+        if (lossratio<0||lossratio>1) lossratio = 1;
+        EV << "feedback_control(), nowRTT = "<< tinfo.nowRTT <<",gradient="<<tinfo.normalized_gradient<< ", ecnratio = "<< ecnratio<<",loss ratio="<<lossratio<<endl;
+        EV<<"------------------------------"<<endl;
+        EV<<"ecn functioning.old ECN_a="<<ECN_a<<",old speed="<<nowrate<<endl;
+        if(ecnratio>targetecnratio){
 
-                   /* ECN_a=(1-g)*ECN_a+g*ecnratio;
-                    nowrate=nowrate*(1-(targetecnratio+ECN_a)/2);
-                    MODEFLAG=0;
-                    EV<<"after ecn decreasing,new ECN_a="<<ECN_a<<",new speed="<<nowrate<<endl;*/
+           /* ECN_a=(1-g)*ECN_a+g*ecnratio;
+            nowrate=nowrate*(1-(targetecnratio+ECN_a)/2);
+            MODEFLAG=0;
+            EV<<"after ecn decreasing,new ECN_a="<<ECN_a<<",new speed="<<nowrate<<endl;*/
 
-                    ECN_a=(1-g)*ECN_a+g*ecnratio;
-                    nowrate=nowrate*(1-(targetecnratio+ECN_a)/2);
-                    tinfo.alpha=ECN_a;
-                    tinfo.ByteCounter=0;
-                    tinfo.LastRateTimer=0;
-                    tinfo.ByteFrSteps=0;
-                    tinfo.TimeFrSteps=0;
-                    tinfo.LastAlphaTimer=0;
-                    tinfo.iRhai=0;
-                    EV<<"after ecn decreasing,new ECN_a="<<ECN_a<<",new speed="<<nowrate<<endl;
-                    cancelEvent(tinfo.alphaTimer);
-                    cancelEvent(tinfo.rateTimer);
-                    // update alpha
-                    scheduleAt(simTime()+nowRTT+0.000005,tinfo.alphaTimer);
-                    // schedule to rate increase event
-                    scheduleAt(simTime()+nowRTT+0.000005,tinfo.rateTimer);
+            ECN_a=(1-g)*ECN_a+g*ecnratio;
+            nowrate=nowrate*(1-(targetecnratio+ECN_a)/2);
+            tinfo.alpha=ECN_a;
+            tinfo.ByteCounter=0;
+            tinfo.LastRateTimer=0;
+            tinfo.ByteFrSteps=0;
+            tinfo.TimeFrSteps=0;
+            tinfo.LastAlphaTimer=0;
+            tinfo.iRhai=0;
+            EV<<"after ecn decreasing,new ECN_a="<<ECN_a<<",new speed="<<nowrate<<endl;
+            cancelEvent(tinfo.alphaTimer);
+            cancelEvent(tinfo.rateTimer);
+            // update alpha
+            scheduleAt(simTime()+nowRTT+0.000005,tinfo.alphaTimer);
+            // schedule to rate increase event
+            scheduleAt(simTime()+nowRTT+0.000005,tinfo.rateTimer);
 
 
+        }
+        else{
+           /* if(MODEFLAG<=3){
+                ECN_a=(1-g)*ECN_a+g*ecnratio;
+                nowrate=nowrate*(1+(targetecnratio+ECN_a)/2);
+                MODEFLAG++;
+                EV<<"after ecn increasing,new ECN_a="<<ECN_a<<",new speed="<<nowrate<<",MODEFLAG="<<MODEFLAG<<endl;
+            }
+            else{
+                w = (w+wmax)/2;
+                nowrate = (1-w)*nowrate + w*maxrate*(1+targetratio);
+                EV<<"after xpass increasing,new speed="<<nowrate<<endl;
+            }*/
+        }
+        EV<<"------------------------------"<<endl;
+    if(useRTT){
+        EV<<"------------------------------"<<endl;
+        EV<<"rtt functioning.old lossratio="<<lossratio<<",old speed="<<nowrate<<endl;
+
+        if(tinfo.nowRTT<tlow){
+            EV<<"rtt is too low."<<endl;
+            lossratio=0;
+        }else{
+            if(tinfo.nowRTT>thigh){
+                EV<<"rtt is too high."<<endl;
+                nowrate=nowrate*(1-rtt_beta*(1-thigh/tinfo.nowRTT));
+            }
+            else{
+                if(tinfo.normalized_gradient>0){
+                    EV<<"Gradient > 0."<<endl;
+                    nowrate=nowrate*(1-rtt_beta*tinfo.normalized_gradient);
                 }
                 else{
-                   /* if(MODEFLAG<=3){
-                        ECN_a=(1-g)*ECN_a+g*ecnratio;
-                        nowrate=nowrate*(1+(targetecnratio+ECN_a)/2);
-                        MODEFLAG++;
-                        EV<<"after ecn increasing,new ECN_a="<<ECN_a<<",new speed="<<nowrate<<",MODEFLAG="<<MODEFLAG<<endl;
-                    }
-                    else{
-                        w = (w+wmax)/2;
-                        nowrate = (1-w)*nowrate + w*maxrate*(1+targetratio);
-                        EV<<"after xpass increasing,new speed="<<nowrate<<endl;
-                    }*/
-                }
-                EV<<"------------------------------"<<endl;
-            if(useRTT){
-                EV<<"------------------------------"<<endl;
-                EV<<"rtt functioning.old lossratio="<<lossratio<<",old speed="<<nowrate<<endl;
-
-                if(tinfo.nowRTT<tlow){
-                    EV<<"rtt is too low."<<endl;
+                    EV<<"Gradient <= 0."<<endl;
                     lossratio=0;
-                }else{
-                    if(tinfo.nowRTT>thigh){
-                        EV<<"rtt is too high."<<endl;
-                        nowrate=nowrate*(1-rtt_beta*(1-thigh/tinfo.nowRTT));
-                    }
-                    else{
-                        if(tinfo.normalized_gradient>0){
-                            EV<<"Gradient > 0."<<endl;
-                            nowrate=nowrate*(1-rtt_beta*tinfo.normalized_gradient);
-                        }
-                        else{
-                            EV<<"Gradient <= 0."<<endl;
-                            lossratio=0;
-                        }
-                    }
                 }
-                EV<<"new lossratio="<<lossratio<<",new speed="<<nowrate<<endl;
-                EV<<"------------------------------"<<endl;
             }
+        }
+        EV<<"new lossratio="<<lossratio<<",new speed="<<nowrate<<endl;
+        EV<<"------------------------------"<<endl;
+    }
 
-            EV<<"------------------------------"<<endl;
-            EV<<"xpass functioning.old lossratio="<<lossratio<<",old speed="<<nowrate<<endl;
-            if(lossratio<=targetratio)
-            {
-                EV<<"xpass increasing phase.oldspeed="<<nowrate<<",w="<<w<<endl;
-                if(tinfo.previousincrease)
-                {
-                    w = (w+wmax)/2;
-                }
-                nowrate = (1-w)*nowrate + w*maxrate*(1+targetratio);
-                tinfo.previousincrease = true;
-                EV<<"now w="<<w<<endl;
-            }
-            else
-            {
-                EV<<"xpass decreasing phase.oldspeed="<<nowrate<<",w="<<w<<endl;
-                nowrate = nowrate*(1-lossratio)*(1+targetratio);
-                if (w/2>wmin)
-                    w = w/2;
-                else
-                    w = wmin;
-                tinfo.previousincrease = false;
-                EV<<"now w="<<w<<endl;
-            }
-            EV<<"------------------------------"<<endl;
-            tinfo.omega = w;
+    EV<<"------------------------------"<<endl;
+    EV<<"xpass functioning.old lossratio="<<lossratio<<",old speed="<<nowrate<<endl;
+    if(lossratio<=targetratio)
+    {
+        EV<<"xpass increasing phase.oldspeed="<<nowrate<<",w="<<w<<endl;
+        if(tinfo.previousincrease)
+        {
+            w = (w+wmax)/2;
+        }
+        nowrate = (1-w)*nowrate + w*maxrate*(1+targetratio);
+        tinfo.previousincrease = true;
+        EV<<"now w="<<w<<endl;
+    }
+    else
+    {
+        EV<<"xpass decreasing phase.oldspeed="<<nowrate<<",w="<<w<<endl;
+        nowrate = nowrate*(1-lossratio)*(1+targetratio);
+        if (w/2>wmin)
+            w = w/2;
+        else
+            w = wmin;
+        tinfo.previousincrease = false;
+        EV<<"now w="<<w<<endl;
+    }
+    EV<<"------------------------------"<<endl;
+    tinfo.omega = w;
 //            nowrate = (nowrate<minrate) ? minrate : nowrate;
-            nowrate = (nowrate>maxrate) ? maxrate : nowrate;
+    nowrate = (nowrate>maxrate) ? maxrate : nowrate;
 //            tinfo.alpha=ECN_a;// for dctcp
 //            tinfo.modeflag=MODEFLAG;//for dctcp
-            EV<<"oldspeed="<<oldspeed<<",newspeed="<<nowrate<<endl;
-            tinfo.current_speed = nowrate;
-            tinfo.targetRate=(tinfo.current_speed>oldspeed)?tinfo.current_speed:oldspeed;//for dcqcn
-            return tinfo;
-        }
-        else
-        {
-            tinfo.current_speed = maxrate;
-            return tinfo;
-        }
+    EV<<"oldspeed="<<oldspeed<<",newspeed="<<nowrate<<endl;
+    tinfo.current_speed = nowrate;
+    tinfo.targetRate=(tinfo.current_speed>oldspeed)?tinfo.current_speed:oldspeed;//for dcqcn
+    return tinfo;
+
     };
 };
 } // namespace inet

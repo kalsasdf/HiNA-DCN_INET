@@ -33,7 +33,7 @@ class INET_API RateLimitQueue : public PacketQueueBase, public IPacketBuffer::IC
     IPacketDropperFunction *packetDropperFunction = nullptr;
     IPacketComparatorFunction *packetComparatorFunction = nullptr;
 
-    double bitrate = NaN;
+    double limrate = NaN;
     simtime_t lasttime=0;
 
   protected:

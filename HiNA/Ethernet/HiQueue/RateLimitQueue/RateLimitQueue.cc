@@ -32,7 +32,7 @@ void RateLimitQueue::initialize(int stage)
         if (packetComparatorFunction != nullptr)
             queue.setup(packetComparatorFunction);
         packetDropperFunction = createDropperFunction(par("dropperClass"));
-        bitrate = par("bitrate");EV<<"bitrate = "<<bitrate<<endl;
+        limrate = par("limrate");EV<<"limrate = "<<limrate<<endl;
     }
     else if (stage == INITSTAGE_QUEUEING) {
         checkPacketOperationSupport(inputGate);
@@ -112,9 +112,9 @@ bool RateLimitQueue::canPullSomePacket(cGate *gate) const
     }else{
         auto packet = check_and_cast<Packet *>(queue.front());
         simtime_t interval = simTime() - lasttime;
-        auto time = packet->getBitLength()/(0.05*bitrate);
-        EV<<"packet length = "<<packet->getBitLength()<<", interval = "<<interval<<", extime = "<<time<<endl;
-        if((packet->getBitLength()/interval)>(0.05*bitrate)){
+        auto time = packet->getBitLength()/limrate;
+        EV<<"packet length = "<<packet->getBitLength()<<", interval = "<<interval<<", mintime = "<<time<<endl;
+        if(simtime_t(packet->getBitLength()/limrate)>interval){
             EV<< "interval is not enough, delayed "<<endl;
             return false;
         }else{

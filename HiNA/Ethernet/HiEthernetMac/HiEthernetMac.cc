@@ -129,6 +129,7 @@ void HiEthernetMac::startFrameTransmission()
     ASSERT(hdr);
     ASSERT(!hdr->getSrc().isUnspecified());
 
+
     //for HPCC
     if(HPCC&&std::string(frame->getFullName()).find("HPCCData") != std::string::npos){
         auto& eth_hdr = frame->popAtFront<EthernetMacHeader>();//ÒÆ³ýmacÍ·
@@ -154,6 +155,7 @@ void HiEthernetMac::startFrameTransmission()
 
     // add preamble and SFD (Starting Frame Delimiter), then send out
     encapsulate(frame);
+    updateStats(simTime(), frame);//for rate-meter
 
     //for TIMELY
     if(TIMELY&&std::string(frame->getFullName()).find("TIMELYData") != std::string::npos){
@@ -177,7 +179,7 @@ void HiEthernetMac::startFrameTransmission()
         frame->insertAtFront(bytes);
     }
     signal->encapsulate(frame);
-    updateStats(simTime(), frame);//for rate-meter
+
     ASSERT(curTxSignal == nullptr);
     curTxSignal = signal->dup();
     emit(transmissionStartedSignal, signal);
@@ -197,21 +199,24 @@ void HiEthernetMac::updateStats(simtime_t now, Packet *pck)
     for (auto& region : pck->peekData()->getAllTags<HiTag>()){
         priority = region.getTag()->getPriority();
     }
-    // packet should be counted to new interval
-    if (intvlNumPackets >= batchSize || now - intvlStartTime >= maxInterval)
-        beginNewInterval(now);
 
     intvlNumPackets++;
     intvlNumBits += bits;
+    EV<<"intvlNumbits = "<<intvlNumBits<<", intvlNumPackets = "<<intvlNumPackets<<endl;
     intvlPriBits[priority] += bits;
+
+    // packet should be counted to new interval
+    if (intvlNumPackets >= batchSize || now - intvlStartTime >= maxInterval)
+        beginNewInterval(now);
 }
 
 void HiEthernetMac::beginNewInterval(simtime_t now)
 {
     simtime_t duration = now - intvlStartTime;
+    EV<<"interval = "<<duration<<"s"<<", dbl = "<<duration.dbl()<<"s"<<endl;
 
     // record measurements
-    double bitpersec = intvlNumBits / duration.dbl();
+    double bitpersec = intvlNumBits / duration.dbl()/2;
     double pkpersec = intvlNumPackets / duration.dbl();
     EV<<"currate = "<<bitpersec<<"bps "<<pkpersec<<"pps"<<endl;
     for(int i = 0 ; i < 11 ; i++){
@@ -429,6 +434,7 @@ void HiEthernetMac::handleEndIFGPeriod()
     EV_DETAIL << "IFG elapsed" << endl;
     changeTransmissionState(TX_IDLE_STATE);
 
+
     if (canDequeuePacket()) {
         Packet *packet = dequeuePacket();
         handleUpperPacket(packet);
@@ -462,6 +468,7 @@ void HiEthernetMac::handleEndTxPeriod()
     }
 
     EV_INFO << "Transmission of " << currentTxFrame << " successfully completed.\n";
+
     deleteCurrentTxFrame();
     lastTxFinishTime = simTime();
 

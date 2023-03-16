@@ -50,9 +50,10 @@ void XPASS::initialize()
     frSteps_th=5;
     ByteCounter_th=10000000;
     targetecnratio=0;
-    credit_size = 672;
+    credit_size = 208;//(84-58)*8,58=20(IP)+14(EthernetMac)+8(EthernetPhy)+4(EthernetFcs)+12(interframe gap,IFG)
     max_idletime = 0.00002;
 
+    sendcredit->setKind(SENDCRED);
 }
 
 void XPASS::handleMessage(cMessage *msg)
@@ -231,8 +232,6 @@ void XPASS::receive_credreq(Packet *pck)
             rcvflow = receiver_flowMap[l3addr->getSrcAddress()];
         }
         EV<<"receive credreq, nowRTT = "<<rcvflow.nowRTT<<endl;
-        TimerMsg *sendcredit=new TimerMsg("sendcredit");
-        sendcredit->setKind(SENDCRED);
         sendcredit->setDestAddr(l3addr->getSrcAddress());
         scheduleAt(simTime(),sendcredit);
         receiver_StateMap[l3addr->getSrcAddress()]=CREDIT_SENDING;
@@ -247,7 +246,7 @@ void XPASS::send_credit(L3Address destaddr)
 
     receiver_flowinfo rcvflow = receiver_flowMap[destaddr];
     int jitter_bytes = intrand(8)+1;
-    const auto& content = makeShared<ByteCountChunk>(B(26+jitter_bytes));
+    const auto& content = makeShared<ByteCountChunk>(B(credit_size/8+jitter_bytes));
     auto tag = content->addTag<HiTag>();
     tag->setPacketId(rcvflow.now_send_cdt_seq);
 
@@ -260,14 +259,12 @@ void XPASS::send_credit(L3Address destaddr)
     credit->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::udp);
 
     send(credit, outGate);
-    EV<<"send credit "<<rcvflow.now_send_cdt_seq<<", timestamp = "<<simTime()<<"s"<<endl;
+    EV<<"send credit "<<rcvflow.now_send_cdt_seq<<endl;
     rcvflow.now_send_cdt_seq++;
     receiver_flowMap[destaddr] = rcvflow;
     if(receiver_StateMap[destaddr]==CREDIT_SENDING){
-        TimerMsg *sendcredit=new TimerMsg("sendcredit");
-        sendcredit->setKind(SENDCRED);
         sendcredit->setDestAddr(destaddr);
-        scheduleAt(simTime() + (simtime_t)((credit_size+jitter_bytes*8)/rcvflow.current_speed),sendcredit);
+        scheduleAt(simTime() + (simtime_t)((credit_size+(jitter_bytes+58)*8)/rcvflow.current_speed),sendcredit);
         EV<<"currate = "<<rcvflow.current_speed<<", next time = "<<simTime() + (credit_size+jitter_bytes*8)/rcvflow.current_speed<<"s"<<endl;
     }
 }

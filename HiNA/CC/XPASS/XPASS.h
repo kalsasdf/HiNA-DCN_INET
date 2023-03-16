@@ -139,11 +139,13 @@ class XPASS : public cSimpleModule
     double ByteCounter_th;
     simtime_t nowRTT;
 
+    TimerMsg *sendcredit = new TimerMsg("sendcredit");
+
   protected:
     virtual void initialize() override;
     virtual void handleMessage(cMessage *msg) override;
     virtual void handleSelfMessage(cMessage *msg);
-    virtual ~XPASS() {}
+    virtual ~XPASS() {cancelEvent(sendcredit);delete sendcredit;}
 
     /**
      * Should be redefined to send out the packet; e.g. <tt>send(pck,"out")</tt>.

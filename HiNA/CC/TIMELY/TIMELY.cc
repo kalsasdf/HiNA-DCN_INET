@@ -19,7 +19,7 @@ void TIMELY::initialize(){
     // configuration
     stopTime = par("stopTime");
     activate = par("activate");
-    baseRTT = par("baseRTT");
+    minRTT = par("minRTT");
     Tlow = par("Tlow");
     Thigh = par("Thigh");
     linkspeed = par("linkspeed");
@@ -27,6 +27,7 @@ void TIMELY::initialize(){
     max_pck_size = par("max_pck_size");
     alpha = par("alpha");
     beta = par("beta");
+    TIMELYseg=par("TIMELYseg");
     currentRate = linkspeed;
 
     senddata = new TimerMsg("senddata");
@@ -83,8 +84,6 @@ void TIMELY::processUpperpck(Packet *pck)
             snd_info.flowid = region.getTag()->getFlowId();
             snd_info.cretime = region.getTag()->getCreationtime();
             snd_info.priority = region.getTag()->getPriority();
-            EV << "store new flow, id = "<<snd_info.flowid<<
-                    ", creationtime = "<<snd_info.cretime<<endl;
         }
         auto addressReq = pck->addTagIfAbsent<L3AddressReq>();
         srcAddr = addressReq->getSrcAddress();
@@ -99,6 +98,9 @@ void TIMELY::processUpperpck(Packet *pck)
         snd_info.pckseq = 0;
         snd_info.crcMode = udpHeader->getCrcMode();
         snd_info.crc = udpHeader->getCrc();
+        EV << "store new flow, id = "<<snd_info.flowid<<
+                ", creationtime = "<<snd_info.cretime<<
+                ", flow length = "<<snd_info.remainLength<<endl;
         if(sender_flowMap.empty()){
             sender_flowMap[snd_info.flowid]=snd_info;
             iter=sender_flowMap.begin();//iter needs to be assigned after snd_info is inserted
@@ -126,15 +128,28 @@ void TIMELY::send_data()
     str << packetName << "-" <<snd_info.flowid<< "-" <<snd_info.pckseq;
     Packet *packet = new Packet(str.str().c_str());
     int pcklength;
-    if (snd_info.remainLength > max_pck_size)
+    if (accumlength+max_pck_size>TIMELYseg)
     {
-        pcklength=max_pck_size;
-        snd_info.remainLength = snd_info.remainLength - max_pck_size;
+        if(snd_info.remainLength <= TIMELYseg-accumlength){
+            isLastPck = false;
+            pcklength = snd_info.remainLength;
+            snd_info.remainLength = 0;
+        }else{
+            isLastPck = true;
+            pcklength = TIMELYseg-accumlength;
+            snd_info.remainLength = snd_info.remainLength - pcklength;
+        }
     }
     else
     {
-        pcklength=snd_info.remainLength;
-        snd_info.remainLength = 0;
+        isLastPck = false;
+        if(snd_info.remainLength <= max_pck_size){
+            pcklength = snd_info.remainLength;
+            snd_info.remainLength = 0;
+        }else{
+            pcklength = max_pck_size;
+            snd_info.remainLength = snd_info.remainLength - max_pck_size;
+        }
     }
     const auto& payload = makeShared<ByteCountChunk>(B(pcklength));
     auto tag = payload->addTag<HiTag>();
@@ -142,7 +157,10 @@ void TIMELY::send_data()
     tag->setPriority(snd_info.priority);
     tag->setCreationtime(snd_info.cretime);
     tag->setPacketId(snd_info.pckseq);
+    tag->setIsLastPck(isLastPck);
     snd_info.pckseq += 1;
+    segcount += 1;
+    accumlength += pcklength;
 
     packet->insertAtBack(payload);
 
@@ -171,9 +189,17 @@ void TIMELY::send_data()
     }else{
         sender_flowMap[snd_info.flowid]=snd_info;
     }
-    simtime_t nxtSendTime = simtime_t((packet->getByteLength()+58)*8/currentRate) + simTime();
-    //58=20(IP)+14(EthernetMac)+8(EthernetPhy)+4(EthernetFcs)+12(interframe gap,IFG)
-    scheduleAt(nxtSendTime,senddata);
+    if(accumlength>=TIMELYseg){
+        accumlength=0;
+        simtime_t nxtSendTime = simtime_t((TIMELYseg+segcount*58)*8/currentRate) + simTime();
+        segcount=0;
+        //58=20(IP)+14(EthernetMac)+8(EthernetPhy)+4(EthernetFcs)+12(interframe gap,IFG)
+        EV<<"segment finish, nxtSendTime = "<<nxtSendTime<<endl;
+        scheduleAt(nxtSendTime,senddata);
+    }else{
+        scheduleAt(simTime(),senddata);
+    }
+
     sendDown(packet);
 }
 
@@ -205,18 +231,23 @@ void TIMELY::receive_ack(Packet *pck)
 {
     lastRTT = currentRTT;
     currentRTT = pck->getTimestamp();
+    EV << "RTT is " << currentRTT << ", lastRTT is " << lastRTT <<endl;
     double new_rtt_diff = currentRTT.dbl() - lastRTT.dbl();
     rtt_diff = (1 - alpha) * rtt_diff + alpha * new_rtt_diff;
-    double gradient = rtt_diff / baseRTT.dbl();
+    double gradient = rtt_diff / minRTT.dbl();
 
-    EV << "new_rtt = " << new_rtt_diff << ", rtt_diff = " << rtt_diff  << ", graient = " << gradient << endl;
+    EV << "currentRate = " << currentRate << endl;
+    EV << "new_rtt_diff = " << new_rtt_diff << ", true rtt_diff = " << rtt_diff  << ", gradient = " << gradient << endl;
 
     if(lastRTT!=0){//第一个RTT还没有梯度
         if(currentRTT < Tlow){
+            EV<<"currentRTT < Tlow"<<endl;
             currentRate = currentRate + Rai;
         }else if (currentRTT > Thigh){
+            EV<<"currentRTT > Thigh"<<endl;
             currentRate = currentRate * (1 - beta * (1 - Thigh/currentRTT));
         }else if(gradient <= 0){
+            EV<<"currentRTT between Tlow and Thigh, gradient <= 0"<<endl;
             if(Number >= 5)
                 currentRate += 5 * Rai;
             else{
@@ -224,14 +255,15 @@ void TIMELY::receive_ack(Packet *pck)
                 Number++;
             }
         }else{
+            EV<<"currentRTT between Tlow and Thigh, gradient > 0"<<endl;
             currentRate = currentRate * (1 - beta * (gradient));
             Number = 1;
         }
 
     }
 
-    EV << "currentRate = " << currentRate << ", gradient = " << gradient << endl;
-    EV << "RTT is " << currentRTT << ", lastRTT is " << lastRTT <<endl;
+    EV << "currentRate = " << currentRate << endl;
+
     delete pck;
 }
 

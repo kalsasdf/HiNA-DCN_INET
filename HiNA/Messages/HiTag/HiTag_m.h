@@ -56,6 +56,7 @@ namespace inet {
  *     uint64_t PacketSize;
  *     bool reverse = false;//信用协议反向路由用
  *     simtime_t creationtime;
+ *     bool isLastPck = false;//for TIMELY
  * 
  *     //for PFC
  *     int16_t op;
@@ -74,6 +75,7 @@ class INET_API HiTag : public ::inet::TagBase
     uint64_t PacketSize = 0;
     bool reverse = false;
     ::omnetpp::simtime_t creationtime = SIMTIME_ZERO;
+    bool isLastPck_ = false;
     int16_t op = 0;
     int16_t interfaceId = 0;
 
@@ -115,6 +117,9 @@ class INET_API HiTag : public ::inet::TagBase
 
     virtual ::omnetpp::simtime_t getCreationtime() const;
     virtual void setCreationtime(::omnetpp::simtime_t creationtime);
+
+    virtual bool isLastPck() const;
+    virtual void setIsLastPck(bool isLastPck);
 
     virtual int16_t getOp() const;
     virtual void setOp(int16_t op);

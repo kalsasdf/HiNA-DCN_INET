@@ -18,6 +18,7 @@ class HiTag extends TagBase
     uint64_t PacketSize;
     bool reverse = false;//信用协议反向路由用
     simtime_t creationtime;
+    bool isLastPck = false;//for TIMELY
     
     //for PFC
     int16_t op;

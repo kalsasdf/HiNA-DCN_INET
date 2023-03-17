@@ -46,7 +46,7 @@ protected:
     simtime_t stopTime;
     // configuration for .ned file
     bool activate;
-    simtime_t baseRTT;
+    simtime_t minRTT;
     simtime_t Tlow;
     simtime_t Thigh;
     double linkspeed;
@@ -59,6 +59,10 @@ protected:
     simtime_t currentRTT = 0;
     simtime_t lastRTT = 0;
     double currentRate;
+    int accumlength = 0;
+    int segcount = 0;
+    int TIMELYseg;
+    bool isLastPck = false;
 
     const char *packetName = "TIMELYData";
     cGate *lowerOutGate;

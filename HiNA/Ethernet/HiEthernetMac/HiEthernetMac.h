@@ -55,8 +55,6 @@ class INET_API HiEthernetMac : public EthernetMacBase
 
     //for TIMELY
     bool TIMELY;
-    int TIMELYseg;
-    std::map<Ipv4Address, int> TIMELY_Map;
     //for TIMELY
 
     //for HPCC

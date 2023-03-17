@@ -185,6 +185,7 @@ void HiTag::copy(const HiTag& other)
     this->PacketSize = other.PacketSize;
     this->reverse = other.reverse;
     this->creationtime = other.creationtime;
+    this->isLastPck_ = other.isLastPck_;
     this->op = other.op;
     this->interfaceId = other.interfaceId;
 }
@@ -200,6 +201,7 @@ void HiTag::parsimPack(omnetpp::cCommBuffer *b) const
     doParsimPacking(b,this->PacketSize);
     doParsimPacking(b,this->reverse);
     doParsimPacking(b,this->creationtime);
+    doParsimPacking(b,this->isLastPck_);
     doParsimPacking(b,this->op);
     doParsimPacking(b,this->interfaceId);
 }
@@ -215,6 +217,7 @@ void HiTag::parsimUnpack(omnetpp::cCommBuffer *b)
     doParsimUnpacking(b,this->PacketSize);
     doParsimUnpacking(b,this->reverse);
     doParsimUnpacking(b,this->creationtime);
+    doParsimUnpacking(b,this->isLastPck_);
     doParsimUnpacking(b,this->op);
     doParsimUnpacking(b,this->interfaceId);
 }
@@ -299,6 +302,16 @@ void HiTag::setCreationtime(::omnetpp::simtime_t creationtime)
     this->creationtime = creationtime;
 }
 
+bool HiTag::isLastPck() const
+{
+    return this->isLastPck_;
+}
+
+void HiTag::setIsLastPck(bool isLastPck)
+{
+    this->isLastPck_ = isLastPck;
+}
+
 int16_t HiTag::getOp() const
 {
     return this->op;
@@ -332,6 +345,7 @@ class HiTagDescriptor : public omnetpp::cClassDescriptor
         FIELD_PacketSize,
         FIELD_reverse,
         FIELD_creationtime,
+        FIELD_isLastPck,
         FIELD_op,
         FIELD_interfaceId,
     };
@@ -400,7 +414,7 @@ const char *HiTagDescriptor::getProperty(const char *propertyName) const
 int HiTagDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
-    return base ? 10+base->getFieldCount() : 10;
+    return base ? 11+base->getFieldCount() : 11;
 }
 
 unsigned int HiTagDescriptor::getFieldTypeFlags(int field) const
@@ -420,10 +434,11 @@ unsigned int HiTagDescriptor::getFieldTypeFlags(int field) const
         FD_ISEDITABLE,    // FIELD_PacketSize
         FD_ISEDITABLE,    // FIELD_reverse
         FD_ISEDITABLE,    // FIELD_creationtime
+        FD_ISEDITABLE,    // FIELD_isLastPck
         FD_ISEDITABLE,    // FIELD_op
         FD_ISEDITABLE,    // FIELD_interfaceId
     };
-    return (field >= 0 && field < 10) ? fieldTypeFlags[field] : 0;
+    return (field >= 0 && field < 11) ? fieldTypeFlags[field] : 0;
 }
 
 const char *HiTagDescriptor::getFieldName(int field) const
@@ -443,10 +458,11 @@ const char *HiTagDescriptor::getFieldName(int field) const
         "PacketSize",
         "reverse",
         "creationtime",
+        "isLastPck",
         "op",
         "interfaceId",
     };
-    return (field >= 0 && field < 10) ? fieldNames[field] : nullptr;
+    return (field >= 0 && field < 11) ? fieldNames[field] : nullptr;
 }
 
 int HiTagDescriptor::findField(const char *fieldName) const
@@ -461,8 +477,9 @@ int HiTagDescriptor::findField(const char *fieldName) const
     if (strcmp(fieldName, "PacketSize") == 0) return baseIndex + 5;
     if (strcmp(fieldName, "reverse") == 0) return baseIndex + 6;
     if (strcmp(fieldName, "creationtime") == 0) return baseIndex + 7;
-    if (strcmp(fieldName, "op") == 0) return baseIndex + 8;
-    if (strcmp(fieldName, "interfaceId") == 0) return baseIndex + 9;
+    if (strcmp(fieldName, "isLastPck") == 0) return baseIndex + 8;
+    if (strcmp(fieldName, "op") == 0) return baseIndex + 9;
+    if (strcmp(fieldName, "interfaceId") == 0) return baseIndex + 10;
     return base ? base->findField(fieldName) : -1;
 }
 
@@ -483,10 +500,11 @@ const char *HiTagDescriptor::getFieldTypeString(int field) const
         "uint64_t",    // FIELD_PacketSize
         "bool",    // FIELD_reverse
         "omnetpp::simtime_t",    // FIELD_creationtime
+        "bool",    // FIELD_isLastPck
         "int16_t",    // FIELD_op
         "int16_t",    // FIELD_interfaceId
     };
-    return (field >= 0 && field < 10) ? fieldTypeStrings[field] : nullptr;
+    return (field >= 0 && field < 11) ? fieldTypeStrings[field] : nullptr;
 }
 
 const char **HiTagDescriptor::getFieldPropertyNames(int field) const
@@ -577,6 +595,7 @@ std::string HiTagDescriptor::getFieldValueAsString(omnetpp::any_ptr object, int 
         case FIELD_PacketSize: return uint642string(pp->getPacketSize());
         case FIELD_reverse: return bool2string(pp->getReverse());
         case FIELD_creationtime: return simtime2string(pp->getCreationtime());
+        case FIELD_isLastPck: return bool2string(pp->isLastPck());
         case FIELD_op: return long2string(pp->getOp());
         case FIELD_interfaceId: return long2string(pp->getInterfaceId());
         default: return "";
@@ -603,6 +622,7 @@ void HiTagDescriptor::setFieldValueAsString(omnetpp::any_ptr object, int field, 
         case FIELD_PacketSize: pp->setPacketSize(string2uint64(value)); break;
         case FIELD_reverse: pp->setReverse(string2bool(value)); break;
         case FIELD_creationtime: pp->setCreationtime(string2simtime(value)); break;
+        case FIELD_isLastPck: pp->setIsLastPck(string2bool(value)); break;
         case FIELD_op: pp->setOp(string2long(value)); break;
         case FIELD_interfaceId: pp->setInterfaceId(string2long(value)); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'HiTag'", field);
@@ -627,6 +647,7 @@ omnetpp::cValue HiTagDescriptor::getFieldValue(omnetpp::any_ptr object, int fiel
         case FIELD_PacketSize: return (omnetpp::intval_t)(pp->getPacketSize());
         case FIELD_reverse: return pp->getReverse();
         case FIELD_creationtime: return pp->getCreationtime().dbl();
+        case FIELD_isLastPck: return pp->isLastPck();
         case FIELD_op: return pp->getOp();
         case FIELD_interfaceId: return pp->getInterfaceId();
         default: throw omnetpp::cRuntimeError("Cannot return field %d of class 'HiTag' as cValue -- field index out of range?", field);
@@ -653,6 +674,7 @@ void HiTagDescriptor::setFieldValue(omnetpp::any_ptr object, int field, int i, c
         case FIELD_PacketSize: pp->setPacketSize(omnetpp::checked_int_cast<uint64_t>(value.intValue())); break;
         case FIELD_reverse: pp->setReverse(value.boolValue()); break;
         case FIELD_creationtime: pp->setCreationtime(value.doubleValue()); break;
+        case FIELD_isLastPck: pp->setIsLastPck(value.boolValue()); break;
         case FIELD_op: pp->setOp(omnetpp::checked_int_cast<int16_t>(value.intValue())); break;
         case FIELD_interfaceId: pp->setInterfaceId(omnetpp::checked_int_cast<int16_t>(value.intValue())); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'HiTag'", field);

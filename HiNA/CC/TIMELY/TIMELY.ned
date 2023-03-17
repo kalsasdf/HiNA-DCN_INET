@@ -26,12 +26,13 @@ simple TIMELY like UdpCC
         double linkspeed @unit(bps) = default (10Gbps);
         double stopTime @unit(s) = default(10s);
         double Rai @unit(bps) = default(10Mbps);  // 最大速率的 1 / 50
- 		double baseRTT @unit(s)= default(20us);
+ 		double minRTT @unit(s)= default(20us);
  		double Tlow @unit(s)= default(50us);  // 修改Tlow
  		double Thigh @unit(s)= default(500us);
  		double alpha = default(0.875);
  		double beta = default(0.8);
  		int max_pck_size = default(1472);
+ 		int TIMELYseg @unit(B)= default(16kB);
         
         @display("i=block/downarrow,grey80;is=s;i2=status/down");
     gates:

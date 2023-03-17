@@ -61,8 +61,6 @@ void HiEthernetMac::initialize(int stage)
         radioModule->subscribe(REDPFCQueue::pfcResumeSignal,this);
 
         TIMELY=par("TIMELY");
-        TIMELYseg=par("TIMELYseg");
-
         HPCC=par("HPCC");
 
         if (!par("duplexMode"))
@@ -216,7 +214,7 @@ void HiEthernetMac::beginNewInterval(simtime_t now)
     EV<<"interval = "<<duration<<"s"<<", dbl = "<<duration.dbl()<<"s"<<endl;
 
     // record measurements
-    double bitpersec = intvlNumBits / duration.dbl()/2;
+    double bitpersec = intvlNumBits / duration.dbl();//莫名其妙会高一倍
     double pkpersec = intvlNumPackets / duration.dbl();
     EV<<"currate = "<<bitpersec<<"bps "<<pkpersec<<"pps"<<endl;
     for(int i = 0 ; i < 11 ; i++){
@@ -333,21 +331,20 @@ void HiEthernetMac::processMsgFromNetwork(EthernetSignalBase *signal)
     if(TIMELY){
         if (std::string(packet->getFullName()).find("TIMELYACK") != std::string::npos)
         {
-            simtime_t nowRTT = simTime() - packet->getTimestamp() - packet->getByteLength()/ curEtherDescr->txrate;  // 10*1e9 是测试所使用的链路速率
+            simtime_t nowRTT = simTime() - packet->getTimestamp() - packet->getByteLength()*8/ curEtherDescr->txrate;  // 10*1e9 是测试所使用的链路速率
             EV <<"tsend = " << packet->getTimestamp() << ", tcompletion = " << simTime() << ", nowRTT = " << nowRTT <<endl;
 
             packet->setTimestamp(nowRTT);
         }
         else if((std::string(packet->getFullName()).find("TIMELYData") != std::string::npos))
         {
-            auto& eth_hdr = packet->popAtFront<EthernetMacHeader>();
-            auto& ip_hdr = packet->popAtFront<Ipv4Header>();
-            TIMELY_Map[ip_hdr->getSrcAddress()]+=packet->getByteLength();
-            packet->insertAtFront(ip_hdr);
-            packet->insertAtFront(eth_hdr);
-
-            if(TIMELY_Map[ip_hdr->getSrcAddress()]>=TIMELYseg){
-                TIMELY_Map[ip_hdr->getSrcAddress()]=0;
+            bool isLastPck;
+            for (auto& region : packet->peekData()->getAllTags<HiTag>()){
+                isLastPck = region.getTag()->isLastPck();
+            }
+            if(isLastPck){
+                EV<<"receive an end of seg"<<endl;
+                simtime_t tsend = packet->getTimestamp();
                 Packet *ack = packet->dup();
                 auto ack_eth = ack->removeAtFront<EthernetMacHeader>();
                 auto ack_ip = ack->removeAtFront<Ipv4Header>();
@@ -373,6 +370,7 @@ void HiEthernetMac::processMsgFromNetwork(EthernetSignalBase *signal)
                 const auto& ethernetFcs = makeShared<EthernetFcs>();
                 ethernetFcs->setFcsMode(fcsMode);
                 ack1->insertAtBack(ethernetFcs);
+                ack1->setTimestamp(tsend);
                 addPaddingAndSetFcs(ack1, MIN_ETHERNET_FRAME_BYTES);
 
                 while(currentTxFrame==nullptr&& transmitState == TX_IDLE_STATE){

@@ -69,7 +69,7 @@ inline void doParsimUnpacking(omnetpp::cCommBuffer *b, hopInf& obj) { __doUnpack
  *     chunkLength = B (42);
  *     int nHop;
  *     int pathID;
- *     hopInf hopInfs[];		//交换机上的信息
+ *     hopInf hopInfs[5];		//交换机上的信息
  * }
  * </pre>
  */
@@ -78,8 +78,7 @@ class INET_API INTHeader : public ::inet::FieldsChunk
   protected:
     int nHop = 0;
     int pathID = 0;
-    hopInf *hopInfs = nullptr;
-    size_t hopInfs_arraysize = 0;
+    hopInf hopInfs[5];
 
   private:
     void copy(const INTHeader& other);
@@ -102,15 +101,10 @@ class INET_API INTHeader : public ::inet::FieldsChunk
     virtual int getPathID() const;
     virtual void setPathID(int pathID);
 
-    virtual void setHopInfsArraySize(size_t size);
     virtual size_t getHopInfsArraySize() const;
     virtual const hopInf& getHopInfs(size_t k) const;
     virtual hopInf& getHopInfsForUpdate(size_t k) { handleChange();return const_cast<hopInf&>(const_cast<INTHeader*>(this)->getHopInfs(k));}
     virtual void setHopInfs(size_t k, const hopInf& hopInfs);
-    virtual void insertHopInfs(size_t k, const hopInf& hopInfs);
-    void insertHopInfs(const hopInf& hopInfs) {appendHopInfs(hopInfs);}
-    virtual void appendHopInfs(const hopInf& hopInfs);
-    virtual void eraseHopInfs(size_t k);
 };
 
 inline void doParsimPacking(omnetpp::cCommBuffer *b, const INTHeader& obj) {obj.parsimPack(b);}

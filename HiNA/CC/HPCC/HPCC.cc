@@ -9,39 +9,44 @@ namespace inet {
 
 Define_Module(HPCC);
 
-void HPCC::initialize()
+void HPCC::initialize(int stage)
 {
-    //gates
-    lowerOutGate = gate("lowerOut");
-    lowerInGate = gate("lowerIn");
-    upperOutGate = gate("upperOut");
-    upperInGate = gate("upperIn");
-    // configuration
-    stopTime = par("stopTime");
-    activate = par("activate");
-    linkspeed = par("linkspeed");
-    max_pck_size=par("max_pck_size");
-    baseRTT = par("baseRTT");
-    expectedFlows = par("expectedFlows");
+    if (stage == INITSTAGE_LOCAL){
+        //gates
+        lowerOutGate = gate("lowerOut");
+        lowerInGate = gate("lowerIn");
+        upperOutGate = gate("upperOut");
+        upperInGate = gate("upperIn");
+        // configuration
+        stopTime = par("stopTime");
+        activate = par("activate");
+        linkspeed = par("linkspeed");
+        max_pck_size=par("max_pck_size");
+        baseRTT = par("baseRTT");
+        expectedFlows = par("expectedFlows");
 
-    wint = linkspeed*baseRTT.dbl();
-    wai = wint*(1-yita)/expectedFlows;
-    currentRate = linkspeed;
-    csend_window = wint;
-    send_window = wint;
+        wint = linkspeed*baseRTT.dbl();
+        wai = wint*(1-yita)/expectedFlows;
+        currentRate = linkspeed;
+        csend_window = wint;
+        send_window = wint;
 
-    senddata = new TimerMsg("senddata");
-    senddata->setKind(SENDDATA);
+        senddata = new TimerMsg("senddata");
+        senddata->setKind(SENDDATA);
 
 
-    for(int i=0; i<4; i++)
-    {
-        numNodes[i] = 0;
-        totalDelay[i] = 0;
+        for(int i=0; i<4; i++)
+        {
+            numNodes[i] = 0;
+            totalDelay[i] = 0;
+        }
+    }else if (stage == INITSTAGE_TRANSPORT_LAYER) {
+        registerService(Protocol::udp, gate("upperIn"), gate("upperOut"));
+        registerProtocol(Protocol::udp, gate("lowerOut"), gate("lowerIn"));
+//        registerService(Protocol::hpcc, gate("upperIn"), gate("upperOut"));
+//        registerProtocol(Protocol::hpcc, gate("lowerOut"), gate("lowerIn"));
     }
 
-    registerService(Protocol::udp, gate("upperIn"), gate("upperOut"));
-    registerProtocol(Protocol::udp, gate("lowerOut"), gate("lowerIn"));
 }
 
 void HPCC::handleMessage(cMessage *msg)
@@ -168,10 +173,6 @@ void HPCC::send_data(int packetid)
 
     packet->insertAtBack(payload);
 
-    auto addressReq = packet->addTagIfAbsent<L3AddressReq>();
-    addressReq->setSrcAddress(snd_info.srcAddr);
-    addressReq->setDestAddress(snd_info.destAddr);
-
     //generate and insert a new udpHeader, set source and destination port
     const Protocol *l3Protocol = &Protocol::ipv4;
     auto udpHeader = makeShared<UdpHeader>();
@@ -179,17 +180,23 @@ void HPCC::send_data(int packetid)
     udpHeader->setDestinationPort(snd_info.destPort);
     udpHeader->setCrc(snd_info.crc);
     udpHeader->setCrcMode(snd_info.crcMode);
-    udpHeader->setTotalLengthField(udpHeader->getChunkLength()+packet->getTotalLength());
+    udpHeader->setTotalLengthField(B(udpHeader->getChunkLength()+packet->getTotalLength()));
     insertTransportProtocolHeader(packet, Protocol::udp, udpHeader);
 
     //insert HPCC header(INTHeader)
     auto content = makeShared<INTHeader>();
     content->setNHop(0);
     content->setPathID(0);
+    content->enableImplicitChunkSerialization = true;
+//    auto packetProtocolTag = packet->addTagIfAbsent<PacketProtocolTag>();
+//    packetProtocolTag->setProtocol(&Protocol::hpcc);
     packet->insertAtFront(content);
 
     packet->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(l3Protocol);
     packet->setKind(0);
+    auto addressReq = packet->addTagIfAbsent<L3AddressReq>();
+    addressReq->setSrcAddress(snd_info.srcAddr);
+    addressReq->setDestAddress(snd_info.destAddr);
 
     EV<<"packet length = "<<packet->getByteLength()<<", current rate = "<<currentRate<<endl;
 
@@ -253,18 +260,24 @@ void HPCC::receive_data(Packet *pck)
             auto tag=intinfo->addTag<HiTag>();
             tag->setPacketId(curRcvNum);
 
+            intinfo->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::udp);
+//            auto udpHeader = makeShared<UdpHeader>();
+//            insertTransportProtocolHeader(intinfo, Protocol::udp, udpHeader);
+//            auto packetProtocolTag = intinfo->addTagIfAbsent<PacketProtocolTag>();
+//            packetProtocolTag->setProtocol(&Protocol::hpcc);
             intinfo->insertAtFront(INT_msg);
+            intinfo->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(&Protocol::ipv4);
 
             auto addressReq = intinfo->addTagIfAbsent<L3AddressReq>();
             addressReq->setSrcAddress(desAddr);
             addressReq->setDestAddress(srcAddr);
-            intinfo->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(&Protocol::ipv4);
-            intinfo->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::udp);
 
             EV_INFO << "Sending INT from "<<desAddr<<" to"<< srcAddr <<endl;//could include more details
             EV_DETAIL<<"INT sequence is"<<curRcvNum<<endl;
             sendDown(intinfo);
             EV_DETAIL<<"received a packet of new flow successfully, The transport path = "<<INT_msg->getPathID()<<endl;//gy
+//            auto packetProtocolTag1 = pck->addTagIfAbsent<PacketProtocolTag>();
+//            packetProtocolTag1->setProtocol(&Protocol::udp);
             sendUp(pck);
         }
         else{
@@ -275,13 +288,17 @@ void HPCC::receive_data(Packet *pck)
             auto tag=intinfo->addTag<HiTag>();
             tag->setPacketId(receiver_packetMap[srcAddr]);
 
+            intinfo->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::udp);
+//            auto udpHeader = makeShared<UdpHeader>();
+//            insertTransportProtocolHeader(intinfo, Protocol::udp, udpHeader);
+//            auto packetProtocolTag = intinfo->addTagIfAbsent<PacketProtocolTag>();
+//            packetProtocolTag->setProtocol(&Protocol::hpcc);
             intinfo->insertAtFront(INT_msg);
+            intinfo->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(&Protocol::ipv4);
 
             auto addressReq = intinfo->addTagIfAbsent<L3AddressReq>();
             addressReq->setSrcAddress(desAddr);
             addressReq->setDestAddress(srcAddr);
-            intinfo->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(&Protocol::ipv4);
-            intinfo->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::udp);
 
             EV_INFO << "Sending INT from "<<desAddr<<" to"<< srcAddr <<endl;//could include more details
             EV_DETAIL<<"INT sequence is"<<curRcvNum<<endl;
@@ -302,18 +319,24 @@ void HPCC::receive_data(Packet *pck)
             auto tag=intinfo->addTag<HiTag>();
             tag->setPacketId(curRcvNum);
 
+            intinfo->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::udp);
+//            auto udpHeader = makeShared<UdpHeader>();
+//            insertTransportProtocolHeader(intinfo, Protocol::udp, udpHeader);
+//            auto packetProtocolTag = intinfo->addTagIfAbsent<PacketProtocolTag>();
+//            packetProtocolTag->setProtocol(&Protocol::hpcc);
             intinfo->insertAtFront(INT_msg);
+            intinfo->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(&Protocol::ipv4);
 
             auto addressReq = intinfo->addTagIfAbsent<L3AddressReq>();
             addressReq->setSrcAddress(desAddr);
             addressReq->setDestAddress(srcAddr);
-            intinfo->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(&Protocol::ipv4);
-            intinfo->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::udp);
 
             EV_INFO << "Sending INT from "<<desAddr<<" to"<< srcAddr <<endl;//could include more details
             EV_DETAIL<<"INT sequence is"<<curRcvNum<<endl;
             sendDown(intinfo);
             EV_DETAIL<<"received a packet of new flow successfully, The transport path = "<<INT_msg->getPathID()<<endl;//gy
+//            auto packetProtocolTag1 = pck->addTagIfAbsent<PacketProtocolTag>();
+//            packetProtocolTag1->setProtocol(&Protocol::udp);
             sendUp(pck);
         }
         else//out of order
@@ -325,13 +348,17 @@ void HPCC::receive_data(Packet *pck)
             auto tag=intinfo->addTag<HiTag>();
             tag->setPacketId(receiver_packetMap[srcAddr]);
 
+            intinfo->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::udp);
+//            auto udpHeader = makeShared<UdpHeader>();
+//            insertTransportProtocolHeader(intinfo, Protocol::udp, udpHeader);
+//            auto packetProtocolTag = intinfo->addTagIfAbsent<PacketProtocolTag>();
+//            packetProtocolTag->setProtocol(&Protocol::hpcc);
             intinfo->insertAtFront(INT_msg);
+            intinfo->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(&Protocol::ipv4);
 
             auto addressReq = intinfo->addTagIfAbsent<L3AddressReq>();
             addressReq->setSrcAddress(desAddr);
             addressReq->setDestAddress(srcAddr);
-            intinfo->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(&Protocol::ipv4);
-            intinfo->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::udp);
 
             EV_INFO << "Sending INT from "<<desAddr<<" to"<< srcAddr <<endl;//could include more details
             EV_DETAIL<<"INT sequence is"<<curRcvNum<<endl;
@@ -358,7 +385,7 @@ void HPCC::receiveAck(Packet *pck)
             cancelEvent(senddata);
             scheduleAt(simTime(),senddata);
         }
-        return;
+
     }else{
         sender_packetMap.erase(ackid);
     }
@@ -370,7 +397,7 @@ void HPCC::receiveAck(Packet *pck)
     {
         curINTs[i] = INT_msg->getHopInfs(i);
     }
-    EV<<"the INT size is "<<size<<" the ack sequence is "<<packetid<<endl;
+    EV<<"the INT size is "<<size<<" the ack sequence is "<<ackid<<endl;
 
 
     //function MEASUREINFLIGHT(ack)
@@ -382,7 +409,7 @@ void HPCC::receiveAck(Packet *pck)
         EV<<"tx bytes is "<<curINTs[i].txBytes<<", last txbytes is "<<Last[i].txBytes<<", INT inf "<<i<<", Rate is "<<Rate<<endl;
         EV<<"TS is "<<curINTs[i].TS.dbl()<<", last TS is "<<Last[i].TS.dbl()<<endl;
         EV<<"txrate is "<<curINTs[i].txRate<<", last txrate is "<<Last[i].txRate<<endl;
-        EV<<"queuelength is"<<curINTs[i].queueLength<<", last queuelength is "<<Last[i].queueLength<<endl;
+        EV<<"queuelength is "<<curINTs[i].queueLength<<", last queuelength is "<<Last[i].queueLength<<endl;
         double u1 = (minval(curINTs[i].queueLength, Last[i].queueLength)) /(curINTs[i].txRate * baseRTT.dbl()) + Rate/curINTs[i].txRate;
         EV<<" u1 is "<<u1<<endl;
         if(u1 > u)
@@ -403,11 +430,11 @@ void HPCC::receiveAck(Packet *pck)
             Last[i]  = INT_msg->getHopInfs(i);
         }
         isFirstAck=false;
-        lastUpdateSeq = ackid;
-        csend_window = send_window;
+        delete pck;
         return;
     }
 
+    EV<<"csend_window = "<<csend_window<<endl;
     //function COMPUTEWIND(U,updatewc)
     if(U >= yita || incstage >= maxstage)
     {
@@ -418,25 +445,27 @@ void HPCC::receiveAck(Packet *pck)
         {
             incstage = 0;
             csend_window = send_window;
-            lastUpdateSeq = ackid;//the next packet to send
+            lastUpdateSeq = nxtSendpacketid;//the next packet to send
             EV<<"update the csendwind! the last UpdateSeq is"<<lastUpdateSeq<<" the incstage is"<< incstage<<endl;
         }
     }
     else
     {
         send_window = csend_window + wai;
-//        if(send_window > wint)
-//            send_window = wint;
+        if(send_window > wint)
+            send_window = wint;
 
         EV<<" the wai is "<<wai<<" the snd wind is "<<send_window<<endl;
-        if(packetid > lastUpdateSeq)
+        if(ackid > lastUpdateSeq)
         {
             incstage++;
-            EV<<"update the csendwind! the last UpdateSeq is"<<lastUpdateSeq<<" the incstage is"<< incstage<<endl;
+            EV<<"update the csendwind! the last UpdateSeq is "<<lastUpdateSeq<<" the incstage is "<< incstage<<endl;
             csend_window = send_window;
-            lastUpdateSeq = ackid;//the next packet to send
+            lastUpdateSeq = nxtSendpacketid;//the next packet to send
         }
     }
+    if(send_window<0)
+        throw cRuntimeError("send_windows<0");
 
     currentRate = send_window / baseRTT.dbl();
     EV<<"the ACK computed rate is "<<currentRate<<endl;

@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by opp_msgtool 6.0 from inet/HiNA/Messages/HPCC/INTHeader.msg.
+// Generated file, do not edit! Created by opp_msgtool 6.0 from inet/HiNA/Messages/SWIFT/SACK.msg.
 //
 
 // Disable warnings about unused variables, empty switch stmts, etc:
@@ -28,7 +28,7 @@
 #include <sstream>
 #include <memory>
 #include <type_traits>
-#include "inet\HiNA\Messages\HPCC\INTHeader_m.h"
+#include "inet\HiNA\Messages\SWIFT\SACK_m.h"
 
 namespace omnetpp {
 
@@ -152,39 +152,64 @@ void doParsimUnpacking(omnetpp::cCommBuffer *, T& t)
 
 namespace inet {
 
-hopInf::hopInf()
+Register_Class(SackItem)
+
+SackItem::SackItem() : ::omnetpp::cObject()
 {
 }
 
-void __doPacking(omnetpp::cCommBuffer *b, const hopInf& a)
+SackItem::SackItem(const SackItem& other) : ::omnetpp::cObject(other)
 {
-    doParsimPacking(b,a.queueLength);
-    doParsimPacking(b,a.txRate);
-    doParsimPacking(b,a.txBytes);
-    doParsimPacking(b,a.TS);
+    copy(other);
 }
 
-void __doUnpacking(omnetpp::cCommBuffer *b, hopInf& a)
+SackItem::~SackItem()
 {
-    doParsimUnpacking(b,a.queueLength);
-    doParsimUnpacking(b,a.txRate);
-    doParsimUnpacking(b,a.txBytes);
-    doParsimUnpacking(b,a.TS);
 }
 
-class hopInfDescriptor : public omnetpp::cClassDescriptor
+SackItem& SackItem::operator=(const SackItem& other)
+{
+    if (this == &other) return *this;
+    ::omnetpp::cObject::operator=(other);
+    copy(other);
+    return *this;
+}
+
+void SackItem::copy(const SackItem& other)
+{
+    this->packetid = other.packetid;
+}
+
+void SackItem::parsimPack(omnetpp::cCommBuffer *b) const
+{
+    doParsimPacking(b,this->packetid);
+}
+
+void SackItem::parsimUnpack(omnetpp::cCommBuffer *b)
+{
+    doParsimUnpacking(b,this->packetid);
+}
+
+unsigned int SackItem::getPacketid() const
+{
+    return this->packetid;
+}
+
+void SackItem::setPacketid(unsigned int packetid)
+{
+    this->packetid = packetid;
+}
+
+class SackItemDescriptor : public omnetpp::cClassDescriptor
 {
   private:
     mutable const char **propertyNames;
     enum FieldConstants {
-        FIELD_queueLength,
-        FIELD_txRate,
-        FIELD_txBytes,
-        FIELD_TS,
+        FIELD_packetid,
     };
   public:
-    hopInfDescriptor();
-    virtual ~hopInfDescriptor();
+    SackItemDescriptor();
+    virtual ~SackItemDescriptor();
 
     virtual bool doesSupport(omnetpp::cObject *obj) const override;
     virtual const char **getPropertyNames() const override;
@@ -210,27 +235,27 @@ class hopInfDescriptor : public omnetpp::cClassDescriptor
     virtual void setFieldStructValuePointer(omnetpp::any_ptr object, int field, int i, omnetpp::any_ptr ptr) const override;
 };
 
-Register_ClassDescriptor(hopInfDescriptor)
+Register_ClassDescriptor(SackItemDescriptor)
 
-hopInfDescriptor::hopInfDescriptor() : omnetpp::cClassDescriptor(omnetpp::opp_typename(typeid(inet::hopInf)), "")
+SackItemDescriptor::SackItemDescriptor() : omnetpp::cClassDescriptor(omnetpp::opp_typename(typeid(inet::SackItem)), "omnetpp::cObject")
 {
     propertyNames = nullptr;
 }
 
-hopInfDescriptor::~hopInfDescriptor()
+SackItemDescriptor::~SackItemDescriptor()
 {
     delete[] propertyNames;
 }
 
-bool hopInfDescriptor::doesSupport(omnetpp::cObject *obj) const
+bool SackItemDescriptor::doesSupport(omnetpp::cObject *obj) const
 {
-    return dynamic_cast<hopInf *>(obj)!=nullptr;
+    return dynamic_cast<SackItem *>(obj)!=nullptr;
 }
 
-const char **hopInfDescriptor::getPropertyNames() const
+const char **SackItemDescriptor::getPropertyNames() const
 {
     if (!propertyNames) {
-        static const char *names[] = {  nullptr };
+        static const char *names[] = { "packetData",  nullptr };
         omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
         const char **baseNames = base ? base->getPropertyNames() : nullptr;
         propertyNames = mergeLists(baseNames, names);
@@ -238,19 +263,20 @@ const char **hopInfDescriptor::getPropertyNames() const
     return propertyNames;
 }
 
-const char *hopInfDescriptor::getProperty(const char *propertyName) const
+const char *SackItemDescriptor::getProperty(const char *propertyName) const
 {
+    if (!strcmp(propertyName, "packetData")) return "";
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     return base ? base->getProperty(propertyName) : nullptr;
 }
 
-int hopInfDescriptor::getFieldCount() const
+int SackItemDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
-    return base ? 4+base->getFieldCount() : 4;
+    return base ? 1+base->getFieldCount() : 1;
 }
 
-unsigned int hopInfDescriptor::getFieldTypeFlags(int field) const
+unsigned int SackItemDescriptor::getFieldTypeFlags(int field) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -259,15 +285,12 @@ unsigned int hopInfDescriptor::getFieldTypeFlags(int field) const
         field -= base->getFieldCount();
     }
     static unsigned int fieldTypeFlags[] = {
-        FD_ISEDITABLE,    // FIELD_queueLength
-        FD_ISEDITABLE,    // FIELD_txRate
-        FD_ISEDITABLE,    // FIELD_txBytes
-        FD_ISEDITABLE,    // FIELD_TS
+        FD_ISEDITABLE,    // FIELD_packetid
     };
-    return (field >= 0 && field < 4) ? fieldTypeFlags[field] : 0;
+    return (field >= 0 && field < 1) ? fieldTypeFlags[field] : 0;
 }
 
-const char *hopInfDescriptor::getFieldName(int field) const
+const char *SackItemDescriptor::getFieldName(int field) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -276,26 +299,20 @@ const char *hopInfDescriptor::getFieldName(int field) const
         field -= base->getFieldCount();
     }
     static const char *fieldNames[] = {
-        "queueLength",
-        "txRate",
-        "txBytes",
-        "TS",
+        "packetid",
     };
-    return (field >= 0 && field < 4) ? fieldNames[field] : nullptr;
+    return (field >= 0 && field < 1) ? fieldNames[field] : nullptr;
 }
 
-int hopInfDescriptor::findField(const char *fieldName) const
+int SackItemDescriptor::findField(const char *fieldName) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     int baseIndex = base ? base->getFieldCount() : 0;
-    if (strcmp(fieldName, "queueLength") == 0) return baseIndex + 0;
-    if (strcmp(fieldName, "txRate") == 0) return baseIndex + 1;
-    if (strcmp(fieldName, "txBytes") == 0) return baseIndex + 2;
-    if (strcmp(fieldName, "TS") == 0) return baseIndex + 3;
+    if (strcmp(fieldName, "packetid") == 0) return baseIndex + 0;
     return base ? base->findField(fieldName) : -1;
 }
 
-const char *hopInfDescriptor::getFieldTypeString(int field) const
+const char *SackItemDescriptor::getFieldTypeString(int field) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -304,15 +321,12 @@ const char *hopInfDescriptor::getFieldTypeString(int field) const
         field -= base->getFieldCount();
     }
     static const char *fieldTypeStrings[] = {
-        "inet::b",    // FIELD_queueLength
-        "double",    // FIELD_txRate
-        "uint64",    // FIELD_txBytes
-        "omnetpp::simtime_t",    // FIELD_TS
+        "unsigned int",    // FIELD_packetid
     };
-    return (field >= 0 && field < 4) ? fieldTypeStrings[field] : nullptr;
+    return (field >= 0 && field < 1) ? fieldTypeStrings[field] : nullptr;
 }
 
-const char **hopInfDescriptor::getFieldPropertyNames(int field) const
+const char **SackItemDescriptor::getFieldPropertyNames(int field) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -325,7 +339,7 @@ const char **hopInfDescriptor::getFieldPropertyNames(int field) const
     }
 }
 
-const char *hopInfDescriptor::getFieldProperty(int field, const char *propertyName) const
+const char *SackItemDescriptor::getFieldProperty(int field, const char *propertyName) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -338,7 +352,7 @@ const char *hopInfDescriptor::getFieldProperty(int field, const char *propertyNa
     }
 }
 
-int hopInfDescriptor::getFieldArraySize(omnetpp::any_ptr object, int field) const
+int SackItemDescriptor::getFieldArraySize(omnetpp::any_ptr object, int field) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -346,13 +360,13 @@ int hopInfDescriptor::getFieldArraySize(omnetpp::any_ptr object, int field) cons
             return base->getFieldArraySize(object, field);
         field -= base->getFieldCount();
     }
-    hopInf *pp = omnetpp::fromAnyPtr<hopInf>(object); (void)pp;
+    SackItem *pp = omnetpp::fromAnyPtr<SackItem>(object); (void)pp;
     switch (field) {
         default: return 0;
     }
 }
 
-void hopInfDescriptor::setFieldArraySize(omnetpp::any_ptr object, int field, int size) const
+void SackItemDescriptor::setFieldArraySize(omnetpp::any_ptr object, int field, int size) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -362,13 +376,13 @@ void hopInfDescriptor::setFieldArraySize(omnetpp::any_ptr object, int field, int
         }
         field -= base->getFieldCount();
     }
-    hopInf *pp = omnetpp::fromAnyPtr<hopInf>(object); (void)pp;
+    SackItem *pp = omnetpp::fromAnyPtr<SackItem>(object); (void)pp;
     switch (field) {
-        default: throw omnetpp::cRuntimeError("Cannot set array size of field %d of class 'hopInf'", field);
+        default: throw omnetpp::cRuntimeError("Cannot set array size of field %d of class 'SackItem'", field);
     }
 }
 
-const char *hopInfDescriptor::getFieldDynamicTypeString(omnetpp::any_ptr object, int field, int i) const
+const char *SackItemDescriptor::getFieldDynamicTypeString(omnetpp::any_ptr object, int field, int i) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -376,13 +390,13 @@ const char *hopInfDescriptor::getFieldDynamicTypeString(omnetpp::any_ptr object,
             return base->getFieldDynamicTypeString(object,field,i);
         field -= base->getFieldCount();
     }
-    hopInf *pp = omnetpp::fromAnyPtr<hopInf>(object); (void)pp;
+    SackItem *pp = omnetpp::fromAnyPtr<SackItem>(object); (void)pp;
     switch (field) {
         default: return nullptr;
     }
 }
 
-std::string hopInfDescriptor::getFieldValueAsString(omnetpp::any_ptr object, int field, int i) const
+std::string SackItemDescriptor::getFieldValueAsString(omnetpp::any_ptr object, int field, int i) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -390,17 +404,14 @@ std::string hopInfDescriptor::getFieldValueAsString(omnetpp::any_ptr object, int
             return base->getFieldValueAsString(object,field,i);
         field -= base->getFieldCount();
     }
-    hopInf *pp = omnetpp::fromAnyPtr<hopInf>(object); (void)pp;
+    SackItem *pp = omnetpp::fromAnyPtr<SackItem>(object); (void)pp;
     switch (field) {
-        case FIELD_queueLength: return unit2string(pp->queueLength);
-        case FIELD_txRate: return double2string(pp->txRate);
-        case FIELD_txBytes: return uint642string(pp->txBytes);
-        case FIELD_TS: return simtime2string(pp->TS);
+        case FIELD_packetid: return ulong2string(pp->getPacketid());
         default: return "";
     }
 }
 
-void hopInfDescriptor::setFieldValueAsString(omnetpp::any_ptr object, int field, int i, const char *value) const
+void SackItemDescriptor::setFieldValueAsString(omnetpp::any_ptr object, int field, int i, const char *value) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -410,17 +421,14 @@ void hopInfDescriptor::setFieldValueAsString(omnetpp::any_ptr object, int field,
         }
         field -= base->getFieldCount();
     }
-    hopInf *pp = omnetpp::fromAnyPtr<hopInf>(object); (void)pp;
+    SackItem *pp = omnetpp::fromAnyPtr<SackItem>(object); (void)pp;
     switch (field) {
-        case FIELD_queueLength: pp->queueLength = b(string2long(value)); break;
-        case FIELD_txRate: pp->txRate = string2double(value); break;
-        case FIELD_txBytes: pp->txBytes = string2uint64(value); break;
-        case FIELD_TS: pp->TS = string2simtime(value); break;
-        default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'hopInf'", field);
+        case FIELD_packetid: pp->setPacketid(string2ulong(value)); break;
+        default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'SackItem'", field);
     }
 }
 
-omnetpp::cValue hopInfDescriptor::getFieldValue(omnetpp::any_ptr object, int field, int i) const
+omnetpp::cValue SackItemDescriptor::getFieldValue(omnetpp::any_ptr object, int field, int i) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -428,17 +436,14 @@ omnetpp::cValue hopInfDescriptor::getFieldValue(omnetpp::any_ptr object, int fie
             return base->getFieldValue(object,field,i);
         field -= base->getFieldCount();
     }
-    hopInf *pp = omnetpp::fromAnyPtr<hopInf>(object); (void)pp;
+    SackItem *pp = omnetpp::fromAnyPtr<SackItem>(object); (void)pp;
     switch (field) {
-        case FIELD_queueLength: return cValue(pp->queueLength.get(),"b");
-        case FIELD_txRate: return pp->txRate;
-        case FIELD_txBytes: return omnetpp::checked_int_cast<omnetpp::intval_t>(pp->txBytes);
-        case FIELD_TS: return pp->TS.dbl();
-        default: throw omnetpp::cRuntimeError("Cannot return field %d of class 'hopInf' as cValue -- field index out of range?", field);
+        case FIELD_packetid: return (omnetpp::intval_t)(pp->getPacketid());
+        default: throw omnetpp::cRuntimeError("Cannot return field %d of class 'SackItem' as cValue -- field index out of range?", field);
     }
 }
 
-void hopInfDescriptor::setFieldValue(omnetpp::any_ptr object, int field, int i, const omnetpp::cValue& value) const
+void SackItemDescriptor::setFieldValue(omnetpp::any_ptr object, int field, int i, const omnetpp::cValue& value) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -448,17 +453,14 @@ void hopInfDescriptor::setFieldValue(omnetpp::any_ptr object, int field, int i, 
         }
         field -= base->getFieldCount();
     }
-    hopInf *pp = omnetpp::fromAnyPtr<hopInf>(object); (void)pp;
+    SackItem *pp = omnetpp::fromAnyPtr<SackItem>(object); (void)pp;
     switch (field) {
-        case FIELD_queueLength: pp->queueLength = b(value.intValueInUnit("b")); break;
-        case FIELD_txRate: pp->txRate = value.doubleValue(); break;
-        case FIELD_txBytes: pp->txBytes = omnetpp::checked_int_cast<uint64_t>(value.intValue()); break;
-        case FIELD_TS: pp->TS = value.doubleValue(); break;
-        default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'hopInf'", field);
+        case FIELD_packetid: pp->setPacketid(omnetpp::checked_int_cast<unsigned int>(value.intValue())); break;
+        default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'SackItem'", field);
     }
 }
 
-const char *hopInfDescriptor::getFieldStructName(int field) const
+const char *SackItemDescriptor::getFieldStructName(int field) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -471,7 +473,7 @@ const char *hopInfDescriptor::getFieldStructName(int field) const
     };
 }
 
-omnetpp::any_ptr hopInfDescriptor::getFieldStructValuePointer(omnetpp::any_ptr object, int field, int i) const
+omnetpp::any_ptr SackItemDescriptor::getFieldStructValuePointer(omnetpp::any_ptr object, int field, int i) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -479,13 +481,13 @@ omnetpp::any_ptr hopInfDescriptor::getFieldStructValuePointer(omnetpp::any_ptr o
             return base->getFieldStructValuePointer(object, field, i);
         field -= base->getFieldCount();
     }
-    hopInf *pp = omnetpp::fromAnyPtr<hopInf>(object); (void)pp;
+    SackItem *pp = omnetpp::fromAnyPtr<SackItem>(object); (void)pp;
     switch (field) {
         default: return omnetpp::any_ptr(nullptr);
     }
 }
 
-void hopInfDescriptor::setFieldStructValuePointer(omnetpp::any_ptr object, int field, int i, omnetpp::any_ptr ptr) const
+void SackItemDescriptor::setFieldStructValuePointer(omnetpp::any_ptr object, int field, int i, omnetpp::any_ptr ptr) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -495,30 +497,31 @@ void hopInfDescriptor::setFieldStructValuePointer(omnetpp::any_ptr object, int f
         }
         field -= base->getFieldCount();
     }
-    hopInf *pp = omnetpp::fromAnyPtr<hopInf>(object); (void)pp;
+    SackItem *pp = omnetpp::fromAnyPtr<SackItem>(object); (void)pp;
     switch (field) {
-        default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'hopInf'", field);
+        default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'SackItem'", field);
     }
 }
 
-Register_Class(INTHeader)
+Register_Class(SACK)
 
-INTHeader::INTHeader() : ::inet::FieldsChunk()
+SACK::SACK() : ::inet::FieldsChunk()
 {
-    this->setChunkLength(B (42));
+    this->setChunkLength(B(2));
 
 }
 
-INTHeader::INTHeader(const INTHeader& other) : ::inet::FieldsChunk(other)
+SACK::SACK(const SACK& other) : ::inet::FieldsChunk(other)
 {
     copy(other);
 }
 
-INTHeader::~INTHeader()
+SACK::~SACK()
 {
+    delete [] this->sackItem;
 }
 
-INTHeader& INTHeader::operator=(const INTHeader& other)
+SACK& SACK::operator=(const SACK& other)
 {
     if (this == &other) return *this;
     ::inet::FieldsChunk::operator=(other);
@@ -526,83 +529,114 @@ INTHeader& INTHeader::operator=(const INTHeader& other)
     return *this;
 }
 
-void INTHeader::copy(const INTHeader& other)
+void SACK::copy(const SACK& other)
 {
-    this->nHop = other.nHop;
-    this->pathID = other.pathID;
-    for (size_t i = 0; i < 5; i++) {
-        this->hopInfs[i] = other.hopInfs[i];
+    delete [] this->sackItem;
+    this->sackItem = (other.sackItem_arraysize==0) ? nullptr : new SackItem[other.sackItem_arraysize];
+    sackItem_arraysize = other.sackItem_arraysize;
+    for (size_t i = 0; i < sackItem_arraysize; i++) {
+        this->sackItem[i] = other.sackItem[i];
     }
 }
 
-void INTHeader::parsimPack(omnetpp::cCommBuffer *b) const
+void SACK::parsimPack(omnetpp::cCommBuffer *b) const
 {
     ::inet::FieldsChunk::parsimPack(b);
-    doParsimPacking(b,this->nHop);
-    doParsimPacking(b,this->pathID);
-    doParsimArrayPacking(b,this->hopInfs,5);
+    b->pack(sackItem_arraysize);
+    doParsimArrayPacking(b,this->sackItem,sackItem_arraysize);
 }
 
-void INTHeader::parsimUnpack(omnetpp::cCommBuffer *b)
+void SACK::parsimUnpack(omnetpp::cCommBuffer *b)
 {
     ::inet::FieldsChunk::parsimUnpack(b);
-    doParsimUnpacking(b,this->nHop);
-    doParsimUnpacking(b,this->pathID);
-    doParsimArrayUnpacking(b,this->hopInfs,5);
+    delete [] this->sackItem;
+    b->unpack(sackItem_arraysize);
+    if (sackItem_arraysize == 0) {
+        this->sackItem = nullptr;
+    } else {
+        this->sackItem = new SackItem[sackItem_arraysize];
+        doParsimArrayUnpacking(b,this->sackItem,sackItem_arraysize);
+    }
 }
 
-int INTHeader::getNHop() const
+size_t SACK::getSackItemArraySize() const
 {
-    return this->nHop;
+    return sackItem_arraysize;
 }
 
-void INTHeader::setNHop(int nHop)
+const SackItem& SACK::getSackItem(size_t k) const
+{
+    if (k >= sackItem_arraysize) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)sackItem_arraysize, (unsigned long)k);
+    return this->sackItem[k];
+}
+
+void SACK::setSackItemArraySize(size_t newSize)
 {
     handleChange();
-    this->nHop = nHop;
+    SackItem *sackItem2 = (newSize==0) ? nullptr : new SackItem[newSize];
+    size_t minSize = sackItem_arraysize < newSize ? sackItem_arraysize : newSize;
+    for (size_t i = 0; i < minSize; i++)
+        sackItem2[i] = this->sackItem[i];
+    delete [] this->sackItem;
+    this->sackItem = sackItem2;
+    sackItem_arraysize = newSize;
 }
 
-int INTHeader::getPathID() const
+void SACK::setSackItem(size_t k, const SackItem& sackItem)
 {
-    return this->pathID;
-}
-
-void INTHeader::setPathID(int pathID)
-{
+    if (k >= sackItem_arraysize) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)sackItem_arraysize, (unsigned long)k);
     handleChange();
-    this->pathID = pathID;
+    this->sackItem[k] = sackItem;
 }
 
-size_t INTHeader::getHopInfsArraySize() const
+void SACK::insertSackItem(size_t k, const SackItem& sackItem)
 {
-    return 5;
-}
-
-const hopInf& INTHeader::getHopInfs(size_t k) const
-{
-    if (k >= 5) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)5, (unsigned long)k);
-    return this->hopInfs[k];
-}
-
-void INTHeader::setHopInfs(size_t k, const hopInf& hopInfs)
-{
-    if (k >= 5) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)5, (unsigned long)k);
+    if (k > sackItem_arraysize) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)sackItem_arraysize, (unsigned long)k);
     handleChange();
-    this->hopInfs[k] = hopInfs;
+    size_t newSize = sackItem_arraysize + 1;
+    SackItem *sackItem2 = new SackItem[newSize];
+    size_t i;
+    for (i = 0; i < k; i++)
+        sackItem2[i] = this->sackItem[i];
+    sackItem2[k] = sackItem;
+    for (i = k + 1; i < newSize; i++)
+        sackItem2[i] = this->sackItem[i-1];
+    delete [] this->sackItem;
+    this->sackItem = sackItem2;
+    sackItem_arraysize = newSize;
 }
 
-class INTHeaderDescriptor : public omnetpp::cClassDescriptor
+void SACK::appendSackItem(const SackItem& sackItem)
+{
+    insertSackItem(sackItem_arraysize, sackItem);
+}
+
+void SACK::eraseSackItem(size_t k)
+{
+    if (k >= sackItem_arraysize) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)sackItem_arraysize, (unsigned long)k);
+    handleChange();
+    size_t newSize = sackItem_arraysize - 1;
+    SackItem *sackItem2 = (newSize == 0) ? nullptr : new SackItem[newSize];
+    size_t i;
+    for (i = 0; i < k; i++)
+        sackItem2[i] = this->sackItem[i];
+    for (i = k; i < newSize; i++)
+        sackItem2[i] = this->sackItem[i+1];
+    delete [] this->sackItem;
+    this->sackItem = sackItem2;
+    sackItem_arraysize = newSize;
+}
+
+class SACKDescriptor : public omnetpp::cClassDescriptor
 {
   private:
     mutable const char **propertyNames;
     enum FieldConstants {
-        FIELD_nHop,
-        FIELD_pathID,
-        FIELD_hopInfs,
+        FIELD_sackItem,
     };
   public:
-    INTHeaderDescriptor();
-    virtual ~INTHeaderDescriptor();
+    SACKDescriptor();
+    virtual ~SACKDescriptor();
 
     virtual bool doesSupport(omnetpp::cObject *obj) const override;
     virtual const char **getPropertyNames() const override;
@@ -628,24 +662,24 @@ class INTHeaderDescriptor : public omnetpp::cClassDescriptor
     virtual void setFieldStructValuePointer(omnetpp::any_ptr object, int field, int i, omnetpp::any_ptr ptr) const override;
 };
 
-Register_ClassDescriptor(INTHeaderDescriptor)
+Register_ClassDescriptor(SACKDescriptor)
 
-INTHeaderDescriptor::INTHeaderDescriptor() : omnetpp::cClassDescriptor(omnetpp::opp_typename(typeid(inet::INTHeader)), "inet::FieldsChunk")
+SACKDescriptor::SACKDescriptor() : omnetpp::cClassDescriptor(omnetpp::opp_typename(typeid(inet::SACK)), "inet::FieldsChunk")
 {
     propertyNames = nullptr;
 }
 
-INTHeaderDescriptor::~INTHeaderDescriptor()
+SACKDescriptor::~SACKDescriptor()
 {
     delete[] propertyNames;
 }
 
-bool INTHeaderDescriptor::doesSupport(omnetpp::cObject *obj) const
+bool SACKDescriptor::doesSupport(omnetpp::cObject *obj) const
 {
-    return dynamic_cast<INTHeader *>(obj)!=nullptr;
+    return dynamic_cast<SACK *>(obj)!=nullptr;
 }
 
-const char **INTHeaderDescriptor::getPropertyNames() const
+const char **SACKDescriptor::getPropertyNames() const
 {
     if (!propertyNames) {
         static const char *names[] = {  nullptr };
@@ -656,19 +690,19 @@ const char **INTHeaderDescriptor::getPropertyNames() const
     return propertyNames;
 }
 
-const char *INTHeaderDescriptor::getProperty(const char *propertyName) const
+const char *SACKDescriptor::getProperty(const char *propertyName) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     return base ? base->getProperty(propertyName) : nullptr;
 }
 
-int INTHeaderDescriptor::getFieldCount() const
+int SACKDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
-    return base ? 3+base->getFieldCount() : 3;
+    return base ? 1+base->getFieldCount() : 1;
 }
 
-unsigned int INTHeaderDescriptor::getFieldTypeFlags(int field) const
+unsigned int SACKDescriptor::getFieldTypeFlags(int field) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -677,14 +711,12 @@ unsigned int INTHeaderDescriptor::getFieldTypeFlags(int field) const
         field -= base->getFieldCount();
     }
     static unsigned int fieldTypeFlags[] = {
-        FD_ISEDITABLE,    // FIELD_nHop
-        FD_ISEDITABLE,    // FIELD_pathID
-        FD_ISARRAY | FD_ISCOMPOUND,    // FIELD_hopInfs
+        FD_ISARRAY | FD_ISCOMPOUND | FD_ISCOBJECT | FD_ISRESIZABLE,    // FIELD_sackItem
     };
-    return (field >= 0 && field < 3) ? fieldTypeFlags[field] : 0;
+    return (field >= 0 && field < 1) ? fieldTypeFlags[field] : 0;
 }
 
-const char *INTHeaderDescriptor::getFieldName(int field) const
+const char *SACKDescriptor::getFieldName(int field) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -693,24 +725,20 @@ const char *INTHeaderDescriptor::getFieldName(int field) const
         field -= base->getFieldCount();
     }
     static const char *fieldNames[] = {
-        "nHop",
-        "pathID",
-        "hopInfs",
+        "sackItem",
     };
-    return (field >= 0 && field < 3) ? fieldNames[field] : nullptr;
+    return (field >= 0 && field < 1) ? fieldNames[field] : nullptr;
 }
 
-int INTHeaderDescriptor::findField(const char *fieldName) const
+int SACKDescriptor::findField(const char *fieldName) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     int baseIndex = base ? base->getFieldCount() : 0;
-    if (strcmp(fieldName, "nHop") == 0) return baseIndex + 0;
-    if (strcmp(fieldName, "pathID") == 0) return baseIndex + 1;
-    if (strcmp(fieldName, "hopInfs") == 0) return baseIndex + 2;
+    if (strcmp(fieldName, "sackItem") == 0) return baseIndex + 0;
     return base ? base->findField(fieldName) : -1;
 }
 
-const char *INTHeaderDescriptor::getFieldTypeString(int field) const
+const char *SACKDescriptor::getFieldTypeString(int field) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -719,14 +747,12 @@ const char *INTHeaderDescriptor::getFieldTypeString(int field) const
         field -= base->getFieldCount();
     }
     static const char *fieldTypeStrings[] = {
-        "int",    // FIELD_nHop
-        "int",    // FIELD_pathID
-        "inet::hopInf",    // FIELD_hopInfs
+        "inet::SackItem",    // FIELD_sackItem
     };
-    return (field >= 0 && field < 3) ? fieldTypeStrings[field] : nullptr;
+    return (field >= 0 && field < 1) ? fieldTypeStrings[field] : nullptr;
 }
 
-const char **INTHeaderDescriptor::getFieldPropertyNames(int field) const
+const char **SACKDescriptor::getFieldPropertyNames(int field) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -739,7 +765,7 @@ const char **INTHeaderDescriptor::getFieldPropertyNames(int field) const
     }
 }
 
-const char *INTHeaderDescriptor::getFieldProperty(int field, const char *propertyName) const
+const char *SACKDescriptor::getFieldProperty(int field, const char *propertyName) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -752,7 +778,7 @@ const char *INTHeaderDescriptor::getFieldProperty(int field, const char *propert
     }
 }
 
-int INTHeaderDescriptor::getFieldArraySize(omnetpp::any_ptr object, int field) const
+int SACKDescriptor::getFieldArraySize(omnetpp::any_ptr object, int field) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -760,14 +786,14 @@ int INTHeaderDescriptor::getFieldArraySize(omnetpp::any_ptr object, int field) c
             return base->getFieldArraySize(object, field);
         field -= base->getFieldCount();
     }
-    INTHeader *pp = omnetpp::fromAnyPtr<INTHeader>(object); (void)pp;
+    SACK *pp = omnetpp::fromAnyPtr<SACK>(object); (void)pp;
     switch (field) {
-        case FIELD_hopInfs: return 5;
+        case FIELD_sackItem: return pp->getSackItemArraySize();
         default: return 0;
     }
 }
 
-void INTHeaderDescriptor::setFieldArraySize(omnetpp::any_ptr object, int field, int size) const
+void SACKDescriptor::setFieldArraySize(omnetpp::any_ptr object, int field, int size) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -777,13 +803,14 @@ void INTHeaderDescriptor::setFieldArraySize(omnetpp::any_ptr object, int field, 
         }
         field -= base->getFieldCount();
     }
-    INTHeader *pp = omnetpp::fromAnyPtr<INTHeader>(object); (void)pp;
+    SACK *pp = omnetpp::fromAnyPtr<SACK>(object); (void)pp;
     switch (field) {
-        default: throw omnetpp::cRuntimeError("Cannot set array size of field %d of class 'INTHeader'", field);
+        case FIELD_sackItem: pp->setSackItemArraySize(size); break;
+        default: throw omnetpp::cRuntimeError("Cannot set array size of field %d of class 'SACK'", field);
     }
 }
 
-const char *INTHeaderDescriptor::getFieldDynamicTypeString(omnetpp::any_ptr object, int field, int i) const
+const char *SACKDescriptor::getFieldDynamicTypeString(omnetpp::any_ptr object, int field, int i) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -791,13 +818,13 @@ const char *INTHeaderDescriptor::getFieldDynamicTypeString(omnetpp::any_ptr obje
             return base->getFieldDynamicTypeString(object,field,i);
         field -= base->getFieldCount();
     }
-    INTHeader *pp = omnetpp::fromAnyPtr<INTHeader>(object); (void)pp;
+    SACK *pp = omnetpp::fromAnyPtr<SACK>(object); (void)pp;
     switch (field) {
         default: return nullptr;
     }
 }
 
-std::string INTHeaderDescriptor::getFieldValueAsString(omnetpp::any_ptr object, int field, int i) const
+std::string SACKDescriptor::getFieldValueAsString(omnetpp::any_ptr object, int field, int i) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -805,16 +832,14 @@ std::string INTHeaderDescriptor::getFieldValueAsString(omnetpp::any_ptr object, 
             return base->getFieldValueAsString(object,field,i);
         field -= base->getFieldCount();
     }
-    INTHeader *pp = omnetpp::fromAnyPtr<INTHeader>(object); (void)pp;
+    SACK *pp = omnetpp::fromAnyPtr<SACK>(object); (void)pp;
     switch (field) {
-        case FIELD_nHop: return long2string(pp->getNHop());
-        case FIELD_pathID: return long2string(pp->getPathID());
-        case FIELD_hopInfs: return "";
+        case FIELD_sackItem: return pp->getSackItem(i).str();
         default: return "";
     }
 }
 
-void INTHeaderDescriptor::setFieldValueAsString(omnetpp::any_ptr object, int field, int i, const char *value) const
+void SACKDescriptor::setFieldValueAsString(omnetpp::any_ptr object, int field, int i, const char *value) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -824,15 +849,13 @@ void INTHeaderDescriptor::setFieldValueAsString(omnetpp::any_ptr object, int fie
         }
         field -= base->getFieldCount();
     }
-    INTHeader *pp = omnetpp::fromAnyPtr<INTHeader>(object); (void)pp;
+    SACK *pp = omnetpp::fromAnyPtr<SACK>(object); (void)pp;
     switch (field) {
-        case FIELD_nHop: pp->setNHop(string2long(value)); break;
-        case FIELD_pathID: pp->setPathID(string2long(value)); break;
-        default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'INTHeader'", field);
+        default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'SACK'", field);
     }
 }
 
-omnetpp::cValue INTHeaderDescriptor::getFieldValue(omnetpp::any_ptr object, int field, int i) const
+omnetpp::cValue SACKDescriptor::getFieldValue(omnetpp::any_ptr object, int field, int i) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -840,16 +863,14 @@ omnetpp::cValue INTHeaderDescriptor::getFieldValue(omnetpp::any_ptr object, int 
             return base->getFieldValue(object,field,i);
         field -= base->getFieldCount();
     }
-    INTHeader *pp = omnetpp::fromAnyPtr<INTHeader>(object); (void)pp;
+    SACK *pp = omnetpp::fromAnyPtr<SACK>(object); (void)pp;
     switch (field) {
-        case FIELD_nHop: return pp->getNHop();
-        case FIELD_pathID: return pp->getPathID();
-        case FIELD_hopInfs: return omnetpp::toAnyPtr(&pp->getHopInfs(i)); break;
-        default: throw omnetpp::cRuntimeError("Cannot return field %d of class 'INTHeader' as cValue -- field index out of range?", field);
+        case FIELD_sackItem: return omnetpp::toAnyPtr(&pp->getSackItem(i)); break;
+        default: throw omnetpp::cRuntimeError("Cannot return field %d of class 'SACK' as cValue -- field index out of range?", field);
     }
 }
 
-void INTHeaderDescriptor::setFieldValue(omnetpp::any_ptr object, int field, int i, const omnetpp::cValue& value) const
+void SACKDescriptor::setFieldValue(omnetpp::any_ptr object, int field, int i, const omnetpp::cValue& value) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -859,15 +880,13 @@ void INTHeaderDescriptor::setFieldValue(omnetpp::any_ptr object, int field, int 
         }
         field -= base->getFieldCount();
     }
-    INTHeader *pp = omnetpp::fromAnyPtr<INTHeader>(object); (void)pp;
+    SACK *pp = omnetpp::fromAnyPtr<SACK>(object); (void)pp;
     switch (field) {
-        case FIELD_nHop: pp->setNHop(omnetpp::checked_int_cast<int>(value.intValue())); break;
-        case FIELD_pathID: pp->setPathID(omnetpp::checked_int_cast<int>(value.intValue())); break;
-        default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'INTHeader'", field);
+        default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'SACK'", field);
     }
 }
 
-const char *INTHeaderDescriptor::getFieldStructName(int field) const
+const char *SACKDescriptor::getFieldStructName(int field) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -876,12 +895,12 @@ const char *INTHeaderDescriptor::getFieldStructName(int field) const
         field -= base->getFieldCount();
     }
     switch (field) {
-        case FIELD_hopInfs: return omnetpp::opp_typename(typeid(hopInf));
+        case FIELD_sackItem: return omnetpp::opp_typename(typeid(SackItem));
         default: return nullptr;
     };
 }
 
-omnetpp::any_ptr INTHeaderDescriptor::getFieldStructValuePointer(omnetpp::any_ptr object, int field, int i) const
+omnetpp::any_ptr SACKDescriptor::getFieldStructValuePointer(omnetpp::any_ptr object, int field, int i) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -889,14 +908,14 @@ omnetpp::any_ptr INTHeaderDescriptor::getFieldStructValuePointer(omnetpp::any_pt
             return base->getFieldStructValuePointer(object, field, i);
         field -= base->getFieldCount();
     }
-    INTHeader *pp = omnetpp::fromAnyPtr<INTHeader>(object); (void)pp;
+    SACK *pp = omnetpp::fromAnyPtr<SACK>(object); (void)pp;
     switch (field) {
-        case FIELD_hopInfs: return omnetpp::toAnyPtr(&pp->getHopInfs(i)); break;
+        case FIELD_sackItem: return omnetpp::toAnyPtr(&pp->getSackItem(i)); break;
         default: return omnetpp::any_ptr(nullptr);
     }
 }
 
-void INTHeaderDescriptor::setFieldStructValuePointer(omnetpp::any_ptr object, int field, int i, omnetpp::any_ptr ptr) const
+void SACKDescriptor::setFieldStructValuePointer(omnetpp::any_ptr object, int field, int i, omnetpp::any_ptr ptr) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     if (base) {
@@ -906,9 +925,9 @@ void INTHeaderDescriptor::setFieldStructValuePointer(omnetpp::any_ptr object, in
         }
         field -= base->getFieldCount();
     }
-    INTHeader *pp = omnetpp::fromAnyPtr<INTHeader>(object); (void)pp;
+    SACK *pp = omnetpp::fromAnyPtr<SACK>(object); (void)pp;
     switch (field) {
-        default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'INTHeader'", field);
+        default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'SACK'", field);
     }
 }
 

@@ -78,7 +78,7 @@ void TcpApp::initialize(int stage)
 
 void TcpApp::handleStartOperation(LifecycleOperation *operation)
 {
-    if (tOpen>=SIMTIME_ZERO&&tOpen<tClose) {
+    if (tOpen>=SIMTIME_ZERO&&tOpen<tClose) {EV<<"handleStartOperation"<<endl;
         timeoutMsg->setKind(MSGKIND_CONNECT);
         scheduleAt(tOpen, timeoutMsg);
     }

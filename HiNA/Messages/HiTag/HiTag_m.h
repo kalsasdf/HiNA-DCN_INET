@@ -44,7 +44,7 @@ class HiTag;
 namespace inet {
 
 /**
- * Class generated from <tt>inet\HiNA\Messages\HiTag\HiTag.msg:12</tt> by opp_msgtool.
+ * Class generated from <tt>inet\HiNA\Messages\HiTag\HiTag.msg:13</tt> by opp_msgtool.
  * <pre>
  * class HiTag extends TagBase
  * {

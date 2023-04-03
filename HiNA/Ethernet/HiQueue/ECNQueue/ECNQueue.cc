@@ -27,7 +27,6 @@ void ECNQueue::initialize(int stage)
         packetCapacity = par("packetCapacity");
         dataCapacity = b(par("dataCapacity"));
         K = par("K");
-        queuelengthVector.setName("queuelength (b)");
         buffer = findModuleFromPar<IPacketBuffer>(par("bufferModule"), this);
         packetComparatorFunction = createComparatorFunction(par("comparatorClass"));
         if (packetComparatorFunction != nullptr)
@@ -117,7 +116,6 @@ Packet *ECNQueue::pullPacket(cGate *gate)
     else
         queue.pop();
 
-    queuelengthVector.recordWithTimestamp(simTime(), queue.getBitLength());
     auto queueingTime = simTime() - packet->getArrivalTime();
     auto packetEvent = new PacketQueuedEvent();
     packetEvent->setQueuePacketLength(getNumPackets());

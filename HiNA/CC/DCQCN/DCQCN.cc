@@ -190,8 +190,8 @@ void DCQCN::send_data()
         delete snd_info.rateTimer;
         cancelEvent(snd_info.alphaTimer);
         delete snd_info.alphaTimer;
-        sender_flowMap.erase(snd_info.flowid);
         iter++;
+        sender_flowMap.erase(snd_info.flowid);
     }else{
         if (snd_info.SenderAcceleratingState != Normal)
         {

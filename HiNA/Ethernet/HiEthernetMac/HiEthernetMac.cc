@@ -144,7 +144,7 @@ void HiEthernetMac::startFrameTransmission()
         INT_hdr->setNHop(nHop);
         int pathID = INT_hdr->getPathID() ^ hostModule->getId();//hostID未确定
         INT_hdr->setPathID(pathID);
-        INT_hdr->insertHopInfs(cur_inf);
+        INT_hdr->setHopInfs(nHop-1,cur_inf);
         frame->insertAtFront(INT_hdr);//加INT头
         frame->insertAtFront(ip_hdr);//加ip头
         frame->insertAtFront(eth_hdr);//加mac头
@@ -197,6 +197,8 @@ void HiEthernetMac::updateStats(simtime_t now, Packet *pck)
     for (auto& region : pck->peekData()->getAllTags<HiTag>()){
         priority = region.getTag()->getPriority();
     }
+    if(priority>11||priority<0)
+        priority = 10;
 
     intvlNumPackets++;
     intvlNumBits += bits;
@@ -214,11 +216,12 @@ void HiEthernetMac::beginNewInterval(simtime_t now)
     EV<<"interval = "<<duration<<"s"<<", dbl = "<<duration.dbl()<<"s"<<endl;
 
     // record measurements
-    double bitpersec = intvlNumBits / duration.dbl();//莫名其妙会高一倍
+    double bitpersec = intvlNumBits / duration.dbl();
     double pkpersec = intvlNumPackets / duration.dbl();
     EV<<"currate = "<<bitpersec<<"bps "<<pkpersec<<"pps"<<endl;
     for(int i = 0 ; i < 11 ; i++){
         pribitpersec[i] = intvlPriBits[i] / duration.dbl();
+        intvlPriBits[i] = 0;
     }
 
     bitpersecVector.recordWithTimestamp(intvlStartTime, bitpersec);

@@ -21,6 +21,7 @@ void XPASS::initialize()
     downGate = gate("upperIn");
     // configuration
     activate = par("activate");
+    stopTime = par("stopTime");
     max_pck_size = par("max_pck_size");
     linkspeed = par("linkspeed");
     targetratio = par("targetratio");
@@ -52,8 +53,6 @@ void XPASS::initialize()
     targetecnratio=0;
     credit_size = 208;//(84-58)*8,58=20(IP)+14(EthernetMac)+8(EthernetPhy)+4(EthernetFcs)+12(interframe gap,IFG)
     max_idletime = 0.00002;
-
-    sendcredit->setKind(SENDCRED);
 }
 
 void XPASS::handleMessage(cMessage *msg)
@@ -83,9 +82,6 @@ void XPASS::handleSelfMessage(cMessage *pck)
         case SENDCRED:
             send_credit(timer->getDestAddr());
             break;
-        case STOPCRED:
-            send_stop(timer->getDestAddr());
-            break;
         case ALPHATIMER:
             updateAlpha(timer->getDestAddr());
             break;
@@ -101,6 +97,7 @@ void XPASS::handleSelfMessage(cMessage *pck)
         }
         case SENDSTOP:
             send_stop(timer->getDestAddr());
+            delete pck;
             break;
     }
 }
@@ -220,20 +217,19 @@ void XPASS::receive_credreq(Packet *pck)
             rcvflow.iRhai=0;
             rcvflow.previousincrease = false;
             rcvflow.ReceiverState=Normal;
-            rcvflow.rateTimer = new TimerMsg("rateTimer");
             rcvflow.rateTimer->setKind(RATETIMER);
             rcvflow.rateTimer->setDestAddr(l3addr->getSrcAddress());
-            rcvflow.alphaTimer = new TimerMsg("alphaTimer");
             rcvflow.alphaTimer->setKind(ALPHATIMER);
             rcvflow.alphaTimer->setDestAddr(l3addr->getSrcAddress());
+            rcvflow.sendcredit->setKind(SENDCRED);
+            rcvflow.sendcredit->setDestAddr(l3addr->getSrcAddress());
 
             receiver_flowMap[l3addr->getSrcAddress()]=rcvflow;
         }else{
             rcvflow = receiver_flowMap[l3addr->getSrcAddress()];
         }
         EV<<"receive credreq, nowRTT = "<<rcvflow.nowRTT<<endl;
-        sendcredit->setDestAddr(l3addr->getSrcAddress());
-        scheduleAt(simTime(),sendcredit);
+        scheduleAt(simTime(),rcvflow.sendcredit);
         receiver_StateMap[l3addr->getSrcAddress()]=CREDIT_SENDING;
         delete pck;
     }
@@ -249,6 +245,7 @@ void XPASS::send_credit(L3Address destaddr)
     const auto& content = makeShared<ByteCountChunk>(B(credit_size/8+jitter_bytes));
     auto tag = content->addTag<HiTag>();
     tag->setPacketId(rcvflow.now_send_cdt_seq);
+    content->enableImplicitChunkSerialization = true;
 
     credit->insertAtFront(content);
 
@@ -263,8 +260,8 @@ void XPASS::send_credit(L3Address destaddr)
     rcvflow.now_send_cdt_seq++;
     receiver_flowMap[destaddr] = rcvflow;
     if(receiver_StateMap[destaddr]==CREDIT_SENDING){
-        sendcredit->setDestAddr(destaddr);
-        scheduleAt(simTime() + (simtime_t)((credit_size+(jitter_bytes+58)*8)/rcvflow.current_speed),sendcredit);
+        rcvflow.sendcredit->setDestAddr(destaddr);
+        scheduleAt(simTime() + (simtime_t)((credit_size+(jitter_bytes+58)*8)/rcvflow.current_speed),rcvflow.sendcredit);
         EV<<"currate = "<<rcvflow.current_speed<<", next time = "<<simTime() + (credit_size+jitter_bytes*8)/rcvflow.current_speed<<"s"<<endl;
     }
 }
@@ -283,7 +280,7 @@ void XPASS::receive_credit(Packet *pck)
     }
 
     // if no flow exits to be transmitted, stop transmitting.
-    if (remainSize == 0 && sender_StateMap[l3addr->getSrcAddress()]==CREDIT_RECEIVING)
+    if (simTime()>=stopTime||(remainSize == 0 && sender_StateMap[l3addr->getSrcAddress()]==CREDIT_RECEIVING))
     {
         // send stop credit to the receiver
         TimerMsg *sendstop = new TimerMsg("sendstop");

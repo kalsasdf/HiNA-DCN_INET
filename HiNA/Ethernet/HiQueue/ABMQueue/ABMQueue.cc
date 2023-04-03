@@ -17,8 +17,8 @@ namespace inet {
 
 Define_Module(ABMQueue);
 
-int ABMQueue::sharedBuffer[100]={0};
-uint32_t ABMQueue::congestedNum[100][11]={0};
+int ABMQueue::sharedBuffer[100]={};
+uint32_t ABMQueue::congestedNum[100][11]={};
 
 
 void ABMQueue::initialize(int stage)

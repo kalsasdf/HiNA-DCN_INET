@@ -22,6 +22,7 @@ simple XPASS like UdpCC
 {
     parameters:
         bool activate = default(true);
+        double stopTime @unit(s) = default(1s);
         double linkspeed @unit(bps) = default (1Gbps);
         int max_pck_size = default(1472);
         double wmax=default(0.5);

@@ -12,7 +12,7 @@ using namespace std;
 
 namespace inet {
 
-class HPCC : public cSimpleModule
+class HPCC : public TransportProtocolBase//cSimpleModule
 {
 protected:
     // states for self-scheduling
@@ -42,6 +42,7 @@ protected:
 
     // configuration for .ned file
     bool activate;
+    simtime_t stopTime;
     bool isFirstAck = true;
     uint64_t packetid = 0;
     uint64_t nxtSendpacketid = 0;
@@ -53,8 +54,8 @@ protected:
     int incstage = 0;//the count of Addictive Increase
     int expectedFlows;// the expected maximum number of concurrent flows on a link
     double U;//the normalized total inflight bytes
-    int send_window;//parameter w
-    int csend_window;//parameter wc
+    uint send_window;//parameter w
+    uint csend_window;//parameter wc
     simtime_t baseRTT;
     double currentRate;
     hopInf Last[10];
@@ -80,12 +81,11 @@ protected:
     std::map<L3Address, int> receiver_packetMap;
 
     TimerMsg *senddata = nullptr;
-    simtime_t stopTime;
 
 protected:
-    virtual void initialize() override;
+    virtual void initialize(int stage) override;
     virtual void handleMessage(cMessage *msg) override;
-    virtual void handleSelfMessage(cMessage *msg);
+    virtual void handleSelfMessage(cMessage *msg) override;
     virtual void refreshDisplay() const override;
     virtual ~HPCC() {cancelEvent(senddata); delete senddata;}
 
@@ -113,6 +113,10 @@ protected:
     virtual void receiveAck(Packet *pck);
 
     virtual void finish() override;
+    // ILifeCycle:
+    virtual void handleStartOperation(LifecycleOperation *operation) override{};
+    virtual void handleStopOperation(LifecycleOperation *operation) override{};
+    virtual void handleCrashOperation(LifecycleOperation *operation) override{};
 };
 
 } // namespace inet

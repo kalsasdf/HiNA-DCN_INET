@@ -165,8 +165,8 @@ void PCN::send_data()
     EV << "prepare to send packet, remaining data size = " << snd_info.remainLength <<endl;
 
     if (snd_info.remainLength == 0){
-        sender_flowMap.erase(snd_info.flowid);
         iter++;
+        sender_flowMap.erase(snd_info.flowid);
     }else{
         sender_flowMap[snd_info.flowid]=snd_info;
     }

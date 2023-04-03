@@ -38,8 +38,6 @@ class INET_API ECNQueue : public PacketQueueBase, public IPacketBuffer::ICallbac
     bool useEcn;
     int K;
 
-    cOutVector queuelengthVector;
-
   protected:
     virtual void initialize(int stage) override;
 

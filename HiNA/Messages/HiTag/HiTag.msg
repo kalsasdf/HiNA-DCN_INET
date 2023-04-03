@@ -8,6 +8,7 @@ import inet.common.Units;
 
 namespace inet;
 
+
 class HiTag extends TagBase
 {
     uint32_t Priority=-1;//防止没设置优先级的包进入优先级队列

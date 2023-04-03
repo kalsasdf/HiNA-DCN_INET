@@ -46,6 +46,7 @@ class XPASS : public cSimpleModule
     cGate *downGate;
     const char *packetName = "XPASSData";
     bool activate;
+    simtime_t stopTime;
     double linkspeed;
     int credit_size;
     double targetratio;
@@ -62,7 +63,6 @@ class XPASS : public cSimpleModule
     // states for self-scheduling
     enum SelfpckKindValues {
         SENDCRED,
-        STOPCRED,
         RATETIMER,
         ALPHATIMER,
         SENDSTOP
@@ -96,8 +96,9 @@ class XPASS : public cSimpleModule
         double normalized_gradient;
         double targetRate;
         double modeflag;
-        TimerMsg *alphaTimer=nullptr;
-        TimerMsg *rateTimer=nullptr;
+        TimerMsg *alphaTimer = new TimerMsg("alphaTimer");
+        TimerMsg *rateTimer = new TimerMsg("rateTimer");
+        TimerMsg *sendcredit = new TimerMsg("sendcredit");
     } receiver_flowinfo;
 
     typedef struct sender{
@@ -139,13 +140,16 @@ class XPASS : public cSimpleModule
     double ByteCounter_th;
     simtime_t nowRTT;
 
-    TimerMsg *sendcredit = new TimerMsg("sendcredit");
+
 
   protected:
     virtual void initialize() override;
     virtual void handleMessage(cMessage *msg) override;
     virtual void handleSelfMessage(cMessage *msg);
-    virtual ~XPASS() {cancelEvent(sendcredit);delete sendcredit;}
+    virtual ~XPASS() {for(auto i:receiver_flowMap){
+        delete i.second.alphaTimer;
+        delete i.second.rateTimer;}
+    }
 
     /**
      * Should be redefined to send out the packet; e.g. <tt>send(pck,"out")</tt>.

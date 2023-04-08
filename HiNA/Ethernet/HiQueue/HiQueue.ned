@@ -13,9 +13,9 @@ module HiQueue
 {
     parameters:
        // string interfaceTableModule;
-        bool usePfc;
+        bool usePfc = default(false);
         *.usePfc = this.usePfc;
-        bool useEcn;
+        bool useEcn = default(false);
         *.useEcn = this.useEcn;
         double bitrate @unit(bps);
         @display("bgb=692.05493,771.147");
@@ -36,42 +36,42 @@ module HiQueue
             @display("p=249.55,51.15;is=s");
         }
         Priority_0: <default("REDPFCQueue")> like IPacketQueue {
-            dataCapacity = default(1600000b);// keep low, for low delay and jitter
+            dataCapacity = default(160000b);
             priority = 0;
             @display("p=250,120;is=s");
         }
         Priority_1: <default("REDPFCQueue")> like IPacketQueue {
-            dataCapacity = default(1600000b);
+            dataCapacity = default(160000b);
             priority = 1;
             @display("p=250,180;is=s");
         }
         Priority_2: <default("REDPFCQueue")> like IPacketQueue {
-            dataCapacity = default(1600000b);
+            dataCapacity = default(160000b);
             priority = 2;
             @display("p=250,240;is=s");
         }
         Priority_3: <default("REDPFCQueue")> like IPacketQueue {
-            dataCapacity = default(1600000b);
+            dataCapacity = default(160000b);
             priority = 3;
             @display("p=250,300;is=s");
         }
         Priority_4: <default("REDPFCQueue")> like IPacketQueue {
-            dataCapacity = default(1600000b);
+            dataCapacity = default(160000b);
             priority = 4;
             @display("p=250,360;is=s");
         }
         Priority_5: <default("REDPFCQueue")> like IPacketQueue {
-            dataCapacity = default(1600000b);
+            dataCapacity = default(160000b);
             priority = 5;
             @display("p=250,420;is=s");
         }
         Priority_6: <default("REDPFCQueue")> like IPacketQueue {
-            dataCapacity = default(1600000b);
+            dataCapacity = default(160000b);
             priority = 6;
             @display("p=250,480;is=s");
         }
         Priority_7: <default("REDPFCQueue")> like IPacketQueue {
-            dataCapacity = default(1600000b);
+            dataCapacity = default(160000b);
             priority = 7;
             @display("p=250,540;is=s");
         }

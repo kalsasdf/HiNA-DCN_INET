@@ -69,7 +69,7 @@ module HiLinkLayerNodeBase extends HiNodeBase like IEthernetNetworkNode
         bl: MessageDispatcher {
             @display("p=750,750;b=1000,5");
         }
-        ethernet: <default(sizeof(ethg) > 0 ? "EthernetEncapsulation" : "")> like IEthernetLayer if typename != "" {
+        ethernet: <default(sizeof(ethg) > 0 ? "HiEthernetEncapsulation" : "")> like IEthernetLayer if typename != "" {
             @display("p=375,825");
         }
         ieee8021q: <default("")> like IIeee8021qLayer if typename != "" {

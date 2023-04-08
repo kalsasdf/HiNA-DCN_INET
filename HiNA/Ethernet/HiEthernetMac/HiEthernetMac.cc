@@ -53,6 +53,10 @@ void HiEthernetMac::initialize(int stage)
         WATCH(intvlStartTime);
         WATCH(intvlNumPackets);
         WATCH(intvlNumBits);
+        WATCH(sendpause);
+        WATCH(sendresume);
+        WATCH(receivepause);
+        WATCH(receiveresume);
 
         bitpersecVector.setName("thruput (bps)");
         pkpersecVector.setName("packet/sec");
@@ -405,12 +409,14 @@ void HiEthernetMac::processMsgFromNetwork(EthernetSignalBase *signal)
         else if(controlFrame->getOpCode() == ETHERNET_PFC_PAUSE){
             auto pauseFrame = check_and_cast<const EthernetPfcFrame *>(controlFrame.get());
             EV<<"receive PFC PAUSE for priority "<<pauseFrame->getPriority()<<endl;
+            receivepause++;
             emit(pfcPausedFrame,pauseFrame);
             delete packet;
         }
         else if(controlFrame->getOpCode() == ETHERNET_PFC_RESUME){
             auto pauseFrame = check_and_cast<const EthernetPfcFrame *>(controlFrame.get());
             EV<<"receive PFC RESUME for priority "<<pauseFrame->getPriority()<<endl;
+            receiveresume++;
             emit(pfcResumeFrame,pauseFrame);
             delete packet;
         }
@@ -497,6 +503,11 @@ void HiEthernetMac::finish()
     simtime_t totalRxChannelIdleTime = t - totalSuccessfulRxTime;
     recordScalar("rx channel idle (%)", 100 * (totalRxChannelIdleTime / t));
     recordScalar("rx channel utilization (%)", 100 * (totalSuccessfulRxTime / t));
+
+    recordScalar("send pause frame", sendpause);
+    recordScalar("send resume frame", sendresume);
+    recordScalar("receive pause frame", receivepause);
+    recordScalar("receive resume frame", receiveresume);
 }
 
 void HiEthernetMac::handleEndPausePeriod()
@@ -613,11 +624,12 @@ void HiEthernetMac::receiveSignal(cComponent *source, simsignal_t signalID, cObj
 void HiEthernetMac::processpfccommand(cObject *obj){
     Enter_Method("processpfccommand");
     auto tag=check_and_cast<Packet *>(obj)->getTag<HiTag>();
-    if(networkInterface->getInterfaceId()!=tag->getInterfaceId()){
+    if(networkInterface->getInterfaceId()==tag->getInterfaceId()){
         EV<<"pfc command to "<<networkInterface->getInterfaceName()<<endl;
         while(currentTxFrame==nullptr&& transmitState == TX_IDLE_STATE){
             if(tag->getOp()==ETHERNET_PFC_PAUSE){
                 EV<<"send pause frame"<<endl;
+                sendpause++;
                 auto packet = new Packet("Pause");
                 const auto& frame = makeShared<EthernetPfcFrame>();
                 const auto& hdr = makeShared<EthernetMacHeader>();
@@ -636,6 +648,7 @@ void HiEthernetMac::processpfccommand(cObject *obj){
                 startFrameTransmission();
             }else if(tag->getOp()==ETHERNET_PFC_RESUME){
                 EV<<"send resume frame"<<endl;
+                sendresume++;
                 auto packet = new Packet("Resume");
                 const auto& frame = makeShared<EthernetPfcFrame>();
                 const auto& hdr = makeShared<EthernetMacHeader>();

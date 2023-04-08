@@ -33,6 +33,10 @@ class INET_API REDPFCQueue : public PacketQueueBase, public IPacketBuffer::ICall
   public:
     int packetCapacity = -1;
     b dataCapacity = b(-1);
+    static b sharedBuffer[100][100];
+    b headroom;
+    double alpha;
+    uint64_t maxSize;
 
     IActivePacketSource *producer = nullptr;
     IActivePacketSink *collector = nullptr;
@@ -44,7 +48,7 @@ class INET_API REDPFCQueue : public PacketQueueBase, public IPacketBuffer::ICall
     IPacketComparatorFunction *packetComparatorFunction = nullptr;
 
     bool usePfc;
-    bool paused = false;
+    std::vector<int> paused;
     int XON;
     int XOFF;
     int priority;
@@ -55,13 +59,14 @@ class INET_API REDPFCQueue : public PacketQueueBase, public IPacketBuffer::ICall
     bool useEcn;
     bool markNext = false;
     double count = NaN;
+    int switchid;
     enum RedResult { RANDOMLY_ABOVE_LIMIT, RANDOMLY_BELOW_LIMIT, ABOVE_MAX_LIMIT, BELOW_MIN_LIMIT };
     mutable RedResult lastResult;
 
-    cOutVector queuelengthVector;
 
   protected:
     virtual void initialize(int stage) override;
+    virtual void handleMessage(cMessage *message) override;
 
     virtual IPacketDropperFunction *createDropperFunction(const char *dropperClass) const;
     virtual IPacketComparatorFunction *createComparatorFunction(const char *comparatorClass) const;
@@ -98,6 +103,7 @@ class INET_API REDPFCQueue : public PacketQueueBase, public IPacketBuffer::ICall
 
     virtual void pfcpaused() {}
     virtual void pfcresumed() {}
+    virtual bool BufferManagement(cMessage *msg);
 };
 
 } // namespace inet

@@ -21,6 +21,8 @@ simsignal_t REDPFCQueue::pfcPausedSignal =
         cComponent::registerSignal("pfcPaused");
 simsignal_t REDPFCQueue::pfcResumeSignal =
         cComponent::registerSignal("pfcResume");
+b REDPFCQueue::sharedBuffer[100][100]={};
+
 
 void REDPFCQueue::initialize(int stage)
 {
@@ -31,7 +33,10 @@ void REDPFCQueue::initialize(int stage)
         collector = findConnectedModule<IActivePacketSink>(outputGate);
         packetCapacity = par("packetCapacity");
         dataCapacity = b(par("dataCapacity"));
+        switchid=findContainingNode(this)->getId();EV<<"switchid = "<<switchid<<endl;
         priority = par("priority");
+        sharedBuffer[switchid][priority] = b(par("sharedBuffer"));
+        headroom = b(par("headroom"));
         usePfc = par("usePfc");
         XON = par("XON");
         XOFF = par("XOFF");
@@ -39,8 +44,8 @@ void REDPFCQueue::initialize(int stage)
         Kmin=par("Kmin");
         Pmax=par("Pmax");
         useEcn=par("useEcn");
+        alpha=par("alpha");
         count = -1;
-        queuelengthVector.setName("queuelength (b)");
         cModule *radioModule = getParentModule()->getParentModule();EV<<"parentmodule = "<<radioModule<<endl;
         eth = check_and_cast<NetworkInterface *>(radioModule);EV<<"eth = "<<eth<<endl;
         buffer = findModuleFromPar<IPacketBuffer>(par("bufferModule"), this);
@@ -93,6 +98,18 @@ Packet *REDPFCQueue::getPacket(int index) const
     return check_and_cast<Packet *>(queue.get(index));
 }
 
+void REDPFCQueue::handleMessage(cMessage *message)
+{
+    auto packet = check_and_cast<Packet *>(message);
+    if(BufferManagement(message))
+    {
+        pushPacket(packet, packet->getArrivalGate());
+    }
+    else{
+        dropPacket(packet, QUEUE_OVERFLOW);
+    }
+}
+
 void REDPFCQueue::pushPacket(Packet *packet, cGate *gate)
 {
     Enter_Method("pushPacket");
@@ -101,37 +118,31 @@ void REDPFCQueue::pushPacket(Packet *packet, cGate *gate)
     emit(packetPushStartedSignal, packet, &packetPushStartedDetails);
     EV_INFO << "Pushing packet" << EV_FIELD(packet) << EV_ENDL;
     queue.insert(packet);
-    if (buffer != nullptr)
-        buffer->addPacket(packet);
-    else if (packetDropperFunction != nullptr) {
-        while (isOverloaded()) {
-            auto packet = packetDropperFunction->selectPacket(this);
-            EV_INFO << "Dropping packet" << EV_FIELD(packet) << EV_ENDL;
-            queue.remove(packet);
-            dropPacket(packet, QUEUE_OVERFLOW);
-        }
-    }
-    ASSERT(!isOverloaded());
 
+    int iface = packet->getTag<InterfaceInd>()->getInterfaceId();
+    EV<<"iface = "<<iface;
     if(usePfc){
-        if(queue.getByteLength()>=XOFF&&paused==false){
-            paused = true;
+        if(XOFF>maxSize-headroom.get()/8){
+            XOFF -= maxSize-headroom.get()/8;
+            XON -= maxSize-headroom.get()/8;
+        }
+        if(queue.getByteLength()>=XOFF&&std::find(paused.begin(),paused.end(),iface)==paused.end()){
+            paused.push_back(iface);
             auto pck = new Packet("pause");
             auto newtag=pck->addTagIfAbsent<HiTag>();
             newtag->setOp(ETHERNET_PFC_PAUSE);
             newtag->setPriority(priority);
-            newtag->setInterfaceId(eth->getInterfaceId());
+            newtag->setInterfaceId(iface);
             emit(pfcPausedSignal,pck);
             delete pck;
-
         }
-        if(queue.getByteLength()<=XON&&paused==true){
-            paused = false;
+        if(queue.getByteLength()<=XON&&std::find(paused.begin(),paused.end(),iface)!=paused.end()){
+            paused.erase(std::find(paused.begin(),paused.end(),iface));
             auto pck = new Packet("resume");
             auto newtag=pck->addTagIfAbsent<HiTag>();
             newtag->setOp(ETHERNET_PFC_RESUME);
             newtag->setPriority(priority);
-            newtag->setInterfaceId(eth->getInterfaceId());
+            newtag->setInterfaceId(iface);
             emit(pfcPausedSignal,pck);
             delete pck;
         }
@@ -157,7 +168,6 @@ Packet *REDPFCQueue::pullPacket(cGate *gate)
     else
         queue.pop();
 
-    queuelengthVector.recordWithTimestamp(simTime(), queue.getBitLength());
     auto queueingTime = simTime() - packet->getArrivalTime();
     auto packetEvent = new PacketQueuedEvent();
     packetEvent->setQueuePacketLength(getNumPackets());
@@ -281,6 +291,30 @@ void REDPFCQueue::handlePacketRemoved(Packet *packet)
         queue.remove(packet);
         emit(packetRemovedSignal, packet);
         updateDisplayString();
+    }
+}
+
+bool REDPFCQueue::BufferManagement(cMessage *msg){
+
+    Packet *packet = check_and_cast<Packet*>(msg);
+    int64_t queueLength = queue.getBitLength();
+
+    if(!isOverloaded())
+    {
+        return true;
+    }
+
+    b RemainingBufferSize = sharedBuffer[switchid][priority];  // 当前交换机共享缓存剩余大小
+    EV << "currentqueuelength = " << queueLength << "b, RemainingBufferSize  = " << RemainingBufferSize.get() << "b, Packet Length is" << packet->getByteLength() <<"B"<<endl;
+
+    maxSize = double(alpha*RemainingBufferSize.get()) ;
+    if (queueLength + packet->getBitLength() >  maxSize){
+        EV << "it's false" <<endl;
+        return false; // drop
+    }
+    else{
+        sharedBuffer[switchid][priority] = RemainingBufferSize - b(packet->getBitLength());
+        return true;
     }
 }
 

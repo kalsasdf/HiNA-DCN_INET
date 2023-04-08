@@ -52,6 +52,10 @@ class INET_API HiEthernetMac : public EthernetMacBase
     // statistics
     cOutVector bitpersecVector;
     cOutVector pkpersecVector;
+    int sendpause = 0;
+    int sendresume = 0;
+    int receivepause = 0;
+    int receiveresume = 0;
 
     //for TIMELY
     bool TIMELY;

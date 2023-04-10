@@ -67,6 +67,8 @@ int HiClassifier::classifyPacket(Packet *packet)
         priority = region.getTag()->getPriority();
         flowid = region.getTag()->getFlowId();
     }
+    if (std::string(packet->getFullName()).find("arp") != std::string::npos)
+        return -1;
     EV<<"Scheduling priority of the received packet = "<<priority<<", Flow id = "<< flowid<<endl;
     for (auto it=priorityToGateIndexMap.begin(); it != priorityToGateIndexMap.end(); it++) {
         if(it->second==priority)

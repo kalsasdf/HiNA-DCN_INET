@@ -199,6 +199,7 @@ void HPCC::send_data(int packetid)
     addressReq->setDestAddress(snd_info.destAddr);
 
     EV<<"packet length = "<<packet->getByteLength()<<", current rate = "<<currentRate<<endl;
+    EV<<"packet name "<<packet->getFullName()<<endl;
 
     sendDown(packet);
     send_window-=snd_info.length;
@@ -257,8 +258,10 @@ void HPCC::receive_data(Packet *pck)
             std::ostringstream str;
             str <<"ACK-" <<curRcvNum;
             Packet *intinfo = new Packet(str.str().c_str());
-            auto tag=intinfo->addTag<HiTag>();
+            const auto& payload = makeShared<ByteCountChunk>(B(1));
+            auto tag = payload->addTag<HiTag>();
             tag->setPacketId(curRcvNum);
+            intinfo->insertAtBack(payload);
 
             intinfo->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::udp);
 //            auto udpHeader = makeShared<UdpHeader>();
@@ -272,8 +275,8 @@ void HPCC::receive_data(Packet *pck)
             addressReq->setSrcAddress(desAddr);
             addressReq->setDestAddress(srcAddr);
 
-            EV_INFO << "Sending INT from "<<desAddr<<" to"<< srcAddr <<endl;//could include more details
-            EV_DETAIL<<"INT sequence is"<<curRcvNum<<endl;
+            EV_INFO << "Sending INT from "<<desAddr<<" to "<< srcAddr <<endl;//could include more details
+            EV_DETAIL<<"INT sequence is "<<curRcvNum<<endl;
             sendDown(intinfo);
             EV_DETAIL<<"received a packet of new flow successfully, The transport path = "<<INT_msg->getPathID()<<endl;//gy
 //            auto packetProtocolTag1 = pck->addTagIfAbsent<PacketProtocolTag>();
@@ -285,8 +288,10 @@ void HPCC::receive_data(Packet *pck)
             std::ostringstream str;
             str <<"NACK-" <<receiver_packetMap[srcAddr];
             Packet *intinfo = new Packet(str.str().c_str());
-            auto tag=intinfo->addTag<HiTag>();
+            const auto& payload = makeShared<ByteCountChunk>(B(1));
+            auto tag = payload->addTag<HiTag>();
             tag->setPacketId(receiver_packetMap[srcAddr]);
+            intinfo->insertAtBack(payload);
 
             intinfo->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::udp);
 //            auto udpHeader = makeShared<UdpHeader>();
@@ -300,8 +305,8 @@ void HPCC::receive_data(Packet *pck)
             addressReq->setSrcAddress(desAddr);
             addressReq->setDestAddress(srcAddr);
 
-            EV_INFO << "Sending INT from "<<desAddr<<" to"<< srcAddr <<endl;//could include more details
-            EV_DETAIL<<"INT sequence is"<<curRcvNum<<endl;
+            EV_INFO << "Sending INT from "<<desAddr<<" to "<< srcAddr <<endl;//could include more details
+            EV_DETAIL<<"INT sequence is "<<curRcvNum<<endl;
             sendDown(intinfo);//send int and inform the src go back N
             //print INTinfo
             EV_DETAIL<<"received a out of order packet of new flow, The transport path : nhop = "<<INT_msg->getNHop()<<endl;
@@ -316,8 +321,10 @@ void HPCC::receive_data(Packet *pck)
             std::ostringstream str;
             str <<"ACK-" <<curRcvNum;
             Packet *intinfo = new Packet(str.str().c_str());
-            auto tag=intinfo->addTag<HiTag>();
+            const auto& payload = makeShared<ByteCountChunk>(B(1));
+            auto tag = payload->addTag<HiTag>();
             tag->setPacketId(curRcvNum);
+            intinfo->insertAtBack(payload);
 
             intinfo->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::udp);
 //            auto udpHeader = makeShared<UdpHeader>();
@@ -331,8 +338,8 @@ void HPCC::receive_data(Packet *pck)
             addressReq->setSrcAddress(desAddr);
             addressReq->setDestAddress(srcAddr);
 
-            EV_INFO << "Sending INT from "<<desAddr<<" to"<< srcAddr <<endl;//could include more details
-            EV_DETAIL<<"INT sequence is"<<curRcvNum<<endl;
+            EV_INFO << "Sending INT from "<<desAddr<<" to "<< srcAddr <<endl;//could include more details
+            EV_DETAIL<<"INT sequence is "<<curRcvNum<<endl;
             sendDown(intinfo);
             EV_DETAIL<<"received a packet of new flow successfully, The transport path = "<<INT_msg->getPathID()<<endl;//gy
 //            auto packetProtocolTag1 = pck->addTagIfAbsent<PacketProtocolTag>();
@@ -345,8 +352,10 @@ void HPCC::receive_data(Packet *pck)
             std::ostringstream str;
             str <<"NACK-" <<receiver_packetMap[srcAddr];
             Packet *intinfo = new Packet(str.str().c_str());
-            auto tag=intinfo->addTag<HiTag>();
+            const auto& payload = makeShared<ByteCountChunk>(B(1));
+            auto tag = payload->addTag<HiTag>();
             tag->setPacketId(receiver_packetMap[srcAddr]);
+            intinfo->insertAtBack(payload);
 
             intinfo->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::udp);
 //            auto udpHeader = makeShared<UdpHeader>();
@@ -360,8 +369,8 @@ void HPCC::receive_data(Packet *pck)
             addressReq->setSrcAddress(desAddr);
             addressReq->setDestAddress(srcAddr);
 
-            EV_INFO << "Sending INT from "<<desAddr<<" to"<< srcAddr <<endl;//could include more details
-            EV_DETAIL<<"INT sequence is"<<curRcvNum<<endl;
+            EV_INFO << "Sending INT from "<<desAddr<<" to "<< srcAddr <<endl;//could include more details
+            EV_DETAIL<<"INT sequence is "<<curRcvNum<<endl;
             sendDown(intinfo);//send int and inform the src go back N
             //print INTinfo
             EV_DETAIL<<"received a out of order packet of new flow, The transport path : nhop = "<<INT_msg->getNHop()<<endl;

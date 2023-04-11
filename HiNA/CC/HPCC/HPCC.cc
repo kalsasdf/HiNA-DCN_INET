@@ -185,6 +185,7 @@ void HPCC::send_data(int packetid)
     auto content = makeShared<INTHeader>();
     content->setNHop(0);
     content->setPathID(0);
+    content->enableImplicitChunkSerialization = true;
     packet->insertAtFront(content);
 
     packet->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(l3Protocol);

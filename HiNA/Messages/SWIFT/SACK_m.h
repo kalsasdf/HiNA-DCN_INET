@@ -2,8 +2,8 @@
 // Generated file, do not edit! Created by opp_msgtool 6.0 from inet/HiNA/Messages/SWIFT/SACK.msg.
 //
 
-#ifndef __INET_INET_HINA_MESSAGES_SWIFT_SACK_M_H
-#define __INET_INET_HINA_MESSAGES_SWIFT_SACK_M_H
+#ifndef __INET_SACK_M_H
+#define __INET_SACK_M_H
 
 #if defined(__clang__)
 #  pragma clang diagnostic ignored "-Wreserved-id-macro"
@@ -43,7 +43,7 @@ class SACK;
 namespace inet {
 
 /**
- * Class generated from <tt>inet\HiNA\Messages\SWIFT\SACK.msg:22</tt> by opp_msgtool.
+ * Class generated from <tt>inet/HiNA/Messages/SWIFT/SACK.msg:22</tt> by opp_msgtool.
  * <pre>
  * class SackItem extends cObject
  * {
@@ -80,7 +80,7 @@ inline void doParsimPacking(omnetpp::cCommBuffer *b, const SackItem& obj) {obj.p
 inline void doParsimUnpacking(omnetpp::cCommBuffer *b, SackItem& obj) {obj.parsimUnpack(b);}
 
 /**
- * Class generated from <tt>inet\HiNA\Messages\SWIFT\SACK.msg:29</tt> by opp_msgtool.
+ * Class generated from <tt>inet/HiNA/Messages/SWIFT/SACK.msg:29</tt> by opp_msgtool.
  * <pre>
  * class SACK extends FieldsChunk
  * {
@@ -135,5 +135,5 @@ template<> inline inet::SACK *fromAnyPtr(any_ptr ptr) { return check_and_cast<in
 
 }  // namespace omnetpp
 
-#endif // ifndef __INET_INET_HINA_MESSAGES_SWIFT_SACK_M_H
+#endif // ifndef __INET_SACK_M_H
 

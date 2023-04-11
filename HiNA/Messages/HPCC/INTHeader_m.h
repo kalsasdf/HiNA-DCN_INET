@@ -2,8 +2,8 @@
 // Generated file, do not edit! Created by opp_msgtool 6.0 from inet/HiNA/Messages/HPCC/INTHeader.msg.
 //
 
-#ifndef __INET_INET_HINA_MESSAGES_HPCC_INTHEADER_M_H
-#define __INET_INET_HINA_MESSAGES_HPCC_INTHEADER_M_H
+#ifndef __INET_INTHEADER_M_H
+#define __INET_INTHEADER_M_H
 
 #if defined(__clang__)
 #  pragma clang diagnostic ignored "-Wreserved-id-macro"
@@ -43,7 +43,7 @@ class INTHeader;
 namespace inet {
 
 /**
- * Struct generated from inet\HiNA\Messages\HPCC\INTHeader.msg:21 by opp_msgtool.
+ * Struct generated from inet/HiNA/Messages/HPCC/INTHeader.msg:21 by opp_msgtool.
  */
 struct INET_API hopInf
 {
@@ -62,7 +62,7 @@ inline void doParsimPacking(omnetpp::cCommBuffer *b, const hopInf& obj) { __doPa
 inline void doParsimUnpacking(omnetpp::cCommBuffer *b, hopInf& obj) { __doUnpacking(b, obj); }
 
 /**
- * Class generated from <tt>inet\HiNA\Messages\HPCC\INTHeader.msg:28</tt> by opp_msgtool.
+ * Class generated from <tt>inet/HiNA/Messages/HPCC/INTHeader.msg:28</tt> by opp_msgtool.
  * <pre>
  * class INTHeader extends FieldsChunk
  * {
@@ -122,5 +122,5 @@ template<> inline inet::INTHeader *fromAnyPtr(any_ptr ptr) { return check_and_ca
 
 }  // namespace omnetpp
 
-#endif // ifndef __INET_INET_HINA_MESSAGES_HPCC_INTHEADER_M_H
+#endif // ifndef __INET_INTHEADER_M_H
 

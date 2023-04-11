@@ -34,15 +34,11 @@ void HPCC::initialize(int stage)
         senddata = new TimerMsg("senddata");
         senddata->setKind(SENDDATA);
 
-
-        for(int i=0; i<4; i++)
-        {
-            numNodes[i] = 0;
-            totalDelay[i] = 0;
-        }
     }else if (stage == INITSTAGE_TRANSPORT_LAYER) {
         registerService(Protocol::udp, gate("upperIn"), gate("upperOut"));
         registerProtocol(Protocol::udp, gate("lowerOut"), gate("lowerIn"));
+//        registerService(Protocol::hpcc, gate("upperIn"), gate("upperOut"));
+//        registerProtocol(Protocol::hpcc, gate("lowerOut"), gate("lowerIn"));
     }
 
 }
@@ -163,6 +159,8 @@ void HPCC::send_data(int packetid)
     str << packetName << "-" <<packetid;
     Packet *packet = new Packet(str.str().c_str());
     const auto& payload = makeShared<ByteCountChunk>(B(snd_info.length));
+//    const auto& payload = makeShared<ApplicationPacket>();
+//    payload->setChunkLength(B(snd_info.length));
     auto tag = payload->addTag<HiTag>();
     tag->setFlowId(snd_info.flowid);
     tag->setPriority(snd_info.priority);
@@ -185,7 +183,9 @@ void HPCC::send_data(int packetid)
     auto content = makeShared<INTHeader>();
     content->setNHop(0);
     content->setPathID(0);
-    content->enableImplicitChunkSerialization = true;
+//    content->enableImplicitChunkSerialization = true;
+//    auto packetProtocolTag = packet->addTagIfAbsent<PacketProtocolTag>();
+//    packetProtocolTag->setProtocol(&Protocol::hpcc);
     packet->insertAtFront(content);
 
     packet->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(l3Protocol);
@@ -219,7 +219,7 @@ void HPCC::send_data(int packetid)
 }
 
 void HPCC::processLowerpck(Packet *pck)
-{
+{EV<<"pck name = "<<pck->getFullName()<<endl;
     if (string(pck->getFullName()).find(packetName) != string::npos)//get Data packet
     {
         receive_data(pck);
@@ -259,7 +259,9 @@ void HPCC::receive_data(Packet *pck)
             tag->setPacketId(curRcvNum);
             intinfo->insertAtBack(payload);
 
+//            intinfo->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::hpcc);
             intinfo->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::udp);
+
             intinfo->insertAtFront(INT_msg);
             intinfo->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(&Protocol::ipv4);
 
@@ -270,7 +272,8 @@ void HPCC::receive_data(Packet *pck)
             EV_INFO << "Sending INT from "<<desAddr<<" to "<< srcAddr <<endl;//could include more details
             EV_DETAIL<<"INT sequence is "<<curRcvNum<<endl;
             sendDown(intinfo);
-            EV_DETAIL<<"received a packet of new flow successfully, The transport path = "<<INT_msg->getPathID()<<endl;
+            EV_DETAIL<<"received a packet of new flow successfully, The transport path = "<<INT_msg->getPathID()<<endl;//gy
+//            pck->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::udp);
             sendUp(pck);
         }
         else{
@@ -283,7 +286,9 @@ void HPCC::receive_data(Packet *pck)
             tag->setPacketId(receiver_packetMap[srcAddr]);
             intinfo->insertAtBack(payload);
 
+//            intinfo->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::hpcc);
             intinfo->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::udp);
+
             intinfo->insertAtFront(INT_msg);
             intinfo->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(&Protocol::ipv4);
 
@@ -312,7 +317,9 @@ void HPCC::receive_data(Packet *pck)
             tag->setPacketId(curRcvNum);
             intinfo->insertAtBack(payload);
 
+//            intinfo->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::hpcc);
             intinfo->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::udp);
+
             intinfo->insertAtFront(INT_msg);
             intinfo->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(&Protocol::ipv4);
 
@@ -323,7 +330,8 @@ void HPCC::receive_data(Packet *pck)
             EV_INFO << "Sending INT from "<<desAddr<<" to "<< srcAddr <<endl;//could include more details
             EV_DETAIL<<"INT sequence is "<<curRcvNum<<endl;
             sendDown(intinfo);
-            EV_DETAIL<<"received a packet of new flow successfully, The transport path = "<<INT_msg->getPathID()<<endl;
+            EV_DETAIL<<"received a packet of new flow successfully, The transport path = "<<INT_msg->getPathID()<<endl;//gy
+//            pck->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::udp);
             sendUp(pck);
         }
         else//out of order
@@ -337,7 +345,9 @@ void HPCC::receive_data(Packet *pck)
             tag->setPacketId(receiver_packetMap[srcAddr]);
             intinfo->insertAtBack(payload);
 
+//            intinfo->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::hpcc);
             intinfo->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::udp);
+
             intinfo->insertAtFront(INT_msg);
             intinfo->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(&Protocol::ipv4);
 
@@ -356,7 +366,7 @@ void HPCC::receive_data(Packet *pck)
 }
 
 void HPCC::receiveAck(Packet *pck)
-{
+{EV<<"receiveack"<<endl;
     int ackid;
     for (auto& region : pck->peekData()->getAllTags<HiTag>()){
         ackid = region.getTag()->getPacketId();
@@ -460,12 +470,6 @@ void HPCC::receiveAck(Packet *pck)
         Last[i]  = INT_msg->getHopInfs(i);
     }
 
-    for (int i = 0; i < size; i++)
-    {
-        numNodes[i] = numNodes[i] + 1;
-        totalDelay[i] = totalDelay[i] + simTime()-INT_msg->getHopInfs(i).TS;
-    }
-
     if(SenderState==PAUSING){
         SenderState=SENDING;
         senddata->setPacketId(nxtSendpacketid);
@@ -486,13 +490,13 @@ double HPCC::minval(b numa, b numb)
 
 void HPCC::sendDown(Packet *pck)
 {
-    EV << "sendDown " <<pck->getFullName()<<endl;//gy
+    EV << "sendDown " <<pck->getFullName()<<endl;
     send(pck,lowerOutGate);
 }
 
 void HPCC::sendUp(Packet *pck)
 {
-    EV<<"HPCC, oh sendup!"<<endl;//gy
+    EV<<"HPCC, oh sendup!"<<endl;
     send(pck,upperOutGate);
 }
 
@@ -503,18 +507,7 @@ void HPCC::refreshDisplay() const
 
 void HPCC::finish()
 {
-    if(numNodes[0]!=0)
-        avgDelay1 = totalDelay[0]/numNodes[0];
-    if(numNodes[1]!=0)
-        avgDelay2 = totalDelay[1]/numNodes[1];
-    if(numNodes[2]!=0)
-        avgDelay3 = totalDelay[2]/numNodes[2];
-    if(numNodes[3]!=0)
-        avgDelay4 = totalDelay[3]/numNodes[3];
-    recordScalar("avgDelay1", avgDelay1);
-    recordScalar("avgDelay2", avgDelay2);
-    recordScalar("avgDelay3", avgDelay3);
-    recordScalar("avgDelay4", avgDelay4);
+
 }
 
 }// namespace inet

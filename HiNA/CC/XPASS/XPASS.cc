@@ -1,7 +1,7 @@
 /*
  * XPASS.cc
  *
- *  Created on: 2021Ã„Ãª3Ã”Ã‚1ÃˆÃ•
+ *  Created on: 2021Äê3ÔÂ1ÈÕ
  *      Author: kalsasdf
  */
 
@@ -245,6 +245,7 @@ void XPASS::send_credit(L3Address destaddr)
     const auto& content = makeShared<ByteCountChunk>(B(credit_size/8+jitter_bytes));
     auto tag = content->addTag<HiTag>();
     tag->setPacketId(rcvflow.now_send_cdt_seq);
+    content->enableImplicitChunkSerialization = true;
 
     credit->insertAtFront(content);
 

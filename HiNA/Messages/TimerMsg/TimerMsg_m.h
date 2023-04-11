@@ -2,8 +2,8 @@
 // Generated file, do not edit! Created by opp_msgtool 6.0 from inet/HiNA/Messages/TimerMsg/TimerMsg.msg.
 //
 
-#ifndef __INET_INET_HINA_MESSAGES_TIMERMSG_TIMERMSG_M_H
-#define __INET_INET_HINA_MESSAGES_TIMERMSG_TIMERMSG_M_H
+#ifndef __INET_TIMERMSG_M_H
+#define __INET_TIMERMSG_M_H
 
 #if defined(__clang__)
 #  pragma clang diagnostic ignored "-Wreserved-id-macro"
@@ -44,7 +44,7 @@ class TimerMsg;
 namespace inet {
 
 /**
- * Class generated from <tt>inet\HiNA\Messages\TimerMsg\TimerMsg.msg:20</tt> by opp_msgtool.
+ * Class generated from <tt>inet/HiNA/Messages/TimerMsg/TimerMsg.msg:20</tt> by opp_msgtool.
  * <pre>
  * class TimerMsg extends cMessage
  * {
@@ -111,5 +111,5 @@ template<> inline inet::TimerMsg *fromAnyPtr(any_ptr ptr) { return check_and_cas
 
 }  // namespace omnetpp
 
-#endif // ifndef __INET_INET_HINA_MESSAGES_TIMERMSG_TIMERMSG_M_H
+#endif // ifndef __INET_TIMERMSG_M_H
 

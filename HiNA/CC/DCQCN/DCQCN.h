@@ -96,7 +96,14 @@ protected:
     virtual void handleMessage(cMessage *msg) override;
     virtual void handleSelfMessage(cMessage *msg);
     virtual void refreshDisplay() const override;
-    virtual ~DCQCN() {cancelEvent(senddata); delete senddata;}
+    virtual ~DCQCN() {cancelEvent(senddata); delete senddata;
+    for(auto it : sender_flowMap){
+    cancelEvent(it.second.rateTimer);
+    delete it.second.rateTimer;
+    cancelEvent(it.second.alphaTimer);
+    delete it.second.alphaTimer;
+    }
+    }
 
     virtual void sendDown(Packet *pck);
     virtual void sendUp(Packet *pck);

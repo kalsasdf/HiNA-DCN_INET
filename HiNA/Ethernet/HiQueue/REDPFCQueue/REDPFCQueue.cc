@@ -136,16 +136,6 @@ void REDPFCQueue::pushPacket(Packet *packet, cGate *gate)
             emit(pfcPausedSignal,pck);
             delete pck;
         }
-        if(queue.getByteLength()<=XON&&std::find(paused.begin(),paused.end(),iface)!=paused.end()){
-            paused.erase(std::find(paused.begin(),paused.end(),iface));
-            auto pck = new Packet("resume");
-            auto newtag=pck->addTagIfAbsent<HiTag>();
-            newtag->setOp(ETHERNET_PFC_RESUME);
-            newtag->setPriority(priority);
-            newtag->setInterfaceId(iface);
-            emit(pfcPausedSignal,pck);
-            delete pck;
-        }
     }
 
     if (collector != nullptr && getNumPackets() != 0)
@@ -203,6 +193,18 @@ Packet *REDPFCQueue::pullPacket(cGate *gate)
         break;
     default:
         throw cRuntimeError("Unknown RED result");
+    }
+    if(usePfc&&queue.getByteLength()<=XON){
+        for(auto it : paused){
+            auto pck = new Packet("resume");
+            auto newtag=pck->addTagIfAbsent<HiTag>();
+            newtag->setOp(ETHERNET_PFC_RESUME);
+            newtag->setPriority(priority);
+            newtag->setInterfaceId(it);
+            emit(pfcPausedSignal,pck);
+            delete pck;
+        }
+        paused.clear();
     }
     animatePullPacket(packet, outputGate);
     updateDisplayString();

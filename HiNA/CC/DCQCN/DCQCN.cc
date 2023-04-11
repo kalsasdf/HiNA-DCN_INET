@@ -242,6 +242,10 @@ void DCQCN::receive_data(Packet *pck)
     if (ecn == 3&&simTime()-lastCnpTime[flowid]>min_cnp_interval) // ecn==1, enabled; ecn==3, marked.
     {
         Packet *cnp = new Packet("CNP");
+        const auto& payload = makeShared<ByteCountChunk>(B(1));
+        auto tag = payload->addTag<HiTag>();
+        tag->setFlowId(flowid);
+        cnp->insertAtBack(payload);
         cnp->addTagIfAbsent<L3AddressReq>()->setDestAddress(rcv_srcAddr);
         cnp->addTagIfAbsent<L3AddressReq>()->setSrcAddress(rcv_destAddr);
         cnp->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(&Protocol::ipv4);

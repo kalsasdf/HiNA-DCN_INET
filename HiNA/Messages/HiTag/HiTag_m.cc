@@ -28,7 +28,7 @@
 #include <sstream>
 #include <memory>
 #include <type_traits>
-#include "inet\HiNA\Messages\HiTag\HiTag_m.h"
+#include "HiTag_m.h"
 
 namespace omnetpp {
 

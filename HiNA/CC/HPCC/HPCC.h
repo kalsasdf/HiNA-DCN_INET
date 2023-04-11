@@ -62,13 +62,6 @@ protected:
     int wint;//parameter wint
     int wai;//additive increase(AI) part to ensure fairness
 
-    simtime_t avgDelay1;
-    simtime_t avgDelay2;
-    simtime_t avgDelay3;
-    simtime_t avgDelay4;
-    int64_t numNodes[4];
-    simtime_t totalDelay[4];
-
     const char *packetName = "HPCCData";
     cGate *lowerOutGate;
     cGate *lowerInGate;

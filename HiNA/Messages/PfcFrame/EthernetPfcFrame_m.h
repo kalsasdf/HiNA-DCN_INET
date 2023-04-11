@@ -2,8 +2,8 @@
 // Generated file, do not edit! Created by opp_msgtool 6.0 from inet/HiNA/Messages/PfcFrame/EthernetPfcFrame.msg.
 //
 
-#ifndef __INET_INET_HINA_MESSAGES_PFCFRAME_ETHERNETPFCFRAME_M_H
-#define __INET_INET_HINA_MESSAGES_PFCFRAME_ETHERNETPFCFRAME_M_H
+#ifndef __INET_ETHERNETPFCFRAME_M_H
+#define __INET_ETHERNETPFCFRAME_M_H
 
 #if defined(__clang__)
 #  pragma clang diagnostic ignored "-Wreserved-id-macro"
@@ -44,7 +44,7 @@ class EthernetPfcFrame;
 namespace inet {
 
 /**
- * Enum generated from <tt>inet\HiNA\Messages\PfcFrame\EthernetPfcFrame.msg:14</tt> by opp_msgtool.
+ * Enum generated from <tt>inet/HiNA/Messages/PfcFrame/EthernetPfcFrame.msg:14</tt> by opp_msgtool.
  * <pre>
  * enum EthernetPfcControlOpCode
  * {
@@ -62,7 +62,7 @@ inline void doParsimPacking(omnetpp::cCommBuffer *b, const EthernetPfcControlOpC
 inline void doParsimUnpacking(omnetpp::cCommBuffer *b, EthernetPfcControlOpCode& e) { int n; b->unpack(n); e = static_cast<EthernetPfcControlOpCode>(n); }
 
 /**
- * Class generated from <tt>inet\HiNA\Messages\PfcFrame\EthernetPfcFrame.msg:20</tt> by opp_msgtool.
+ * Class generated from <tt>inet/HiNA/Messages/PfcFrame/EthernetPfcFrame.msg:20</tt> by opp_msgtool.
  * <pre>
  * class EthernetPfcFrame extends EthernetControlFrameBase
  * {
@@ -113,5 +113,5 @@ template<> inline inet::EthernetPfcFrame *fromAnyPtr(any_ptr ptr) { return check
 
 }  // namespace omnetpp
 
-#endif // ifndef __INET_INET_HINA_MESSAGES_PFCFRAME_ETHERNETPFCFRAME_M_H
+#endif // ifndef __INET_ETHERNETPFCFRAME_M_H
 

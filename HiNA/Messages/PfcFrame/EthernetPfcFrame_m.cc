@@ -28,7 +28,7 @@
 #include <sstream>
 #include <memory>
 #include <type_traits>
-#include "inet\HiNA\Messages\PfcFrame\EthernetPfcFrame_m.h"
+#include "EthernetPfcFrame_m.h"
 
 namespace omnetpp {
 

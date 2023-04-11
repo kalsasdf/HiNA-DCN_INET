@@ -43,8 +43,6 @@ void HPCC::initialize(int stage)
     }else if (stage == INITSTAGE_TRANSPORT_LAYER) {
         registerService(Protocol::udp, gate("upperIn"), gate("upperOut"));
         registerProtocol(Protocol::udp, gate("lowerOut"), gate("lowerIn"));
-//        registerService(Protocol::hpcc, gate("upperIn"), gate("upperOut"));
-//        registerProtocol(Protocol::hpcc, gate("lowerOut"), gate("lowerIn"));
     }
 
 }
@@ -187,9 +185,6 @@ void HPCC::send_data(int packetid)
     auto content = makeShared<INTHeader>();
     content->setNHop(0);
     content->setPathID(0);
-    content->enableImplicitChunkSerialization = true;
-//    auto packetProtocolTag = packet->addTagIfAbsent<PacketProtocolTag>();
-//    packetProtocolTag->setProtocol(&Protocol::hpcc);
     packet->insertAtFront(content);
 
     packet->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(l3Protocol);
@@ -264,10 +259,6 @@ void HPCC::receive_data(Packet *pck)
             intinfo->insertAtBack(payload);
 
             intinfo->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::udp);
-//            auto udpHeader = makeShared<UdpHeader>();
-//            insertTransportProtocolHeader(intinfo, Protocol::udp, udpHeader);
-//            auto packetProtocolTag = intinfo->addTagIfAbsent<PacketProtocolTag>();
-//            packetProtocolTag->setProtocol(&Protocol::hpcc);
             intinfo->insertAtFront(INT_msg);
             intinfo->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(&Protocol::ipv4);
 
@@ -278,9 +269,7 @@ void HPCC::receive_data(Packet *pck)
             EV_INFO << "Sending INT from "<<desAddr<<" to "<< srcAddr <<endl;//could include more details
             EV_DETAIL<<"INT sequence is "<<curRcvNum<<endl;
             sendDown(intinfo);
-            EV_DETAIL<<"received a packet of new flow successfully, The transport path = "<<INT_msg->getPathID()<<endl;//gy
-//            auto packetProtocolTag1 = pck->addTagIfAbsent<PacketProtocolTag>();
-//            packetProtocolTag1->setProtocol(&Protocol::udp);
+            EV_DETAIL<<"received a packet of new flow successfully, The transport path = "<<INT_msg->getPathID()<<endl;
             sendUp(pck);
         }
         else{
@@ -294,10 +283,6 @@ void HPCC::receive_data(Packet *pck)
             intinfo->insertAtBack(payload);
 
             intinfo->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::udp);
-//            auto udpHeader = makeShared<UdpHeader>();
-//            insertTransportProtocolHeader(intinfo, Protocol::udp, udpHeader);
-//            auto packetProtocolTag = intinfo->addTagIfAbsent<PacketProtocolTag>();
-//            packetProtocolTag->setProtocol(&Protocol::hpcc);
             intinfo->insertAtFront(INT_msg);
             intinfo->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(&Protocol::ipv4);
 
@@ -327,10 +312,6 @@ void HPCC::receive_data(Packet *pck)
             intinfo->insertAtBack(payload);
 
             intinfo->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::udp);
-//            auto udpHeader = makeShared<UdpHeader>();
-//            insertTransportProtocolHeader(intinfo, Protocol::udp, udpHeader);
-//            auto packetProtocolTag = intinfo->addTagIfAbsent<PacketProtocolTag>();
-//            packetProtocolTag->setProtocol(&Protocol::hpcc);
             intinfo->insertAtFront(INT_msg);
             intinfo->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(&Protocol::ipv4);
 
@@ -341,9 +322,7 @@ void HPCC::receive_data(Packet *pck)
             EV_INFO << "Sending INT from "<<desAddr<<" to "<< srcAddr <<endl;//could include more details
             EV_DETAIL<<"INT sequence is "<<curRcvNum<<endl;
             sendDown(intinfo);
-            EV_DETAIL<<"received a packet of new flow successfully, The transport path = "<<INT_msg->getPathID()<<endl;//gy
-//            auto packetProtocolTag1 = pck->addTagIfAbsent<PacketProtocolTag>();
-//            packetProtocolTag1->setProtocol(&Protocol::udp);
+            EV_DETAIL<<"received a packet of new flow successfully, The transport path = "<<INT_msg->getPathID()<<endl;
             sendUp(pck);
         }
         else//out of order
@@ -358,10 +337,6 @@ void HPCC::receive_data(Packet *pck)
             intinfo->insertAtBack(payload);
 
             intinfo->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::udp);
-//            auto udpHeader = makeShared<UdpHeader>();
-//            insertTransportProtocolHeader(intinfo, Protocol::udp, udpHeader);
-//            auto packetProtocolTag = intinfo->addTagIfAbsent<PacketProtocolTag>();
-//            packetProtocolTag->setProtocol(&Protocol::hpcc);
             intinfo->insertAtFront(INT_msg);
             intinfo->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(&Protocol::ipv4);
 

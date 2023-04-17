@@ -63,7 +63,7 @@ protected:
     };
 
     L3Address srcAddr;
-    TimerMsg *senddata = nullptr;
+    TimerMsg *senddata;
     simtime_t stopTime;
 
     // configuration for .ned file

@@ -54,6 +54,7 @@ class INET_API TcpApp : public TcpAppBase
 
     // state
     cMessage *timeoutMsg = nullptr;
+    SocketMap socketMap;
 
     // statistics
     int numSent = 0;
@@ -77,6 +78,7 @@ class INET_API TcpApp : public TcpAppBase
   protected:
 
     virtual int numInitStages() const override { return NUM_INIT_STAGES; }
+    virtual void handleMessageWhenUp(cMessage *msg) override;
     virtual void initialize(int stage) override;
     virtual void finish() override;
     virtual void refreshDisplay() const override;
@@ -87,6 +89,7 @@ class INET_API TcpApp : public TcpAppBase
 
     virtual void handleTimer(cMessage *msg) override;
     virtual void socketEstablished(TcpSocket *socket) override;
+    virtual void socketAvailable(TcpSocket *socket, TcpAvailableInfo *availableInfo) override;
     virtual void socketDataArrived(TcpSocket *socket, Packet *pck, bool urgent) override;
     virtual void socketClosed(TcpSocket *socket) override;
     virtual void socketFailure(TcpSocket *socket, int code) override;

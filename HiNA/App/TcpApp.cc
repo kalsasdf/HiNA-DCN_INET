@@ -200,15 +200,44 @@ void TcpApp::socketDataArrived(TcpSocket *socket, Packet *pck, bool urgent)
     TcpAppBase::socketDataArrived(socket, pck, urgent);
 }
 
+void TcpApp::handleMessageWhenUp(cMessage *msg)
+{
+    if (msg->isSelfMessage())
+        handleTimer(msg);
+    else {
+        TcpSocket *temp_socket = check_and_cast_nullable<TcpSocket *>(socketMap.findSocketFor(msg));
+        if (temp_socket){
+            EV<<"TcpApp::handleMessageWhenUp, temp_socket is true"<<endl;
+            temp_socket->processMessage(msg);
+        }
+        else if (socket.belongsToSocket(msg)){
+            EV<<"TcpApp::handleMessageWhenUp, temp_socket is false"<<endl;
+            socket.processMessage(msg);
+        }
+        else {;
+            EV_ERROR << "message " << msg->getFullName() << "(" << msg->getClassName() << ") arrived for unknown socket \n";
+            delete msg;
+        }
+    }
+}
+
 void TcpApp::finish()
 {
-
     recordScalar("average FCT",sumFct.dbl()/numReceived);
     recordScalar("Flows sent", numSent);
     recordScalar("Flows received", numReceived);
     recordScalar("BytesRcvd", BytesRcvd);
     recordScalar("BytesSent", BytesSent);
     recordScalar("final flow id", flowid);
+}
+
+void TcpApp::socketAvailable(TcpSocket *socket, TcpAvailableInfo *availableInfo)
+{
+    // new TCP connection -- create new socket object and server process
+    TcpSocket *newSocket = new TcpSocket(availableInfo);
+    newSocket->setOutputGate(gate("socketOut"));
+    socketMap.addSocket(newSocket);
+    socket->accept(availableInfo->getNewSocketId());
 }
 
 void TcpApp::socketClosed(TcpSocket *socket)

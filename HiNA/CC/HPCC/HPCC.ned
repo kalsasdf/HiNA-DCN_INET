@@ -28,6 +28,8 @@ simple HPCC like UdpCC
  		int max_pck_size = default(1430);
       
         @display("i=block/downarrow,grey80;is=s;i2=status/down");
+        @signal[Usignal](type=double);
+        @statistic[U](title="HPCC utilization"; source=Usignal; record=vector); 
 
     gates:
         input upperIn @labels(UdpHeader,IPv4ControlInfo/down,IPv6ControlInfo/down);// higher layer

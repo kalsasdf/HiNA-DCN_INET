@@ -49,30 +49,23 @@ class INET_API TcpApp : public TcpAppBase
     simtime_t tOpen;
     simtime_t tSend;
     simtime_t tClose;
-    int sendBytes = 0;
     const char *packetName = nullptr;
+    const char *trafficMode = nullptr;
+    double packetLength;
+    double linkSpeed;
+    double workLoad;
 
     // state
-    cMessage *timeoutMsg = nullptr;
+    cMessage *selfMsg = nullptr;
     SocketMap socketMap;
 
     // statistics
     int numSent = 0;
     int numReceived = 0;
-    static uint32_t flowid;
-
-    std::map<long,simtime_t> flow_completion_time;
-    cOutVector FCT_Vector;
     cOutVector goodputVector;
     long BytesRcvd=0;
     long BytesSent=0;
-
-    simtime_t sumFct=0;
-    simtime_t this_flow_creation_time=0;
-    simtime_t last_flow_creation_time=0;
     simtime_t last_pck_time=0;
-    int this_flow_id=0;
-    int last_flow_id=0;
 
 
   protected:
@@ -84,6 +77,7 @@ class INET_API TcpApp : public TcpAppBase
     virtual void refreshDisplay() const override;
 
     virtual void parseScript(const char *script);
+    virtual void updateNextFlow(const char* TM);
     virtual Packet *createDataPacket(long sendBytes);
     virtual void sendData();
 

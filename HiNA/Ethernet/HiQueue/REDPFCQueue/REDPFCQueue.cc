@@ -46,8 +46,6 @@ void REDPFCQueue::initialize(int stage)
         useEcn=par("useEcn");
         alpha=par("alpha");
         count = -1;
-        cModule *radioModule = getParentModule()->getParentModule();EV<<"parentmodule = "<<radioModule<<endl;
-        eth = check_and_cast<NetworkInterface *>(radioModule);EV<<"eth = "<<eth<<endl;
         buffer = findModuleFromPar<IPacketBuffer>(par("bufferModule"), this);
         packetComparatorFunction = createComparatorFunction(par("comparatorClass"));
         if (packetComparatorFunction != nullptr)

@@ -74,6 +74,7 @@ protected:
     std::map<L3Address, int> receiver_packetMap;
 
     TimerMsg *senddata = nullptr;
+    simsignal_t Usignal;
 
 protected:
     virtual void initialize(int stage) override;

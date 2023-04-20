@@ -52,7 +52,6 @@ class INET_API REDPFCQueue : public PacketQueueBase, public IPacketBuffer::ICall
     int XON;
     int XOFF;
     int priority;
-    NetworkInterface *eth;
     int Kmax;
     int Kmin;
     double Pmax;

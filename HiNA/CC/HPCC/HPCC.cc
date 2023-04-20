@@ -30,6 +30,7 @@ void HPCC::initialize(int stage)
         currentRate = linkspeed;
         csend_window = wint;
         send_window = wint;
+        Usignal = cComponent::registerSignal("Usignal");
 
         senddata = new TimerMsg("senddata");
         senddata->setKind(SENDDATA);
@@ -159,8 +160,6 @@ void HPCC::send_data(int packetid)
     str << packetName << "-" <<packetid;
     Packet *packet = new Packet(str.str().c_str());
     const auto& payload = makeShared<ByteCountChunk>(B(snd_info.length));
-//    const auto& payload = makeShared<ApplicationPacket>();
-//    payload->setChunkLength(B(snd_info.length));
     auto tag = payload->addTag<HiTag>();
     tag->setFlowId(snd_info.flowid);
     tag->setPriority(snd_info.priority);
@@ -183,9 +182,6 @@ void HPCC::send_data(int packetid)
     auto content = makeShared<INTHeader>();
     content->setNHop(0);
     content->setPathID(0);
-//    content->enableImplicitChunkSerialization = true;
-//    auto packetProtocolTag = packet->addTagIfAbsent<PacketProtocolTag>();
-//    packetProtocolTag->setProtocol(&Protocol::hpcc);
     packet->insertAtFront(content);
 
     packet->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(l3Protocol);
@@ -259,7 +255,6 @@ void HPCC::receive_data(Packet *pck)
             tag->setPacketId(curRcvNum);
             intinfo->insertAtBack(payload);
 
-//            intinfo->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::hpcc);
             intinfo->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::udp);
 
             intinfo->insertAtFront(INT_msg);
@@ -273,7 +268,6 @@ void HPCC::receive_data(Packet *pck)
             EV_DETAIL<<"INT sequence is "<<curRcvNum<<endl;
             sendDown(intinfo);
             EV_DETAIL<<"received a packet of new flow successfully, The transport path = "<<INT_msg->getPathID()<<endl;//gy
-//            pck->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::udp);
             sendUp(pck);
         }
         else{
@@ -286,7 +280,6 @@ void HPCC::receive_data(Packet *pck)
             tag->setPacketId(receiver_packetMap[srcAddr]);
             intinfo->insertAtBack(payload);
 
-//            intinfo->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::hpcc);
             intinfo->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::udp);
 
             intinfo->insertAtFront(INT_msg);
@@ -317,7 +310,6 @@ void HPCC::receive_data(Packet *pck)
             tag->setPacketId(curRcvNum);
             intinfo->insertAtBack(payload);
 
-//            intinfo->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::hpcc);
             intinfo->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::udp);
 
             intinfo->insertAtFront(INT_msg);
@@ -331,7 +323,6 @@ void HPCC::receive_data(Packet *pck)
             EV_DETAIL<<"INT sequence is "<<curRcvNum<<endl;
             sendDown(intinfo);
             EV_DETAIL<<"received a packet of new flow successfully, The transport path = "<<INT_msg->getPathID()<<endl;//gy
-//            pck->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::udp);
             sendUp(pck);
         }
         else//out of order
@@ -345,7 +336,6 @@ void HPCC::receive_data(Packet *pck)
             tag->setPacketId(receiver_packetMap[srcAddr]);
             intinfo->insertAtBack(payload);
 
-//            intinfo->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::hpcc);
             intinfo->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::udp);
 
             intinfo->insertAtFront(INT_msg);
@@ -366,7 +356,7 @@ void HPCC::receive_data(Packet *pck)
 }
 
 void HPCC::receiveAck(Packet *pck)
-{EV<<"receiveack"<<endl;
+{
     int ackid;
     for (auto& region : pck->peekData()->getAllTags<HiTag>()){
         ackid = region.getTag()->getPacketId();
@@ -417,6 +407,7 @@ void HPCC::receiveAck(Packet *pck)
     if (tao > baseRTT)
         tao = baseRTT;
     U = (1-(tao.dbl()/baseRTT.dbl()))*U + (tao.dbl()/baseRTT.dbl())*u;
+    emit(Usignal,U);
     EV<<"the ACK computed U is "<<U<<endl;
 
     if(isFirstAck){

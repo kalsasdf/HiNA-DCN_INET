@@ -183,7 +183,8 @@ void HiUdpApp::processSend()
 {
     updateNextFlow(trafficMode);
     sendPacket();
-    simtime_t txTime = simtime_t(packetLength*8/linkSpeed);
+    simtime_t txTime = simtime_t((packetLength+66)*8/linkSpeed);
+    //66=8(UDP)+20(IP)+14(EthernetMac)+8(EthernetPhy)+4(EthernetFcs)+12(interframe gap,IFG)
     simtime_t d = simTime() + txTime/workLoad;
     EV<<"simTime() = "<<simTime()<<", next time = "<<d<<endl;
     if ((stopTime < SIMTIME_ZERO || d < stopTime)) {

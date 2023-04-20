@@ -35,41 +35,32 @@ Define_Module(TcpApp);
 #define MSGKIND_SEND       2
 #define MSGKIND_CLOSE      3
 
-uint32_t TcpApp::flowid=0;
-
 TcpApp::~TcpApp()
 {
-    cancelAndDelete(timeoutMsg);
+    cancelAndDelete(selfMsg);
 }
 
 void TcpApp::initialize(int stage)
 {
     TcpAppBase::initialize(stage);
     if (stage == INITSTAGE_LOCAL) {
-        FCT_Vector.setName("FCT");
         goodputVector.setName("goodput (bps)");
         WATCH(numSent);
         WATCH(numReceived);
-        flow_completion_time.clear();
 
         tOpen = par("tOpen");
         tSend = par("tSend");
         tClose = par("tClose");
         packetName = par("packetName");
-        sendBytes = par("sendBytes");
+        workLoad = par("workLoad");
+        linkSpeed = par("linkSpeed");
+        trafficMode = par("trafficMode");
         commandIndex = 0;
 
         const char *script = par("sendScript");
         parseScript(script);
 
-        if (sendBytes > 0 && commands.size() > 0)
-            throw cRuntimeError("Cannot use both sendScript and tSend+sendBytes");
-        if (sendBytes > 0)
-            commands.push_back(Command(tSend, sendBytes));
-        if (commands.size() == 0)
-            throw cRuntimeError("sendScript is empty");
-
-        timeoutMsg = new cMessage("timer");
+        selfMsg = new cMessage("selftimer");
     }else if (stage == INITSTAGE_APPLICATION_LAYER) {
         if(tOpen<SIMTIME_ZERO)
             socket.listen();
@@ -79,14 +70,14 @@ void TcpApp::initialize(int stage)
 void TcpApp::handleStartOperation(LifecycleOperation *operation)
 {
     if (tOpen>=SIMTIME_ZERO&&tOpen<tClose) {EV<<"handleStartOperation"<<endl;
-        timeoutMsg->setKind(MSGKIND_CONNECT);
-        scheduleAt(tOpen, timeoutMsg);
+        selfMsg->setKind(MSGKIND_CONNECT);
+        scheduleAt(tOpen, selfMsg);
     }
 }
 
 void TcpApp::handleStopOperation(LifecycleOperation *operation)
 {
-    cancelEvent(timeoutMsg);
+    cancelEvent(selfMsg);
     if (socket.isOpen())
         close();
     delayActiveOperationFinish(par("stopOperationTimeout"));
@@ -94,7 +85,7 @@ void TcpApp::handleStopOperation(LifecycleOperation *operation)
 
 void TcpApp::handleCrashOperation(LifecycleOperation *operation)
 {
-    cancelEvent(timeoutMsg);
+    cancelEvent(selfMsg);
     if (operation->getRootModule() != getContainingNode(this)){
         socket.destroy();
     }
@@ -126,29 +117,31 @@ void TcpApp::socketEstablished(TcpSocket *socket)
 
     ASSERT(commandIndex == 0);
     if(tOpen>=0){
-        timeoutMsg->setKind(MSGKIND_SEND);
-        simtime_t tSend = commands[commandIndex].tSend;
-        scheduleAt(std::max(tSend, simTime()), timeoutMsg);
+        selfMsg->setKind(MSGKIND_SEND);
+        scheduleAt(std::max(tSend, simTime()), selfMsg);
     }
 
 }
 
 void TcpApp::sendData()
 {
-    long numBytes;
-
-    numBytes = commands[commandIndex].numBytes;
-
-    EV_INFO << "sending data with " << numBytes << " bytes\n";
-    sendPacket(createDataPacket(numBytes));
-    if(simTime()<tClose&&++commandIndex < (int)commands.size()){
+    updateNextFlow(trafficMode);
+    EV_INFO << "sending data with " << packetLength << " bytes\n";
+    sendPacket(createDataPacket(packetLength));
+    if(simTime()>=tClose){
+        selfMsg->setKind(MSGKIND_CLOSE);
+        scheduleAt(std::max(tClose, simTime()), selfMsg);
+    }else if(std::string(trafficMode).find("LongFlow") != std::string::npos){
+        simtime_t txTime = simtime_t((packetLength+78)*8/linkSpeed);
+        //78=20(TCP)+20(IP)+14(EthernetMac)+8(EthernetPhy)+4(EthernetFcs)+12(interframe gap,IFG)
+        simtime_t d = simTime() + txTime/workLoad;
+        EV<<"simTime() = "<<simTime()<<", next time = "<<d<<endl;
+        selfMsg->setKind(MSGKIND_SEND);
+        scheduleAt(d, selfMsg);
+    }else if(++commandIndex < (int)commands.size()){
         simtime_t tSend = commands[commandIndex].tSend;
-        timeoutMsg->setKind(MSGKIND_SEND);
-        scheduleAt(std::max(tSend, simTime()), timeoutMsg);
-    }
-    else {
-        timeoutMsg->setKind(MSGKIND_CLOSE);
-        scheduleAt(std::max(tClose, simTime()), timeoutMsg);
+        selfMsg->setKind(MSGKIND_SEND);
+        scheduleAt(std::max(tSend, simTime()), selfMsg);
     }
 
 }
@@ -156,16 +149,10 @@ void TcpApp::sendData()
 Packet *TcpApp::createDataPacket(long sendBytes)
 {
     std::ostringstream str;
-    str << packetName << "-" << flowid;
+    str << packetName;
     Packet *packet = new Packet(str.str().c_str());
     auto payload = makeShared<ByteCountChunk>(B(sendBytes));
-    auto tag = payload->addTag<HiTag>();
-    tag->setFlowId(flowid);
-    tag->setFlowSize(sendBytes);
-    tag->setCreationtime(simTime());
-    EV_INFO<<"flow "<<flowid<<" creationtime = "<<simTime()<<endl;
     packet->insertAtBack(payload);
-    flowid++;
     numSent++;
     BytesSent+=sendBytes;
     return packet;
@@ -173,29 +160,10 @@ Packet *TcpApp::createDataPacket(long sendBytes)
 
 void TcpApp::socketDataArrived(TcpSocket *socket, Packet *pck, bool urgent)
 {
-    for (auto& region : pck->peekData()->getAllTags<HiTag>()){
-        this_flow_id = region.getTag()->getFlowId();
-        this_flow_creation_time = region.getTag()->getCreationtime();
-    }
-
     auto appbitpersec = pck->getBitLength() / (simTime()-last_pck_time).dbl();
     goodputVector.recordWithTimestamp(last_pck_time, appbitpersec);
 
-    EV_INFO<<"this_flow_id = "<<this_flow_id<<endl;//", source address = "<<addressReq->getSrcAddress()<<endl;
-    EV_INFO<<"this_flow_creation_time = "<<this_flow_creation_time<<", last_pck_time = "<<last_pck_time<<endl;
-
-    if (last_flow_creation_time != this_flow_creation_time)
-    {
-        numReceived++;
-        flow_completion_time[numReceived-1] = last_pck_time - last_flow_creation_time;
-        FCT_Vector.record(flow_completion_time[numReceived-1]);
-        sumFct+=flow_completion_time[numReceived-1];
-        EV << "socketDataArrived(), flow_transmission_time = "<<flow_completion_time[numReceived-1]<<" flowid = "<<last_flow_id<<endl;
-    }
-
-    last_flow_creation_time = this_flow_creation_time;
     last_pck_time = simTime();
-    last_flow_id=this_flow_id;
     BytesRcvd+=pck->getByteLength();
     TcpAppBase::socketDataArrived(socket, pck, urgent);
 }
@@ -223,12 +191,10 @@ void TcpApp::handleMessageWhenUp(cMessage *msg)
 
 void TcpApp::finish()
 {
-    recordScalar("average FCT",sumFct.dbl()/numReceived);
-    recordScalar("Flows sent", numSent);
-    recordScalar("Flows received", numReceived);
+    recordScalar("num sent", numSent);
+    recordScalar("num received", numReceived);
     recordScalar("BytesRcvd", BytesRcvd);
     recordScalar("BytesSent", BytesSent);
-    recordScalar("final flow id", flowid);
 }
 
 void TcpApp::socketAvailable(TcpSocket *socket, TcpAvailableInfo *availableInfo)
@@ -243,7 +209,7 @@ void TcpApp::socketAvailable(TcpSocket *socket, TcpAvailableInfo *availableInfo)
 void TcpApp::socketClosed(TcpSocket *socket)
 {
     TcpAppBase::socketClosed(socket);
-    cancelEvent(timeoutMsg);
+    cancelEvent(selfMsg);
     if (operationalState == State::STOPPING_OPERATION && !this->socket.isOpen())
         startActiveOperationExtraTimeOrFinish(par("stopOperationExtraTime"));
 }
@@ -251,7 +217,7 @@ void TcpApp::socketClosed(TcpSocket *socket)
 void TcpApp::socketFailure(TcpSocket *socket, int code)
 {
     TcpAppBase::socketFailure(socket, code);
-    cancelEvent(timeoutMsg);
+    cancelEvent(selfMsg);
 }
 
 void TcpApp::refreshDisplay() const
@@ -315,5 +281,17 @@ void TcpApp::parseScript(const char *script)
     EV_DEBUG << "parser finished\n";
 }
 
+void TcpApp::updateNextFlow(const char* TM)
+{
+    if(std::string(TM).find("sendscript") != std::string::npos){
+        packetLength = commands[commandIndex].numBytes;
+    }else if(std::string(TM).find("LongFlow") != std::string::npos){
+        packetLength=10000;
+    }
+    else
+    {
+        throw cRuntimeError("Unrecognized traffic mode!");
+    }
+}
 } // namespace inet
 

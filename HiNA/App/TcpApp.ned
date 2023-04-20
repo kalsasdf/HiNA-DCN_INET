@@ -89,14 +89,15 @@ simple TcpApp like IApp
         string connectAddress = default("");
         int connectPort = default(100);
         string packetName = default("TcpData");
-        //string dataTransferMode @enum("bytecount","object","bytestream") = default("bytecount");
         double tOpen @unit(s) = default(-1s);
         double tSend @unit(s) = default(-1s);
         double tClose @unit(s) = default(2s);
         int timeToLive = default(-1); // if not -1, set the TTL (IPv4) or Hop Limit (IPv6) field of sent packets to this value
         int dscp = default(-1); // if not -1, set the DSCP (IPv4/IPv6) field of sent packets to this value
         int tos = default(-1); // if not -1, set the Type Of Service (IPv4) / Traffic Class (IPv6) field of sent packets to this value
-        int sendBytes @unit(B) = default(1MiB);
+        string trafficMode = default("LongFlow");
+        double linkSpeed @unit(bps) = default(1e9bps);
+        double workLoad = default(1);
         string sendScript = default("");//With sendScript, the format is "<time> <numBytes>;<time> <numBytes>;..."
         
         @display("i=block/app");

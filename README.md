@@ -1,5 +1,6 @@
 [HiNA-DCN inet项目.docx](https://github.com/kalsasdf/HiNA-DCN_INET/files/11248932/HiNA-DCN.inet.docx)
 
+2023-4-20 新增生成Tcp_sendscript的python脚本
 
 2023-4-17 TcpApp功能优化
 

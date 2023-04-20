@@ -13,7 +13,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package inet.examples.HiNA.test;
+package inet.examples.HiNA.test.dumbbell;
 
 
 import inet.common.misc.ThruputMeter;
@@ -38,10 +38,10 @@ network testdumbbell
             datarate = 10Gbps;
         }
     submodules:
-        r1: HiHost {
+        Hostr1: HiHost {
             @display("p=866.885,25.29;i=device/server");
         }
-        s1: HiHost {
+        Hosts1: HiHost {
             @display("p=325.96,25.29;i=device/server");
         }
         Router1: HiSwitch {
@@ -50,83 +50,83 @@ network testdumbbell
         configurator: Ipv4NetworkConfigurator {
             @display("p=68,37");
         }
-        s2: HiHost {
+        Hosts2: HiHost {
             @display("p=325.96,81.49;i=device/server");
         }
-        s3: HiHost {
+        Hosts3: HiHost {
             @display("p=325.96,139.095;i=device/server");
         }
-        s4: HiHost {
+        Hosts4: HiHost {
             @display("p=325.96,202.32;i=device/server");
         }
-        s5: HiHost {
+        Hosts5: HiHost {
             @display("p=325.96,258.52;i=device/server");
         }
         Router2: HiSwitch {
             @display("p=685.64,282.405");
         }
-        r2: HiHost {
+        Hostr2: HiHost {
             @display("p=866.885,81.49;i=device/server");
         }
-        r3: HiHost {
+        Hostr3: HiHost {
             @display("p=866.885,139.095;i=device/server");
         }
-        r4: HiHost {
+        Hostr4: HiHost {
             @display("p=866.885,202.32;i=device/server");
         }
-        r5: HiHost {
+        Hostr5: HiHost {
             @display("p=866.885,257.115;i=device/server");
         }
-        s6: HiHost {
+        Hosts6: HiHost {
             @display("p=325.96,314.72;i=device/server");
         }
-        s7: HiHost {
+        Hosts7: HiHost {
             @display("p=325.96,370.92;i=device/server");
         }
-        s8: HiHost {
+        Hosts8: HiHost {
             @display("p=325.96,428.525;i=device/server");
         }
-        s9: HiHost {
+        Hosts9: HiHost {
             @display("p=325.96,491.75;i=device/server");
         }
-        s10: HiHost {
+        Hosts10: HiHost {
             @display("p=325.96,546.545;i=device/server");
         }
-        r6: HiHost {
+        Hostr6: HiHost {
             @display("p=866.885,314.72;i=device/server");
         }
-        r7: HiHost {
+        Hostr7: HiHost {
             @display("p=866.885,370.92;i=device/server");
         }
-        r8: HiHost {
+        Hostr8: HiHost {
             @display("p=866.885,428.525;i=device/server");
         }
-        r9: HiHost {
+        Hostr9: HiHost {
             @display("p=866.885,491.75;i=device/server");
         }
-        r10: HiHost {
+        Hostr10: HiHost {
             @display("p=866.885,546.545;i=device/server");
         }
     connections:
-        s1.ethg++ <--> agchannel <--> Router1.ethg++;
-        s2.ethg++ <--> agchannel <--> Router1.ethg++;
-        s3.ethg++ <--> agchannel <--> Router1.ethg++;
-        s4.ethg++ <--> agchannel <--> Router1.ethg++;
-        s5.ethg++ <--> agchannel <--> Router1.ethg++;
-        s6.ethg++ <--> agchannel <--> Router1.ethg++;
-        s7.ethg++ <--> agchannel <--> Router1.ethg++;
-        s8.ethg++ <--> agchannel <--> Router1.ethg++;
-        s9.ethg++ <--> agchannel <--> Router1.ethg++;
-        s10.ethg++ <--> agchannel <--> Router1.ethg++;
-        Router2.ethg++ <--> agchannel <--> r1.ethg++;
-        Router2.ethg++ <--> agchannel <--> r2.ethg++;
-        Router2.ethg++ <--> agchannel <--> r3.ethg++;
-        Router2.ethg++ <--> agchannel <--> r4.ethg++;
-        Router2.ethg++ <--> agchannel <--> r5.ethg++;
-        Router2.ethg++ <--> agchannel <--> r6.ethg++;
-        Router2.ethg++ <--> agchannel <--> r7.ethg++;
-        Router2.ethg++ <--> agchannel <--> r8.ethg++;
-        Router2.ethg++ <--> agchannel <--> r9.ethg++;
-        Router2.ethg++ <--> agchannel <--> r10.ethg++;
+        Hosts1.ethg++ <--> agchannel <--> Router1.ethg++;
+        Hosts2.ethg++ <--> agchannel <--> Router1.ethg++;
+        Hosts3.ethg++ <--> agchannel <--> Router1.ethg++;
+        Hosts4.ethg++ <--> agchannel <--> Router1.ethg++;
+        Hosts5.ethg++ <--> agchannel <--> Router1.ethg++;
+        Hosts6.ethg++ <--> agchannel <--> Router1.ethg++;
+        Hosts7.ethg++ <--> agchannel <--> Router1.ethg++;
+        Hosts8.ethg++ <--> agchannel <--> Router1.ethg++;
+        Hosts9.ethg++ <--> agchannel <--> Router1.ethg++;
+        Hosts10.ethg++ <--> agchannel <--> Router1.ethg++;
+        Router2.ethg++ <--> agchannel <--> Hostr1.ethg++;
+        Router2.ethg++ <--> agchannel <--> Hostr2.ethg++;
+        Router2.ethg++ <--> agchannel <--> Hostr3.ethg++;
+        Router2.ethg++ <--> agchannel <--> Hostr4.ethg++;
+        Router2.ethg++ <--> agchannel <--> Hostr5.ethg++;
+        Router2.ethg++ <--> agchannel <--> Hostr6.ethg++;
+        Router2.ethg++ <--> agchannel <--> Hostr7.ethg++;
+        Router2.ethg++ <--> agchannel <--> Hostr8.ethg++;
+        Router2.ethg++ <--> agchannel <--> Hostr9.ethg++;
+        Router2.ethg++ <--> agchannel <--> Hostr10.ethg++;
         Router1.ethg++ <--> agchannel <--> Router2.ethg++;
 }

@@ -117,7 +117,7 @@ void REDPFCQueue::pushPacket(Packet *packet, cGate *gate)
     EV_INFO << "Pushing packet" << EV_FIELD(packet) << EV_ENDL;
     queue.insert(packet);
 
-    int iface = packet->getTag<InterfaceInd>()->getInterfaceId();
+    int iface = packet->addTagIfAbsent<InterfaceInd>()->getInterfaceId();
     EV<<"iface = "<<iface;
     if(usePfc){
         if(XOFF>maxSize-headroom.get()/8){
@@ -304,7 +304,7 @@ bool REDPFCQueue::BufferManagement(cMessage *msg){
         return true;
     }
 
-    b RemainingBufferSize = sharedBuffer[switchid][priority];  // µ±Ç°½»»»»ú¹²Ïí»º´æÊ£Óà´óĞ¡
+    b RemainingBufferSize = sharedBuffer[switchid][priority];  // å½“å‰äº¤æ¢æœºå…±äº«ç¼“å­˜å‰©ä½™å¤§å°
     EV << "currentqueuelength = " << queueLength << "b, RemainingBufferSize  = " << RemainingBufferSize.get() << "b, Packet Length is" << packet->getByteLength() <<"B"<<endl;
 
     maxSize = double(alpha*RemainingBufferSize.get()) ;

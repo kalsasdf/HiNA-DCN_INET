@@ -133,25 +133,27 @@ void HiEthernetMac::startFrameTransmission()
 
 
     //for HPCC
-    if(HPCC&&std::string(frame->getFullName()).find("HPCCData") != std::string::npos){
-        auto& eth_hdr = frame->popAtFront<EthernetMacHeader>();//移除mac头
-        auto& ip_hdr = frame->popAtFront<Ipv4Header>();//移除ip头/arp/70B
-        auto& INT_hdr = frame->removeAtFront<INTHeader>();//移除INT头
-        hopInf cur_inf;
-        cur_inf.TS= simTime();//记录时间戳
-        cur_inf.queueLength = check_and_cast<WrrScheduler*>(getParentModule()->getSubmodule("Hiqueue")->getSubmodule("WrrScheduler"))->getTotalLength();
+    if(HPCC){
         txBytes+=frame->getByteLength();
-        cur_inf.txBytes = txBytes;
-        cur_inf.txRate = curEtherDescr->txrate;
-        EV<<"(mac) the queueLenth is "<<cur_inf.queueLength<<" the txBytes is "<<cur_inf.txBytes<<" the txrate is "<<cur_inf.txRate<<endl;
-        int nHop= INT_hdr->getNHop()+1;
-        INT_hdr->setNHop(nHop);
-        int pathID = INT_hdr->getPathID() ^ hostModule->getId();//hostID未确定
-        INT_hdr->setPathID(pathID);
-        INT_hdr->setHopInfs(nHop-1,cur_inf);
-        frame->insertAtFront(INT_hdr);//加INT头
-        frame->insertAtFront(ip_hdr);//加ip头
-        frame->insertAtFront(eth_hdr);//加mac头
+        if(std::string(frame->getFullName()).find("HPCCData") != std::string::npos){
+            auto& eth_hdr = frame->popAtFront<EthernetMacHeader>();//移除mac头
+            auto& ip_hdr = frame->popAtFront<Ipv4Header>();//移除ip头/arp/70B
+            auto& INT_hdr = frame->removeAtFront<INTHeader>();//移除INT头
+            hopInf cur_inf;
+            cur_inf.TS= simTime();//记录时间戳
+            cur_inf.queueLength = check_and_cast<WrrScheduler*>(getParentModule()->getSubmodule("Hiqueue")->getSubmodule("WrrScheduler"))->getTotalLength();
+            cur_inf.txBytes = txBytes;
+            cur_inf.txRate = curEtherDescr->txrate;
+            EV<<"(mac) the queueLenth is "<<cur_inf.queueLength<<" the txBytes is "<<cur_inf.txBytes<<" the txrate is "<<cur_inf.txRate<<endl;
+            int nHop= INT_hdr->getNHop()+1;
+            INT_hdr->setNHop(nHop);
+            int pathID = INT_hdr->getPathID() ^ hostModule->getId();//hostID未确定
+            INT_hdr->setPathID(pathID);
+            INT_hdr->setHopInfs(nHop-1,cur_inf);
+            frame->insertAtFront(INT_hdr);//加INT头
+            frame->insertAtFront(ip_hdr);//加ip头
+            frame->insertAtFront(eth_hdr);//加mac头
+        }
     }
     //for HPCC
 

@@ -30,21 +30,12 @@ class INET_API SwitchMacQueue : public PacketQueueBase, public IPacketBuffer::IC
     IPassivePacketSource *provider = nullptr;
 
     cPacketQueue queue;
-    IPacketBuffer *buffer = nullptr;
-
-    IPacketDropperFunction *packetDropperFunction = nullptr;
-    IPacketComparatorFunction *packetComparatorFunction = nullptr;
 
   protected:
     virtual void initialize(int stage) override;
 
-    virtual IPacketDropperFunction *createDropperFunction(const char *dropperClass) const;
-    virtual IPacketComparatorFunction *createComparatorFunction(const char *comparatorClass) const;
-
-    virtual bool isOverloaded() const;
-
   public:
-    virtual ~SwitchMacQueue() { delete packetDropperFunction; }
+    virtual ~SwitchMacQueue() { }
 
     virtual int getMaxNumPackets() const override { return packetCapacity; }
     virtual int getNumPackets() const override;

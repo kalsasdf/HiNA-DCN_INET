@@ -46,7 +46,6 @@ void REDPFCQueue::initialize(int stage)
         useEcn=par("useEcn");
         alpha=par("alpha");
         count = -1;
-        buffer = findModuleFromPar<IPacketBuffer>(par("bufferModule"), this);
         packetComparatorFunction = createComparatorFunction(par("comparatorClass"));
         if (packetComparatorFunction != nullptr)
             queue.setup(packetComparatorFunction);
@@ -148,13 +147,14 @@ Packet *REDPFCQueue::pullPacket(cGate *gate)
     Enter_Method("pullPacket");
     auto packet = check_and_cast<Packet *>(queue.front());
     EV_INFO << "Pulling packet" << EV_FIELD(packet) << EV_ENDL;
-    EV<<"queuelength = "<<queue.getBitLength()<<endl;
-    if (buffer != nullptr) {
-        queue.remove(packet);
-        buffer->removePacket(packet);
+    EV<<"queuelength = "<<queue.getBitLength()<<"b"<<endl;
+    if(queue.getBitLength()-dataCapacity.get()>=packet->getBitLength()){
+        sharedBuffer[switchid][priority]+=b(packet->getBitLength());
+    }else if(queue.getBitLength()>=dataCapacity.get()){
+        sharedBuffer[switchid][priority]+=b(queue.getBitLength()-dataCapacity.get());
     }
-    else
-        queue.pop();
+    queue.pop();
+    EV<<"after pop queuelength = "<<queue.getBitLength()<<endl;
 
     auto queueingTime = simTime() - packet->getArrivalTime();
     auto packetEvent = new PacketQueuedEvent();
@@ -239,8 +239,6 @@ void REDPFCQueue::removePacket(Packet *packet)
     Enter_Method("removePacket");
     EV_INFO << "Removing packet" << EV_FIELD(packet) << EV_ENDL;
     queue.remove(packet);
-    if (buffer != nullptr)
-        buffer->removePacket(packet);
     emit(packetRemovedSignal, packet);
     updateDisplayString();
 }
@@ -252,8 +250,6 @@ void REDPFCQueue::removeAllPackets()
     std::vector<Packet *> packets;
     for (int i = 0; i < getNumPackets(); i++)
         packets.push_back(check_and_cast<Packet *>(queue.pop()));
-    if (buffer != nullptr)
-        buffer->removeAllPackets();
     for (auto packet : packets) {
         emit(packetRemovedSignal, packet);
         delete packet;
@@ -304,7 +300,7 @@ bool REDPFCQueue::BufferManagement(cMessage *msg){
         return true;
     }
 
-    b RemainingBufferSize = sharedBuffer[switchid][priority];  // 当前交换机共享缓存剩余大小
+    b RemainingBufferSize = sharedBuffer[switchid][priority];
     EV << "currentqueuelength = " << queueLength << "b, RemainingBufferSize  = " << RemainingBufferSize.get() << "b, Packet Length is" << packet->getByteLength() <<"B"<<endl;
 
     maxSize = double(alpha*RemainingBufferSize.get()) ;

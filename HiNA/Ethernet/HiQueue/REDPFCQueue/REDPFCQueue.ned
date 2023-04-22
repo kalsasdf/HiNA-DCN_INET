@@ -61,7 +61,6 @@ simple REDPFCQueue extends PacketQueueBase like IPacketQueue
         int dataCapacity @unit(b) = default(-1b); // maximum total length of packets in the queue, no limit by default
         string dropperClass = default("inet::queueing::PacketAtCollectionEndDropper"); // determines which packets are dropped when the queue is overloaded, packets are not dropped by default; the parameter must be the name of a C++ class which implements the IPacketDropperFunction C++ interface and is registered via Register_Class
         string comparatorClass = default(""); // determines the order of packets in the queue, insertion order by default; the parameter must be the name of a C++ class which implements the IPacketComparatorFunction C++ interface and is registered via Register_Class
-        string bufferModule = default(""); // relative module path to the IPacketBuffer module used by this queue, implicit buffer by default
         displayStringTextFormat = default("contains %p pk (%l) pushed %u\npulled %o removed %r dropped %d");
         int priority = default(-1);
         bool usePfc = default(false);
@@ -71,7 +70,7 @@ simple REDPFCQueue extends PacketQueueBase like IPacketQueue
         int Kmax @unit(B) = default(0B);
         int Kmin @unit(B) = default(0B);
         double Pmax = default(0);
-        int sharedBuffer @unit(b)= default(-1b);
+        int sharedBuffer @unit(b)= default(16Mb);
         int headroom @unit(b) = default(1b);
         double alpha = default(1);
         @class(REDPFCQueue);

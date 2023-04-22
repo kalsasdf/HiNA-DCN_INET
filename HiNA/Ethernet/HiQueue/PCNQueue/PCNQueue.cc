@@ -28,12 +28,14 @@ Packet *PCNQueue::pullPacket(cGate *gate)
     Enter_Method("pullPacket");
     auto packet = check_and_cast<Packet *>(queue.front());
     EV_INFO << "Pulling packet" << EV_FIELD(packet) << EV_ENDL;
-    if (buffer != nullptr) {
-        queue.remove(packet);
-        buffer->removePacket(packet);
+    EV<<"queuelength = "<<queue.getBitLength()<<"b"<<endl;
+    if(queue.getBitLength()-dataCapacity.get()>=packet->getBitLength()){
+        sharedBuffer[switchid][priority]+=b(packet->getBitLength());
+    }else if(queue.getBitLength()>=dataCapacity.get()){
+        sharedBuffer[switchid][priority]+=b(queue.getBitLength()-dataCapacity.get());
     }
-    else
-        queue.pop();
+    queue.pop();
+    EV<<"after pop queuelength = "<<queue.getBitLength()<<endl;
 
     auto queueingTime = simTime() - packet->getArrivalTime();
     auto packetEvent = new PacketQueuedEvent();

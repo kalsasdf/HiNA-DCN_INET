@@ -25,14 +25,6 @@ void SwitchMacQueue::initialize(int stage)
         producer = findConnectedModule<IActivePacketSource>(inputGate);
         collector = findConnectedModule<IActivePacketSink>(outputGate);
         provider = findConnectedModule<IPassivePacketSource>(inputGate);
-        packetCapacity = par("packetCapacity");
-        dataCapacity = b(par("dataCapacity"));
-        buffer = findModuleFromPar<IPacketBuffer>(par("bufferModule"), this);
-        packetComparatorFunction = createComparatorFunction(par("comparatorClass"));
-        if (packetComparatorFunction != nullptr)
-            queue.setup(packetComparatorFunction);
-        packetDropperFunction = createDropperFunction(par("dropperClass"));
-
     }
     else if (stage == INITSTAGE_QUEUEING) {
         checkPacketOperationSupport(inputGate);
@@ -42,28 +34,6 @@ void SwitchMacQueue::initialize(int stage)
     }
     else if (stage == INITSTAGE_LAST)
         updateDisplayString();
-}
-
-IPacketDropperFunction *SwitchMacQueue::createDropperFunction(const char *dropperClass) const
-{
-    if (strlen(dropperClass) == 0)
-        return nullptr;
-    else
-        return check_and_cast<IPacketDropperFunction *>(createOne(dropperClass));
-}
-
-IPacketComparatorFunction *SwitchMacQueue::createComparatorFunction(const char *comparatorClass) const
-{
-    if (strlen(comparatorClass) == 0)
-        return nullptr;
-    else
-        return check_and_cast<IPacketComparatorFunction *>(createOne(comparatorClass));
-}
-
-bool SwitchMacQueue::isOverloaded() const
-{
-    return (packetCapacity != -1 && getNumPackets() > packetCapacity) ||
-           (dataCapacity != b(-1) && getTotalLength() > dataCapacity);
 }
 
 int SwitchMacQueue::getNumPackets() const
@@ -86,17 +56,6 @@ void SwitchMacQueue::pushPacket(Packet *packet, cGate *gate)
     emit(packetPushStartedSignal, packet, &packetPushStartedDetails);
     EV_INFO << "Pushing packet" << EV_FIELD(packet) << EV_ENDL;
     queue.insert(packet);
-    if (buffer != nullptr)
-        buffer->addPacket(packet);
-    else if (packetDropperFunction != nullptr) {
-        while (isOverloaded()) {
-            auto packet = packetDropperFunction->selectPacket(this);
-            EV_INFO << "Dropping packet" << EV_FIELD(packet) << EV_ENDL;
-            queue.remove(packet);
-            dropPacket(packet, QUEUE_OVERFLOW);
-        }
-    }
-    ASSERT(!isOverloaded());
 
     cNamedObject packetPushEndedDetails("atomicOperationEnded");
     emit(packetPushEndedSignal, nullptr, &packetPushEndedDetails);
@@ -123,12 +82,7 @@ Packet *SwitchMacQueue::pullPacket(cGate *gate)
     Enter_Method("pullPacket");
     auto packet = check_and_cast<Packet *>(queue.front());
     EV_INFO << "Pulling packet" << EV_FIELD(packet) << EV_ENDL;
-    if (buffer != nullptr) {
-        queue.remove(packet);
-        buffer->removePacket(packet);
-    }
-    else
-        queue.pop();
+    queue.pop();
 //    provider->canPullSomePacket(inputGate);
     auto queueingTime = simTime() - packet->getArrivalTime();
     auto packetEvent = new PacketQueuedEvent();
@@ -151,8 +105,6 @@ void SwitchMacQueue::removePacket(Packet *packet)
     Enter_Method("removePacket");
     EV_INFO << "Removing packet" << EV_FIELD(packet) << EV_ENDL;
     queue.remove(packet);
-    if (buffer != nullptr)
-        buffer->removePacket(packet);
     emit(packetRemovedSignal, packet);
     updateDisplayString();
 }
@@ -164,8 +116,6 @@ void SwitchMacQueue::removeAllPackets()
     std::vector<Packet *> packets;
     for (int i = 0; i < getNumPackets(); i++)
         packets.push_back(check_and_cast<Packet *>(queue.pop()));
-    if (buffer != nullptr)
-        buffer->removeAllPackets();
     for (auto packet : packets) {
         emit(packetRemovedSignal, packet);
         delete packet;
@@ -175,23 +125,11 @@ void SwitchMacQueue::removeAllPackets()
 
 bool SwitchMacQueue::canPushSomePacket(cGate *gate) const
 {
-    if (packetDropperFunction)
-        return true;
-    if (getMaxNumPackets() != -1 && getNumPackets() >= getMaxNumPackets())
-        return false;
-    if (getMaxTotalLength() != b(-1) && getTotalLength() >= getMaxTotalLength())
-        return false;
     return true;
 }
 
 bool SwitchMacQueue::canPushPacket(Packet *packet, cGate *gate) const
 {
-    if (packetDropperFunction)
-        return true;
-    if (getMaxNumPackets() != -1 && getNumPackets() >= getMaxNumPackets())
-        return false;
-    if (getMaxTotalLength() != b(-1) && getMaxTotalLength() - getTotalLength() < packet->getDataLength())
-        return false;
     return true;
 }
 

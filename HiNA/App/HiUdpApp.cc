@@ -60,6 +60,9 @@ void HiUdpApp::initialize(int stage)
         stopTime = par("stopTime");
         packetName = par("packetName");
         AppPriority = par("AppPrioirty");
+        commandIndex = 0;
+        const char *script = par("sendScript");
+        parseScript(script);
         if (stopTime >= SIMTIME_ZERO && stopTime < startTime)
             throw cRuntimeError("Invalid startTime/stopTime parameters");
         selfMsg = new cMessage("sendTimer");
@@ -288,6 +291,87 @@ void HiUdpApp::refreshDisplay() const
     char buf[100];
     sprintf(buf, "rcvd: %d pks\nsent: %d pks", numReceived, numSent);
     getDisplayString().setTagArg("t", 0, buf);
+}
+
+void HiUdpApp::parseScript(const char *script)
+{
+    // ------------------------------------------------------------------------
+    // 从指定的脚本文件 或 ini字符串参数中读取流量模式
+//    char* buffer = nullptr;
+//    if(*script){
+//        std::fstream SCRIPT_FILE;
+//        int file_length;
+//        SCRIPT_FILE.open(script);
+//        if(!SCRIPT_FILE.is_open()){     // 脚本文件不存在，表示script指向ini文件配置的字符串参数
+//            EV_INFO << "Script file not found!Traffic Pattern is configured by const string." << endl;
+//            EV_INFO << script << endl;
+//        }
+//        else{                           // 脚本文件存在,取出文件内容，赋值给buffer，再传给script
+//            SCRIPT_FILE.seekg(0, std::ios::end);    // 将文件指针定位到文件结束位置
+//            file_length = SCRIPT_FILE.tellg();      // 根据文件指针当前位置，计算得到文件长度
+//            SCRIPT_FILE.seekg(0, std::ios::beg);    // 将文件指针定位到文件开始位置
+//            if(file_length == 0) script = "";
+//            else{
+//                buffer = new char[file_length];
+//                SCRIPT_FILE.read(buffer, file_length);
+//                script = buffer;
+//            }
+//            SCRIPT_FILE.close();
+//        }
+//    }
+//    delete[] buffer;
+    // else{} 为空时，script指向空串 ""，表示既未指定脚本文件路径、又没有指定ini字符串参数
+    // ------------------------------------------------------------------------
+    const char *s = script;
+
+    EV_DEBUG << "parse script \"" << script << "\"\n";
+    while (*s) {
+        // parse time
+        while (isspace(*s))
+            s++;
+
+        if (!*s || *s == ';')
+            break;
+
+        const char *s0 = s;
+        simtime_t tSend = strtod(s, &const_cast<char *&>(s));
+
+        if (s == s0)
+            throw cRuntimeError("Syntax error in script: simulation time expected");
+
+        // parse number of bytes
+        while (isspace(*s))
+            s++;
+
+        if (!isdigit(*s))
+            throw cRuntimeError("Syntax error in script: number of bytes expected");
+
+        long numBytes = strtol(s, nullptr, 10);
+
+        while (isdigit(*s))
+            s++;
+
+        // add command
+        EV_DEBUG << " add command (" << tSend << "s, " << numBytes << "B)\n";
+        commands.push_back(Command(tSend, numBytes));
+
+        // skip delimiter
+        while (isspace(*s))
+            s++;
+
+        if (!*s)
+            break;
+
+        if (*s != ';')
+            throw cRuntimeError("Syntax error in script: separator ';' missing");
+
+        s++;
+
+        while (isspace(*s))
+            s++;
+    }
+
+    EV_DEBUG << "parser finished\n";
 }
 
 void HiUdpApp::updateNextFlow(const char* TM)
@@ -728,6 +812,9 @@ void HiUdpApp::updateNextFlow(const char* TM)
     else if(std::string(TM).find("LongFlow") != std::string::npos)
     {
         packetLength=10000;
+    }
+    else if(std::string(TM).find("sendscript") != std::string::npos){
+        packetLength = commands[commandIndex].numBytes;
     }
     else
     {

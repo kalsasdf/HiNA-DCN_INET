@@ -54,7 +54,7 @@ simple HiUdpApp like IApp
         double linkSpeed @unit(bps) = default(1e9bps);
         double workLoad = default(1);
         string trafficMode = default("LongFlow");// CacheFollower, DataMining, WebServer, WebSearch.
-        
+        string sendScript = default("");        
         int timeToLive = default(-1); // if not -1, set the TTL (IPv4) or Hop Limit (IPv6) field of sent packets to this value
         int dscp = default(-1);
         int tos = default(-1); // if not -1, set the ToS (IPv4) or Traffic Class (IPv6) field of sent packets to this value

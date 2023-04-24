@@ -20,6 +20,7 @@
 #define __INET_HIUdpAPP_H
 
 #include <vector>
+#include <fstream>
 
 #include "inet/HiNA/Messages/HiTag/HiTag_m.h"
 #include "inet/networklayer/common/L3AddressTag_m.h"
@@ -37,6 +38,15 @@ class INET_API HiUdpApp : public ClockUserModuleMixin<ApplicationBase>, public U
 {
   protected:
     enum SelfMsgKinds { START = 1, SEND, STOP };
+
+    struct Command {
+        simtime_t tSend;
+        long numBytes = 0;
+        Command(simtime_t t, long n) { tSend = t; numBytes = n; }
+    };
+    typedef std::vector<Command> CommandVector;
+    CommandVector commands;
+    int commandIndex = -1;
 
     // parameters
     std::vector<L3Address> connectAddresses;
@@ -87,6 +97,7 @@ class INET_API HiUdpApp : public ClockUserModuleMixin<ApplicationBase>, public U
     virtual void processStart();
     virtual void processSend();
     virtual void processStop();
+    virtual void parseScript(const char *script);
     virtual void updateNextFlow(const char* TM);
 
     virtual void handleStartOperation(LifecycleOperation *operation) override;

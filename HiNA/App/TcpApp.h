@@ -19,6 +19,7 @@
 
 #include <vector>
 #include <map>
+#include <fstream>
 
 #include "inet/common/INETDefs.h"
 #include "inet/common/lifecycle/LifecycleOperation.h"

@@ -119,9 +119,9 @@ void REDPFCQueue::pushPacket(Packet *packet, cGate *gate)
     int iface = packet->addTagIfAbsent<InterfaceInd>()->getInterfaceId();
     EV<<"iface = "<<iface;
     if(usePfc){
-        if(XOFF>maxSize-headroom.get()/8){
-            XOFF -= maxSize-headroom.get()/8;
-            XON -= maxSize-headroom.get()/8;
+        if(XOFF>(maxSize-headroom.get())/8){
+            XOFF -= (maxSize-headroom.get())/8;
+            XON -= (maxSize-headroom.get())/8;
         }
         if(queue.getByteLength()>=XOFF&&std::find(paused.begin(),paused.end(),iface)==paused.end()){
             paused.push_back(iface);

@@ -55,7 +55,7 @@ class INET_API HiUdpApp : public ClockUserModuleMixin<ApplicationBase>, public U
     simtime_t startTime;
     simtime_t stopTime;
     const char *packetName = nullptr;
-    double packetLength;
+    uint messageLength;
     uint32_t AppPriority;
     const char *trafficMode = nullptr;
     double linkSpeed;
@@ -75,6 +75,8 @@ class INET_API HiUdpApp : public ClockUserModuleMixin<ApplicationBase>, public U
     cOutVector goodputVector;
     long BytesRcvd=0;
     long BytesSent=0;
+    int num=0;
+    int count=0;
 
     simtime_t sumFct=0;
     simtime_t this_flow_creation_time=0;
@@ -91,7 +93,7 @@ class INET_API HiUdpApp : public ClockUserModuleMixin<ApplicationBase>, public U
 
     // chooses random destination address
     virtual L3Address chooseDestAddr(int k);
-    virtual void sendPacket();
+    virtual void sendPacket(int packetlength);
     virtual void processPacket(Packet *msg);
 
     virtual void processStart();

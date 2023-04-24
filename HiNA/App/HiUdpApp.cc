@@ -184,23 +184,62 @@ void HiUdpApp::setSocketOptions()
 
 void HiUdpApp::processSend()
 {
-    updateNextFlow(trafficMode);
-    sendPacket();
-    simtime_t txTime = simtime_t((packetLength+66)*8/linkSpeed);
-    //66=8(UDP)+20(IP)+14(EthernetMac)+8(EthernetPhy)+4(EthernetFcs)+12(interframe gap,IFG)
-    simtime_t d = simTime() + txTime/workLoad;
-    EV<<"simTime() = "<<simTime()<<", next time = "<<d<<endl;
-    if ((stopTime < SIMTIME_ZERO || d < stopTime)) {
-        selfMsg->setKind(SEND);
-        scheduleAt(d, selfMsg);
+    if(count==0){
+        updateNextFlow(trafficMode);
+        if(messageLength>65535){
+            count = num = messageLength%65535;
+            sendPacket(65535);
+            selfMsg->setKind(SEND);
+            scheduleAt(simTime(), selfMsg);
+        }else{
+            sendPacket(messageLength);
+            flowid++;
+            if(simTime()>=stopTime){
+                selfMsg->setKind(STOP);
+                scheduleAt(stopTime, selfMsg);
+            }else if(std::string(trafficMode).find("sendscript") != std::string::npos&&++commandIndex < (int)commands.size()){
+                simtime_t tSend = commands[commandIndex].tSend;
+                selfMsg->setKind(SEND);
+                scheduleAt(std::max(tSend, simTime()), selfMsg);
+            }else {
+                simtime_t txTime = simtime_t((messageLength+66)*8/linkSpeed);
+                //66=8(UDP)+20(IP)+14(EthernetMac)+8(EthernetPhy)+4(EthernetFcs)+12(interframe gap,IFG)
+                simtime_t d = simTime() + txTime/workLoad;
+                EV<<"simTime() = "<<simTime()<<", next time = "<<d<<endl;
+                selfMsg->setKind(SEND);
+                scheduleAt(d, selfMsg);
+            }
+        }
+    }else{
+        count--;
+        if(count==0){
+            sendPacket(messageLength-num*65535);
+            flowid++;
+            if(simTime()>=stopTime){
+                selfMsg->setKind(STOP);
+                scheduleAt(stopTime, selfMsg);
+            }else if(std::string(trafficMode).find("sendscript") != std::string::npos&&++commandIndex < (int)commands.size()){
+                simtime_t tSend = commands[commandIndex].tSend;
+                selfMsg->setKind(SEND);
+                scheduleAt(std::max(tSend, simTime()), selfMsg);
+            }else {
+                simtime_t txTime = simtime_t((messageLength+66*num)*8/linkSpeed);
+                //66=8(UDP)+20(IP)+14(EthernetMac)+8(EthernetPhy)+4(EthernetFcs)+12(interframe gap,IFG)
+                simtime_t d = simTime() + txTime/workLoad;
+                EV<<"simTime() = "<<simTime()<<", next time = "<<d<<endl;
+                selfMsg->setKind(SEND);
+                scheduleAt(d, selfMsg);
+            }
+        }else{
+            sendPacket(65535);
+            selfMsg->setKind(SEND);
+            scheduleAt(simTime(), selfMsg);
+        }
     }
-    else {
-        selfMsg->setKind(STOP);
-        scheduleAt(stopTime, selfMsg);
-    }
+
 }
 
-void HiUdpApp::sendPacket()
+void HiUdpApp::sendPacket(int packetlength)
 {
     srand(flowid);
     int k = rand()%connectAddresses.size();
@@ -213,10 +252,10 @@ void HiUdpApp::sendPacket()
 
     Packet *packet = new Packet(str.str().c_str());
 
-    auto payload = makeShared<ByteCountChunk>(B(packetLength));
+    auto payload = makeShared<ByteCountChunk>(B(packetlength));
     auto tag = payload->addTag<HiTag>();
     tag->setFlowId(flowid);
-    tag->setFlowSize(packetLength);
+    tag->setFlowSize(messageLength);
     tag->setCreationtime(simTime());
     tag->setPriority(AppPriority);
 
@@ -224,9 +263,8 @@ void HiUdpApp::sendPacket()
 
     emit(packetSentSignal, packet);
     socket.sendTo(packet, destAddr, connectPort);
-    flowid++;
     numSent++;
-    BytesSent+=packetLength;
+    BytesSent+=packetlength;
 }
 
 L3Address HiUdpApp::chooseDestAddr(int k)
@@ -385,91 +423,91 @@ void HiUdpApp::updateNextFlow(const char* TM)
     {// 50% 0~10kb, 3% 10~100kb, 18% 100kb~1mb, 29% 1mb~, average 701kb
         if (seed<=0.01)
         {
-            packetLength = 70;
+            messageLength = 70;
         }
         else if (seed<=0.015)
         {
-            packetLength = rand()%(150-71) + 71;
+            messageLength = rand()%(150-71) + 71;
         }
         else if (seed<=0.04)
         {
-            packetLength = 150;
+            messageLength = 150;
         }
         else if (seed<=0.08)
         {
-            packetLength = rand()%(300-151) + 151;
+            messageLength = rand()%(300-151) + 151;
         }
         else if (seed<=0.1)
         {
-            packetLength = rand()%(350-301) + 301;
+            messageLength = rand()%(350-301) + 301;
         }
         else if (seed<=0.19)
         {
-            packetLength = 350;
+            messageLength = 350;
         }
         else if (seed<=0.2)
         {
-            packetLength = rand()%(450-351) + 351;
+            messageLength = rand()%(450-351) + 351;
         }
         else if (seed<=0.28)
         {
-            packetLength = rand()%(500-451) + 451;
+            messageLength = rand()%(500-451) + 451;
         }
         else if (seed<=0.3)
         {
-            packetLength = rand()%(600-501) + 501;
+            messageLength = rand()%(600-501) + 501;
         }
         else if (seed<=0.35)
         {
-            packetLength = rand()%(700-601) + 601;
+            messageLength = rand()%(700-601) + 601;
         }
         else if (seed<=0.4)
         {
-            packetLength = rand()%(1100-701) + 701;
+            messageLength = rand()%(1100-701) + 701;
         }
         else if (seed<=0.42)
         {
-            packetLength = rand()%(2000-1101) + 1101;
+            messageLength = rand()%(2000-1101) + 1101;
         }
         else if (seed<=0.48)
         {
-            packetLength = rand()%(10000-2001) + 2001;
+            messageLength = rand()%(10000-2001) + 2001;
         }
         else if (seed<=0.5)
         {
-            packetLength = rand()%(30000-10001) + 10001;
+            messageLength = rand()%(30000-10001) + 10001;
         }
         else if (seed<=0.52)
         {
-            packetLength = rand()%(100000-30001) + 30001;
+            messageLength = rand()%(100000-30001) + 30001;
         }
         else if (seed<=0.6)
         {
-            packetLength = rand()%(200000-100001) + 100001;
+            messageLength = rand()%(200000-100001) + 100001;
         }
         else if (seed<=0.68)
         {
-            packetLength = rand()%(400000-200001) + 200001;
+            messageLength = rand()%(400000-200001) + 200001;
         }
         else if (seed<=0.7)
         {
-            packetLength = rand()%(600000-400001) + 400001;
+            messageLength = rand()%(600000-400001) + 400001;
         }
         else if (seed<=0.701)
         {
-            packetLength = rand()%(15000-6001)*100 + 600001;
+            messageLength = rand()%(15000-6001)*100 + 600001;
         }
         else if (seed<=0.8)
         {
-            packetLength = rand()%(20000-15001)*100 + 1500001;
+            messageLength = rand()%(20000-15001)*100 + 1500001;
         }
         else if (seed<=0.9)
         {
-            packetLength = rand()%(24000-20001)*100 + 2000001;
+            messageLength = rand()%(24000-20001)*100 + 2000001;
         }
         else if (seed<=1)
         {
-            packetLength = rand()%(30000-24001)*100 + 2400001;
+            messageLength = rand()%(30000-24001)*100 + 2400001;
         }
         else
         {
@@ -480,27 +518,27 @@ void HiUdpApp::updateNextFlow(const char* TM)
     {// 78% 0~10kb, 5% 10~100kb, 8% 100kb~1mb, 9% 1mb~, average 7410kb
         if (seed<=0.8)
         {
-            packetLength = rand()%(10000-101) + 101;
+            messageLength = rand()%(10000-101) + 101;
         }
         else if (seed<=0.8346)
         {
-            packetLength = rand()%(15252-1001)*10 + 10001;
+            messageLength = rand()%(15252-1001)*10 + 10001;
         }
         else if (seed<=0.9)
         {
-            packetLength = rand()%(39054-15253)*10 + 152523;
+            messageLength = rand()%(39054-15253)*10 + 152523;
         }
         else if (seed<=0.953846)
         {
-            packetLength = rand()%(32235-3906)*100 + 390542;
+            messageLength = rand()%(32235-3906)*100 + 390542;
         }
         else if (seed<=0.99)
         {
-            packetLength = rand()%(10000-323)*10000 + 3223543;
+            messageLength = rand()%(10000-323)*10000 + 3223543;
         }
         else if (seed<=1)
         {
-            packetLength = rand()%(10000-1001)*100000 + 100000001;
+            messageLength = rand()%(10000-1001)*100000 + 100000001;
         }
         else
         {
@@ -511,47 +549,47 @@ void HiUdpApp::updateNextFlow(const char* TM)
     {// 63% 0~10kb, 18% 10~100kb, 19% 100kb~1mb, 0% 1mb~, average 64kb
         if (seed<=0.12)
         {
-            packetLength = rand()%(300-151) + 151;
+            messageLength = rand()%(300-151) + 151;
         }
         else if (seed<=0.2)
         {
-            packetLength = 300;
+            messageLength = 300;
         }
         else if (seed<=0.3)
         {
-            packetLength = rand()%(1000-601) + 601;
+            messageLength = rand()%(1000-601) + 601;
         }
         else if (seed<=0.4)
         {
-            packetLength = rand()%(2000-1001) + 1001;
+            messageLength = rand()%(2000-1001) + 1001;
         }
         else if (seed<=0.5)
         {
-            packetLength = rand()%(3100-2001) + 2001;
+            messageLength = rand()%(3100-2001) + 2001;
         }
         else if (seed<=0.6)
         {
-            packetLength = rand()%(6000-3101) + 3101;
+            messageLength = rand()%(6000-3101) + 3101;
         }
         else if (seed<=0.71)
         {
-            packetLength = rand()%(20000-6001) + 6001;
+            messageLength = rand()%(20000-6001) + 6001;
         }
         else if (seed<=0.8)
         {
-            packetLength = rand()%(6000-2001)*10 + 20001;
+            messageLength = rand()%(6000-2001)*10 + 20001;
         }
         else if (seed<=0.82)
         {
-            packetLength = rand()%(15000-6001)*10 + 60001;
+            messageLength = rand()%(15000-6001)*10 + 60001;
         }
         else if (seed<=0.9)
         {
-            packetLength = rand()%(30000-15001)*10 + 150001;
+            messageLength = rand()%(30000-15001)*10 + 150001;
         }
         else if (seed<=1)
         {
-            packetLength = rand()%(50000-30001)*10 + 300001;
+            messageLength = rand()%(50000-30001)*10 + 300001;
         }
         else
         {
@@ -562,47 +600,47 @@ void HiUdpApp::updateNextFlow(const char* TM)
     {// 49% 0~10kb, 3% 10~100kb, 18% 100kb~1mb, 20% 1mb~ (big14000kb), average 1600kb
         if (seed<=0.15)
         {
-            packetLength = 9000;
+            messageLength = 9000;
         }
         else if (seed<=0.2)
         {
-            packetLength = rand()%(18582-9001) + 9001;
+            messageLength = rand()%(18582-9001) + 9001;
         }
         else if (seed<=0.3)
         {
-            packetLength = rand()%(28140-18583) + 18583;
+            messageLength = rand()%(28140-18583) + 18583;
         }
         else if (seed<=0.4)
         {
-            packetLength = rand()%(38913-28141) + 28141;
+            messageLength = rand()%(38913-28141) + 28141;
         }
         else if (seed<=0.53)
         {
-            packetLength = rand()%(7747-3892)*10 + 38914;
+            messageLength = rand()%(7747-3892)*10 + 38914;
         }
         else if (seed<=0.6)
         {
-            packetLength = rand()%(20000-7747)*10 + 77469;
+            messageLength = rand()%(20000-7747)*10 + 77469;
         }
         else if (seed<=0.7)
         {
-            packetLength = rand()%(10000-2001)*100 + 200001;
+            messageLength = rand()%(10000-2001)*100 + 200001;
         }
         else if (seed<=0.8)
         {
-            packetLength = rand()%(20000-10001)*100 + 1000001;
+            messageLength = rand()%(20000-10001)*100 + 1000001;
         }
         else if (seed<=0.9)
         {
-            packetLength = rand()%(50000-20001)*100 + 2000001;
+            messageLength = rand()%(50000-20001)*100 + 2000001;
         }
         else if (seed<=0.97)
         {
-            packetLength = rand()%(10000-5001)*1000 + 5000001;
+            messageLength = rand()%(10000-5001)*1000 + 5000001;
         }
         else if (seed<=1)
         {
-            packetLength = rand()%(30000-10001)*1000 + 10000001;
+            messageLength = rand()%(30000-10001)*1000 + 10000001;
         }
         else
         {
@@ -613,15 +651,15 @@ void HiUdpApp::updateNextFlow(const char* TM)
     {
         if (seed<=0.4436)
         {
-            packetLength = 48;
+            messageLength = 48;
         }
         else if (seed<=0.7265)
         {
-            packetLength = 56;
+            messageLength = 56;
         }
         else if (seed<=1)
         {
-            packetLength = 128;
+            messageLength = 128;
         }
         else
         {
@@ -632,19 +670,19 @@ void HiUdpApp::updateNextFlow(const char* TM)
     {
         if (seed<=0.6316)
         {
-            packetLength = 48;
+            messageLength = 48;
         }
         else if (seed<=0.6345)
         {
-            packetLength = 128;
+            messageLength = 128;
         }
         else if (seed<=0.8172)
         {
-            packetLength = 3544;
+            messageLength = 3544;
         }
         else if (seed<=1)
         {
-            packetLength = 3552;
+            messageLength = 3552;
         }
         else
         {
@@ -655,59 +693,59 @@ void HiUdpApp::updateNextFlow(const char* TM)
     {
         if (seed<=0.0226)
         {
-            packetLength = 48;
+            messageLength = 48;
         }
         else if (seed<=0.0234)
         {
-            packetLength = 56;
+            messageLength = 56;
         }
         else if (seed<=0.0242)
         {
-            packetLength = 64;
+            messageLength = 64;
         }
         else if (seed<=0.025)
         {
-            packetLength = 80;
+            messageLength = 80;
         }
         else if (seed<=0.0258)
         {
-            packetLength = 112;
+            messageLength = 112;
         }
         else if (seed<=0.9115)
         {
-            packetLength = 128;
+            messageLength = 128;
         }
         else if (seed<=0.9123)
         {
-            packetLength = 176;
+            messageLength = 176;
         }
         else if (seed<=0.9131)
         {
-            packetLength = 304;
+            messageLength = 304;
         }
         else if (seed<=0.921)
         {
-            packetLength = 308;
+            messageLength = 308;
         }
         else if (seed<=0.9218)
         {
-            packetLength = 560;
+            messageLength = 560;
         }
         else if (seed<=0.9889)
         {
-            packetLength = 1072;
+            messageLength = 1072;
         }
         else if (seed<=0.9697)
         {
-            packetLength = 2096;
+            messageLength = 2096;
         }
         else if (seed<=0.9905)
         {
-            packetLength = 4144;
+            messageLength = 4144;
         }
         else if (seed<=1)
         {
-            packetLength = 16432;
+            messageLength = 16432;
         }
         else
         {
@@ -718,91 +756,91 @@ void HiUdpApp::updateNextFlow(const char* TM)
     {
         if (seed<=0.0978)
         {
-            packetLength = 48;
+            messageLength = 48;
         }
         else if (seed<=0.4065)
         {
-            packetLength = 56;
+            messageLength = 56;
         }
         else if (seed<=0.6638)
         {
-            packetLength = 64;
+            messageLength = 64;
         }
         else if (seed<=0.6747)
         {
-            packetLength = 72;
+            messageLength = 72;
         }
         else if (seed<=0.6954)
         {
-            packetLength = 80;
+            messageLength = 80;
         }
         else if (seed<=0.6980)
         {
-            packetLength = 96;
+            messageLength = 96;
         }
         else if (seed<=0.7180)
         {
-            packetLength = 112;
+            messageLength = 112;
         }
         else if (seed<=0.7316)
         {
-            packetLength = 120;
+            messageLength = 120;
         }
         else if (seed<=0.7445)
         {
-            packetLength = 128;
+            messageLength = 128;
         }
         else if (seed<=0.7664)
         {
-            packetLength = 144;
+            messageLength = 144;
         }
         else if (seed<=0.7873)
         {
-            packetLength = 176;
+            messageLength = 176;
         }
         else if (seed<=0.7900)
         {
-            packetLength = 192;
+            messageLength = 192;
         }
         else if (seed<=0.8109)
         {
-            packetLength = 304;
+            messageLength = 304;
         }
         else if (seed<=0.8302)
         {
-            packetLength = 336;
+            messageLength = 336;
         }
         else if (seed<=0.8495)
         {
-            packetLength = 368;
+            messageLength = 368;
         }
         else if (seed<=0.8688)
         {
-            packetLength = 848;
+            messageLength = 848;
         }
         else if (seed<=0.8881)
         {
-            packetLength = 1072;
+            messageLength = 1072;
         }
         else if (seed<=0.9074)
         {
-            packetLength = 1200;
+            messageLength = 1200;
         }
         else if (seed<=0.9267)
         {
-            packetLength = 2640;
+            messageLength = 2640;
         }
         else if (seed<=0.9511)
         {
-            packetLength = 4144;
+            messageLength = 4144;
         }
         else if (seed<=0.9756)
         {
-            packetLength = 4400;
+            messageLength = 4400;
         }
         else if (seed<=1)
         {
-            packetLength = 9296;
+            messageLength = 9296;
         }
         else
         {
@@ -811,16 +849,16 @@ void HiUdpApp::updateNextFlow(const char* TM)
     }
     else if(std::string(TM).find("LongFlow") != std::string::npos)
     {
-        packetLength=10000;
+        messageLength=10000;
     }
     else if(std::string(TM).find("sendscript") != std::string::npos){
-        packetLength = commands[commandIndex].numBytes;
+        messageLength = commands[commandIndex].numBytes;
     }
     else
     {
         throw cRuntimeError("Unrecognized traffic mode!");
     }
-    EV<<"update new flow, traffic mode = "<<TM<<", new flow size = "<<packetLength<<endl;
+    EV<<"update new flow, traffic mode = "<<TM<<", new flow size = "<<messageLength<<endl;
 }
 
 void HiUdpApp::socketClosed(UdpSocket *socket)

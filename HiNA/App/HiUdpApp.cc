@@ -194,20 +194,20 @@ void HiUdpApp::processSend()
         }else{
             sendPacket(messageLength);
             flowid++;
-            if(simTime()>=stopTime){
-                selfMsg->setKind(STOP);
-                scheduleAt(std::max(stopTime,simTime()), selfMsg);
-            }else if(std::string(trafficMode).find("sendscript") != std::string::npos&&++commandIndex < (int)commands.size()){
+            simtime_t txTime = simtime_t((messageLength+ceil(messageLength/1472)*66)*8/linkSpeed);
+            //66=8(UDP)+20(IP)+14(EthernetMac)+8(EthernetPhy)+4(EthernetFcs)+12(interframe gap,IFG)
+            simtime_t d = simTime() + txTime/workLoad;
+            if(std::string(trafficMode).find("sendscript") != std::string::npos&&++commandIndex < (int)commands.size()){
                 simtime_t tSend = commands[commandIndex].tSend;
                 selfMsg->setKind(SEND);
                 scheduleAt(std::max(tSend, simTime()), selfMsg);
-            }else {
-                simtime_t txTime = simtime_t((messageLength+ceil(messageLength/1472)*66)*8/linkSpeed);
-                //66=8(UDP)+20(IP)+14(EthernetMac)+8(EthernetPhy)+4(EthernetFcs)+12(interframe gap,IFG)
-                simtime_t d = simTime() + txTime/workLoad;
+            }else if(d<stopTime){
                 EV<<"simTime() = "<<simTime()<<", next time = "<<d<<endl;
                 selfMsg->setKind(SEND);
                 scheduleAt(d, selfMsg);
+            }else {
+                selfMsg->setKind(STOP);
+                scheduleAt(stopTime, selfMsg);
             }
         }
     }else{
@@ -215,20 +215,20 @@ void HiUdpApp::processSend()
         if(count==0){
             sendPacket(messageLength-num*65527);
             flowid++;
-            if(simTime()>=stopTime){
-                selfMsg->setKind(STOP);
-                scheduleAt(std::max(stopTime,simTime()), selfMsg);
-            }else if(std::string(trafficMode).find("sendscript") != std::string::npos&&++commandIndex < (int)commands.size()){
+            simtime_t txTime = simtime_t((messageLength+ceil(messageLength/1472)*66)*8/linkSpeed);
+            //66=8(UDP)+20(IP)+14(EthernetMac)+8(EthernetPhy)+4(EthernetFcs)+12(interframe gap,IFG)
+            simtime_t d = simTime() + txTime/workLoad;
+            if(std::string(trafficMode).find("sendscript") != std::string::npos&&++commandIndex < (int)commands.size()){
                 simtime_t tSend = commands[commandIndex].tSend;
                 selfMsg->setKind(SEND);
                 scheduleAt(std::max(tSend, simTime()), selfMsg);
-            }else {
-                simtime_t txTime = simtime_t((messageLength+ceil(messageLength/1472)*66)*8/linkSpeed);
-                //66=8(UDP)+20(IP)+14(EthernetMac)+8(EthernetPhy)+4(EthernetFcs)+12(interframe gap,IFG)
-                simtime_t d = simTime() + txTime/workLoad;
+            }else if(d<stopTime){
                 EV<<"simTime() = "<<simTime()<<", next time = "<<d<<endl;
                 selfMsg->setKind(SEND);
                 scheduleAt(d, selfMsg);
+            }else {
+                selfMsg->setKind(STOP);
+                scheduleAt(stopTime, selfMsg);
             }
         }else{
             sendPacket(65527);

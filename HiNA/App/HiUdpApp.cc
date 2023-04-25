@@ -187,7 +187,7 @@ void HiUdpApp::processSend()
     if(count==0){
         updateNextFlow(trafficMode);
         if(messageLength>65527){
-            count = num = messageLength%65527;
+            count = num = messageLength/65527;
             sendPacket(65527);
             selfMsg->setKind(SEND);
             scheduleAt(simTime(), selfMsg);

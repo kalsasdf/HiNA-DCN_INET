@@ -132,7 +132,7 @@ void TcpApp::sendData()
         selfMsg->setKind(MSGKIND_CLOSE);
         scheduleAt(std::max(tClose, simTime()), selfMsg);
     }else if(std::string(trafficMode).find("LongFlow") != std::string::npos){
-        simtime_t txTime = simtime_t((packetLength+78)*8/linkSpeed);
+        simtime_t txTime = simtime_t((packetLength+ceil(packetLength/1460)*78)*8/linkSpeed);
         //78=20(TCP)+20(IP)+14(EthernetMac)+8(EthernetPhy)+4(EthernetFcs)+12(interframe gap,IFG)
         simtime_t d = simTime() + txTime/workLoad;
         EV<<"simTime() = "<<simTime()<<", next time = "<<d<<endl;

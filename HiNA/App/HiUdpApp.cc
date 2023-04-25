@@ -196,13 +196,13 @@ void HiUdpApp::processSend()
             flowid++;
             if(simTime()>=stopTime){
                 selfMsg->setKind(STOP);
-                scheduleAt(stopTime, selfMsg);
+                scheduleAt(std::max(stopTime,simTime()), selfMsg);
             }else if(std::string(trafficMode).find("sendscript") != std::string::npos&&++commandIndex < (int)commands.size()){
                 simtime_t tSend = commands[commandIndex].tSend;
                 selfMsg->setKind(SEND);
                 scheduleAt(std::max(tSend, simTime()), selfMsg);
             }else {
-                simtime_t txTime = simtime_t((messageLength+66)*8/linkSpeed);
+                simtime_t txTime = simtime_t((messageLength+ceil(messageLength/1472)*66)*8/linkSpeed);
                 //66=8(UDP)+20(IP)+14(EthernetMac)+8(EthernetPhy)+4(EthernetFcs)+12(interframe gap,IFG)
                 simtime_t d = simTime() + txTime/workLoad;
                 EV<<"simTime() = "<<simTime()<<", next time = "<<d<<endl;
@@ -217,13 +217,13 @@ void HiUdpApp::processSend()
             flowid++;
             if(simTime()>=stopTime){
                 selfMsg->setKind(STOP);
-                scheduleAt(stopTime, selfMsg);
+                scheduleAt(std::max(stopTime,simTime()), selfMsg);
             }else if(std::string(trafficMode).find("sendscript") != std::string::npos&&++commandIndex < (int)commands.size()){
                 simtime_t tSend = commands[commandIndex].tSend;
                 selfMsg->setKind(SEND);
                 scheduleAt(std::max(tSend, simTime()), selfMsg);
             }else {
-                simtime_t txTime = simtime_t((messageLength+66*num)*8/linkSpeed);
+                simtime_t txTime = simtime_t((messageLength+ceil(messageLength/1472)*66)*8/linkSpeed);
                 //66=8(UDP)+20(IP)+14(EthernetMac)+8(EthernetPhy)+4(EthernetFcs)+12(interframe gap,IFG)
                 simtime_t d = simTime() + txTime/workLoad;
                 EV<<"simTime() = "<<simTime()<<", next time = "<<d<<endl;
@@ -236,7 +236,6 @@ void HiUdpApp::processSend()
             scheduleAt(simTime(), selfMsg);
         }
     }
-
 }
 
 void HiUdpApp::sendPacket(int packetlength)
@@ -334,20 +333,20 @@ void HiUdpApp::refreshDisplay() const
 void HiUdpApp::parseScript(const char *script)
 {
     // ------------------------------------------------------------------------
-    // ä»ŽæŒ‡å®šçš„è„šæœ¬æ–‡ä»¶ æˆ– iniå­—ç¬¦ä¸²å‚æ•°ä¸­è¯»å–æµé‡æ¨¡å¼
+    // ´ÓÖ¸¶¨µÄ½Å±¾ÎÄ¼þ »ò ini×Ö·û´®²ÎÊýÖÐ¶ÁÈ¡Á÷Á¿Ä£Ê½
 //    char* buffer = nullptr;
 //    if(*script){
 //        std::fstream SCRIPT_FILE;
 //        int file_length;
 //        SCRIPT_FILE.open(script);
-//        if(!SCRIPT_FILE.is_open()){     // è„šæœ¬æ–‡ä»¶ä¸å­˜åœ¨ï¼Œè¡¨ç¤ºscriptæŒ‡å‘iniæ–‡ä»¶é…ç½®çš„å­—ç¬¦ä¸²å‚æ•°
+//        if(!SCRIPT_FILE.is_open()){     // ½Å±¾ÎÄ¼þ²»´æÔÚ£¬±íÊ¾scriptÖ¸ÏòiniÎÄ¼þÅäÖÃµÄ×Ö·û´®²ÎÊý
 //            EV_INFO << "Script file not found!Traffic Pattern is configured by const string." << endl;
 //            EV_INFO << script << endl;
 //        }
-//        else{                           // è„šæœ¬æ–‡ä»¶å­˜åœ¨,å–å‡ºæ–‡ä»¶å†…å®¹ï¼Œèµ‹å€¼ç»™bufferï¼Œå†ä¼ ç»™script
-//            SCRIPT_FILE.seekg(0, std::ios::end);    // å°†æ–‡ä»¶æŒ‡é’ˆå®šä½åˆ°æ–‡ä»¶ç»“æŸä½ç½®
-//            file_length = SCRIPT_FILE.tellg();      // æ ¹æ®æ–‡ä»¶æŒ‡é’ˆå½“å‰ä½ç½®ï¼Œè®¡ç®—å¾—åˆ°æ–‡ä»¶é•¿åº¦
-//            SCRIPT_FILE.seekg(0, std::ios::beg);    // å°†æ–‡ä»¶æŒ‡é’ˆå®šä½åˆ°æ–‡ä»¶å¼€å§‹ä½ç½®
+//        else{                           // ½Å±¾ÎÄ¼þ´æÔÚ,È¡³öÎÄ¼þÄÚÈÝ£¬¸³Öµ¸øbuffer£¬ÔÙ´«¸øscript
+//            SCRIPT_FILE.seekg(0, std::ios::end);    // ½«ÎÄ¼þÖ¸Õë¶¨Î»µ½ÎÄ¼þ½áÊøÎ»ÖÃ
+//            file_length = SCRIPT_FILE.tellg();      // ¸ù¾ÝÎÄ¼þÖ¸Õëµ±Ç°Î»ÖÃ£¬¼ÆËãµÃµ½ÎÄ¼þ³¤¶È
+//            SCRIPT_FILE.seekg(0, std::ios::beg);    // ½«ÎÄ¼þÖ¸Õë¶¨Î»µ½ÎÄ¼þ¿ªÊ¼Î»ÖÃ
 //            if(file_length == 0) script = "";
 //            else{
 //                buffer = new char[file_length];
@@ -358,7 +357,7 @@ void HiUdpApp::parseScript(const char *script)
 //        }
 //    }
 //    delete[] buffer;
-    // else{} ä¸ºç©ºæ—¶ï¼ŒscriptæŒ‡å‘ç©ºä¸² ""ï¼Œè¡¨ç¤ºæ—¢æœªæŒ‡å®šè„šæœ¬æ–‡ä»¶è·¯å¾„ã€åˆæ²¡æœ‰æŒ‡å®šiniå­—ç¬¦ä¸²å‚æ•°
+    // else{} Îª¿ÕÊ±£¬scriptÖ¸Ïò¿Õ´® ""£¬±íÊ¾¼ÈÎ´Ö¸¶¨½Å±¾ÎÄ¼þÂ·¾¶¡¢ÓÖÃ»ÓÐÖ¸¶¨ini×Ö·û´®²ÎÊý
     // ------------------------------------------------------------------------
     const char *s = script;
 
@@ -849,7 +848,7 @@ void HiUdpApp::updateNextFlow(const char* TM)
     }
     else if(std::string(TM).find("LongFlow") != std::string::npos)
     {
-        messageLength=10000;
+        messageLength=100000;
     }
     else if(std::string(TM).find("sendscript") != std::string::npos){
         messageLength = commands[commandIndex].numBytes;

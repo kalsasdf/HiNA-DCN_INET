@@ -327,7 +327,7 @@ void SWIFT::receive_data(Packet *pck)
             sack->setTimestamp(ts);
 
             sendDown(sack);
-            delete pck;
+            sendUp(pck);
         }
     }
     else{
@@ -422,10 +422,10 @@ void SWIFT::receive_data(Packet *pck)
             sack->setTimestamp(ts);
 
             sendDown(sack);
-            delete pck;
+            sendUp(pck);
         }
         else{
-            sendUp(pck);
+            delete pck;
         }
     }
 }
@@ -506,7 +506,7 @@ void SWIFT::receive_ack(Packet *pck)
         }
 
     }else{
-        if(can_decrease){  // beta 0.8  max_mdf = 0.5  aiÃ»ÓĞ
+        if(can_decrease){  // beta 0.8  max_mdf = 0.5  aiæ²¡æœ‰
             temp_cwnd = max(1 - beta*(currentRTT-target_delay)/(currentRTT), 1-max_mdf) * temp_cwnd;
             can_decrease = false;
         }
@@ -555,10 +555,10 @@ void SWIFT::time_out()
         snd_cwnd = (1 - max_mdf) * snd_cwnd;
         can_decrease = false;
     }
-    RTO *= 2;  // µäĞÍRTO»úÖÆ£¬³¬Ê±ºóÊ±¼ä³Ë2
+    RTO *= 2;  // å…¸å‹RTOæœºåˆ¶ï¼Œè¶…æ—¶åæ—¶é—´ä¹˜2
     send_window=snd_cwnd;
     nxtSendpacketid=snd_una;
-    send_data();  // ³¬Ê±ºó£¬Á¢¼´ÖØ·¢Î´È·ÈÏµÄµÚÒ»¸ö±¨ÎÄ
+    send_data();  // è¶…æ—¶åï¼Œç«‹å³é‡å‘æœªç¡®è®¤çš„ç¬¬ä¸€ä¸ªæŠ¥æ–‡
     cancelEvent(timeout);
     scheduleAt(simTime() + RTO, timeout);
 }

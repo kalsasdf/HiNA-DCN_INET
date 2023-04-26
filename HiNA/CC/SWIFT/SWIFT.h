@@ -48,9 +48,8 @@ protected:
 
     struct receiver_info{
         uint rcv_nxt = 0;
-        uint lastRcvNum = 0;
         std::list<SackItem> sacks_array;
-        uint acksequence[];
+        vector<uint> acksequence;
     };
 
     std::list<uint> sacks_array_snd;

@@ -334,8 +334,13 @@ void SWIFT::receive_data(Packet *pck)
         if(curRcvNum == receiver_Map[srcAddr].rcv_nxt)//ordered
         {
             receiver_Map[srcAddr].rcv_nxt++;
-            while(receiver_Map[srcAddr].acksequence[receiver_Map[srcAddr].rcv_nxt] == 1)
+
+            while(find(receiver_Map[srcAddr].acksequence.begin(),receiver_Map[srcAddr].acksequence.end(),receiver_Map[srcAddr].rcv_nxt)!=receiver_Map[srcAddr].acksequence.end())
+            {
+                receiver_Map[srcAddr].acksequence.erase(find(receiver_Map[srcAddr].acksequence.begin(),receiver_Map[srcAddr].acksequence.end(),receiver_Map[srcAddr].rcv_nxt));
                 receiver_Map[srcAddr].rcv_nxt++;
+            }
+
             EV_DETAIL<<"packet is ordered, send ACK-"<<curRcvNum<<endl;
             std::ostringstream str;
             str <<"ACK-" <<curRcvNum;
@@ -357,8 +362,7 @@ void SWIFT::receive_data(Packet *pck)
         }
         else if(curRcvNum > receiver_Map[srcAddr].rcv_nxt)//out of order
         {
-            receiver_Map[srcAddr].lastRcvNum = receiver_Map[srcAddr].lastRcvNum>curRcvNum?receiver_Map[srcAddr].lastRcvNum:curRcvNum;
-            receiver_Map[srcAddr].acksequence[curRcvNum]=1;
+            receiver_Map[srcAddr].acksequence.push_back(curRcvNum);
 
             auto it = receiver_Map[srcAddr].sacks_array.begin();
             while (it != receiver_Map[srcAddr].sacks_array.end()) {
@@ -419,6 +423,9 @@ void SWIFT::receive_data(Packet *pck)
 
             sendDown(sack);
             delete pck;
+        }
+        else{
+            sendUp(pck);
         }
     }
 }

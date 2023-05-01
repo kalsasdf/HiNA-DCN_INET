@@ -9,32 +9,34 @@ namespace inet {
 
 Define_Module(DCQCN);
 
-void DCQCN::initialize()
+void DCQCN::initialize(int stage)
 {
-    //gates
-    lowerOutGate = gate("lowerOut");
-    lowerInGate = gate("lowerIn");
-    upperOutGate = gate("upperOut");
-    upperInGate = gate("upperIn");
-    // configuration
-    stopTime = par("stopTime");
-    activate = par("activate");
-    gamma = par("gamma");
-    linkspeed = par("linkspeed");
-    initialrate = par("initialrate");
-    min_cnp_interval = par("min_cnp_interval");
-    AlphaTimer_th = par("AlphaTimer_th");
-    RateTimer_th = par("RateTimer_th");
-    ByteCounter_th = par("ByteCounter_th");
-    frSteps_th = par("frSteps_th");
-    Rai = par("Rai");
-    Rhai = par("Rhai");
-    max_pck_size=par("max_pck_size");
-    senddata = new TimerMsg("senddata");
-    senddata->setKind(SENDDATA);
-
-    registerService(Protocol::udp, gate("upperIn"), gate("upperOut"));
-    registerProtocol(Protocol::udp, gate("lowerOut"), gate("lowerIn"));
+    if (stage == INITSTAGE_LOCAL){
+        //gates
+        lowerOutGate = gate("lowerOut");
+        lowerInGate = gate("lowerIn");
+        upperOutGate = gate("upperOut");
+        upperInGate = gate("upperIn");
+        // configuration
+        stopTime = par("stopTime");
+        activate = par("activate");
+        gamma = par("gamma");
+        linkspeed = par("linkspeed");
+        initialrate = par("initialrate");
+        min_cnp_interval = par("min_cnp_interval");
+        AlphaTimer_th = par("AlphaTimer_th");
+        RateTimer_th = par("RateTimer_th");
+        ByteCounter_th = par("ByteCounter_th");
+        frSteps_th = par("frSteps_th");
+        Rai = par("Rai");
+        Rhai = par("Rhai");
+        max_pck_size=par("max_pck_size");
+        senddata = new TimerMsg("senddata");
+        senddata->setKind(SENDDATA);
+    }else if (stage == INITSTAGE_TRANSPORT_LAYER) {
+        registerService(Protocol::udp, gate("upperIn"), gate("upperOut"));
+        registerProtocol(Protocol::udp, gate("lowerOut"), gate("lowerIn"));
+    }
 }
 
 void DCQCN::handleMessage(cMessage *msg)

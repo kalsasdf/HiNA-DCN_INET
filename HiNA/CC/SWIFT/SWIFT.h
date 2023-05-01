@@ -16,7 +16,7 @@ using namespace std;
 namespace inet {
 
 
-class SWIFT : public cSimpleModule
+class SWIFT : public TransportProtocolBase
 {
 protected:
     enum SenderState{
@@ -53,12 +53,11 @@ protected:
     };
 
     std::list<uint> sacks_array_snd;
-    L3Address srcAddr;
     TimerMsg *senddata = nullptr;
     TimerMsg *timeout = nullptr;
-    simtime_t stopTime;
     // configuration for .ned file
     bool activate;
+    simtime_t stopTime;
     double linkspeed;
     int64_t max_pck_size;
     simtime_t baseRTT;
@@ -94,7 +93,6 @@ protected:
 
     double fs_range;
     double snd_cwnd;
-    double send_window;
     double max_cwnd;
 
     cOutVector currentRTTVector;
@@ -111,14 +109,13 @@ protected:
     // structures for data, credit and informations
     // The destinations addresses of the flows at sender, The flow information at sender
     std::map<uint32_t, sender_packetinfo> sender_packetMap;
-    std::map<uint32_t, sender_packetinfo>::iterator iter;
 
     std::map<L3Address, receiver_info> receiver_Map;
 
 protected:
-    virtual void initialize() override;
+    virtual void initialize(int stage) override;
     virtual void handleMessage(cMessage *msg) override;
-    virtual void handleSelfMessage(cMessage *msg);
+    virtual void handleSelfMessage(cMessage *msg) override;
     virtual void refreshDisplay() const override;
     virtual ~SWIFT() {cancelEvent(senddata); delete senddata;
     cancelEvent(timeout); delete timeout;}
@@ -142,8 +139,11 @@ protected:
     virtual void processUpperpck(Packet *pck);
     virtual void processLowerpck(Packet *pck);
 
-
     virtual void finish() override;
+    // ILifeCycle:
+    virtual void handleStartOperation(LifecycleOperation *operation) override{};
+    virtual void handleStopOperation(LifecycleOperation *operation) override{};
+    virtual void handleCrashOperation(LifecycleOperation *operation) override{};
 };
 
 } // namespace inet

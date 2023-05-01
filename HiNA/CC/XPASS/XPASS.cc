@@ -13,46 +13,43 @@ namespace inet {
 
 Define_Module(XPASS);
 
-void XPASS::initialize()
+void XPASS::initialize(int stage)
 {
-    outGate = gate("lowerOut");
-    inGate = gate("lowerIn");
-    upGate = gate("upperOut");
-    downGate = gate("upperIn");
-    // configuration
-    activate = par("activate");
-    stopTime = par("stopTime");
-    max_pck_size = par("max_pck_size");
-    linkspeed = par("linkspeed");
-    targetratio = par("targetratio");
-    initialrate = par("initialrate");
-    maxrate = 0.05*linkspeed;
-    currate = maxrate*initialrate;//initial sending rate
-    wmax = par("wmax");
-    wmin = par("wmin");
-    // for ecn based control;
-    rtt_beta=par("rtt_beta");
-    thigh=par("thigh");
-    tlow=par("tlow");
-    useECN = par("useECN");
-    useRTT = par("useRTT");
-    minRTT=par("minRTT");
-    gamma=par("gamma");
-    alpha=par("alpha");
-    Rai = par("Rai");
-    Rhai = par("Rhai");
+    if (stage == INITSTAGE_LOCAL){
+        //gates
+        outGate = gate("lowerOut");
+        inGate = gate("lowerIn");
+        upGate = gate("upperOut");
+        downGate = gate("upperIn");
+        // configuration
+        activate = par("activate");
+        stopTime = par("stopTime");
+        max_pck_size = par("max_pck_size");
+        linkspeed = par("linkspeed");
+        targetratio = par("targetratio");
+        initialrate = par("initialrate");
+        maxrate = 0.05*linkspeed;
+        currate = maxrate*initialrate;//initial sending rate
+        wmax = par("wmax");
+        wmin = par("wmin");
+        // for ecn based control;
+        rtt_beta=par("rtt_beta");
+        thigh=par("thigh");
+        tlow=par("tlow");
+        useECN = par("useECN");
+        useRTT = par("useRTT");
+        minRTT=par("minRTT");
+        gamma=par("gamma");
+        alpha=par("alpha");
+        Rai = par("Rai");
+        Rhai = par("Rhai");
 
-    registerService(Protocol::udp, gate("upperIn"), gate("upperOut"));
-    registerProtocol(Protocol::udp, gate("lowerOut"), gate("lowerIn"));
-
-    receiver_flowMap.clear();
-    sender_flowMap.clear();
-
-    frSteps_th=5;
-    ByteCounter_th=10000000;
-    targetecnratio=0;
-    credit_size = 208;//(84-58)*8,58=20(IP)+14(EthernetMac)+8(EthernetPhy)+4(EthernetFcs)+12(interframe gap,IFG)
-    max_idletime = 0.00002;
+        receiver_flowMap.clear();
+        sender_flowMap.clear();
+    }else if (stage == INITSTAGE_TRANSPORT_LAYER) {
+        registerService(Protocol::udp, gate("upperIn"), gate("upperOut"));
+        registerProtocol(Protocol::udp, gate("lowerOut"), gate("lowerIn"));
+    }
 }
 
 void XPASS::handleMessage(cMessage *msg)

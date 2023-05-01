@@ -66,6 +66,7 @@ void HiEthernetMac::initialize(int stage)
 
         TIMELY=par("TIMELY");
         HPCC=par("HPCC");
+        PSD=par("PSD");
 
         if (!par("duplexMode"))
             throw cRuntimeError("Half duplex operation is not supported by HiEthernetMac, use the EthernetCsmaMac module for that! (Please enable csmacdSupport on EthernetInterface)");
@@ -137,7 +138,7 @@ void HiEthernetMac::startFrameTransmission()
         txBytes+=frame->getByteLength();
         if(std::string(frame->getFullName()).find("HPCCData") != std::string::npos){
             auto& eth_hdr = frame->popAtFront<EthernetMacHeader>();//移除mac头
-            auto& ip_hdr = frame->popAtFront<Ipv4Header>();//移除ip头/arp/70B
+            auto& ip_hdr = frame->popAtFront<Ipv4Header>();//移除ip头
             auto& INT_hdr = frame->removeAtFront<INTHeader>();//移除INT头
             hopInf cur_inf;
             cur_inf.TS= simTime();//记录时间戳
@@ -156,6 +157,20 @@ void HiEthernetMac::startFrameTransmission()
         }
     }
     //for HPCC
+
+    //for PSD
+    if(PSD&&std::string(frame->getFullName()).find("PSDData") != std::string::npos){
+        auto& eth_hdr = frame->popAtFront<EthernetMacHeader>();//移除mac头
+        auto& ip_hdr = frame->popAtFront<Ipv4Header>();//移除ip头
+        auto& INT_hdr = frame->removeAtFront<PSDINTHeader>();//移除INT头
+        if(simTime()-INT_hdr->getTS()>INT_hdr->getMPD())
+            INT_hdr->setMPD(simTime()-INT_hdr->getTS());
+        INT_hdr->setTS(simTime());
+        frame->insertAtFront(INT_hdr);//加INT头
+        frame->insertAtFront(ip_hdr);//加ip头
+        frame->insertAtFront(eth_hdr);//加mac头
+    }
+    //for PSD
 
     // add preamble and SFD (Starting Frame Delimiter), then send out
     encapsulate(frame);

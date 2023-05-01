@@ -74,7 +74,7 @@ void HPCC::handleSelfMessage(cMessage *pck)
                 break;
             }
             else{
-                send_data(timer->getPacketId());
+                send_data();
                 break;
             }
         }
@@ -132,13 +132,11 @@ void HPCC::processUpperpck(Packet *pck)
 
             if(sender_packetMap.empty()){
                 sender_packetMap[packetid]=snd_info;
-                iter=sender_packetMap.begin();//iter needs to be assigned after snd_info is inserted
             }else{
                 sender_packetMap[packetid]=snd_info;
             }
             if(SenderState==STOPPING){
                 SenderState=SENDING;
-                senddata->setPacketId(nxtSendpacketid);
                 scheduleAt(simTime(),senddata);
             }
             packetid++;
@@ -152,8 +150,9 @@ void HPCC::processUpperpck(Packet *pck)
     }
 }
 
-void HPCC::send_data(int packetid)
+void HPCC::send_data()
 {
+    int packetid = nxtSendpacketid;
     sender_packetinfo snd_info = sender_packetMap.find(packetid)->second;
     EV<<"send_data(), prepare to send packet to destination "<<snd_info.destAddr.toIpv4()<<endl;
     std::ostringstream str;
@@ -204,7 +203,6 @@ void HPCC::send_data(int packetid)
     else if(send_window>=sender_packetMap[nxtSendpacketid].length){
         simtime_t nxtSendTime = simtime_t((packet->getByteLength()+58)*8/currentRate) + simTime();
         //58=20(IP)+14(EthernetMac)+8(EthernetPhy)+4(EthernetFcs)+12(interframe gap,IFG)
-        senddata->setPacketId(nxtSendpacketid);
         scheduleAt(nxtSendTime,senddata);
     }
     else{
@@ -215,7 +213,7 @@ void HPCC::send_data(int packetid)
 }
 
 void HPCC::processLowerpck(Packet *pck)
-{EV<<"pck name = "<<pck->getFullName()<<endl;
+{
     if (string(pck->getFullName()).find(packetName) != string::npos)//get Data packet
     {
         receive_data(pck);
@@ -366,7 +364,6 @@ void HPCC::receiveAck(Packet *pck)
         EV<<"this is "<<pck->getFullName()<<endl;
         nxtSendpacketid = ackid;//go back N
         while(!senddata->isScheduled()){
-            senddata->setFlowId(ackid);
             cancelEvent(senddata);
             scheduleAt(simTime(),senddata);
         }
@@ -463,7 +460,6 @@ void HPCC::receiveAck(Packet *pck)
 
     if(SenderState==PAUSING){
         SenderState=SENDING;
-        senddata->setPacketId(nxtSendpacketid);
         scheduleAt(simTime(),senddata);
     }
     delete pck;

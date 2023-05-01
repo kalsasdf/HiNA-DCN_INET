@@ -5,8 +5,8 @@
 //
 
 
-#ifndef __INET_REDPFCQUEUE_H
-#define __INET_REDPFCQUEUE_H
+#ifndef __INET_BEQUEUE_H
+#define __INET_BEQUEUE_H
 
 #include "inet/queueing/base/PacketQueueBase.h"
 #include "inet/queueing/contract/IActivePacketSink.h"
@@ -15,22 +15,12 @@
 #include "inet/queueing/contract/IPacketComparatorFunction.h"
 #include "inet/queueing/contract/IPacketDropperFunction.h"
 
-#include "inet/linklayer/common/FcsMode_m.h"
-#include "inet/linklayer/common/InterfaceTag_m.h"
-#include "inet/HiNA/Messages/HiTag/HiTag_m.h"
-#include "inet/HiNA/Messages/PfcFrame/EthernetPfcFrame_m.h"
-#include "inet/common/IProtocolRegistrationListener.h"
-#include "inet/linklayer/ethernet/common/EthernetMacHeader_m.h"
-#include "inet/linklayer/ethernet/common/EthernetControlFrame_m.h"
-#include "inet/networklayer/common/NetworkInterface.h"
-#include "inet/queueing/marker/EcnMarker.h"
-
 namespace inet {
 using namespace inet::queueing;
 
-class INET_API REDPFCQueue : public PacketQueueBase, public IPacketBuffer::ICallback
+class INET_API BeQueue : public PacketQueueBase, public IPacketBuffer::ICallback
 {
-  public:
+  protected:
     int packetCapacity = -1;
     b dataCapacity = b(-1);
     static b sharedBuffer[100][100];
@@ -42,29 +32,15 @@ class INET_API REDPFCQueue : public PacketQueueBase, public IPacketBuffer::ICall
     IActivePacketSink *collector = nullptr;
 
     cPacketQueue queue;
-//    IPacketBuffer *buffer = nullptr;
+    IPacketBuffer *buffer = nullptr;
 
     IPacketDropperFunction *packetDropperFunction = nullptr;
     IPacketComparatorFunction *packetComparatorFunction = nullptr;
 
-    bool usePfc;
-    std::vector<int> paused;
-    int XON;
-    int XOFF;
     int priority;
-    int Kmax;
-    int Kmin;
-    double Pmax;
-    bool useEcn;
-    bool markNext = false;
-    double count = NaN;
     int switchid;
-    enum RedResult { RANDOMLY_ABOVE_LIMIT, RANDOMLY_BELOW_LIMIT, ABOVE_MAX_LIMIT, BELOW_MIN_LIMIT };
-    mutable RedResult lastResult;
-
     cOutVector queuelengthVector;
     cOutVector sharedBufferVector;
-
 
   protected:
     virtual void initialize(int stage) override;
@@ -72,13 +48,11 @@ class INET_API REDPFCQueue : public PacketQueueBase, public IPacketBuffer::ICall
 
     virtual IPacketDropperFunction *createDropperFunction(const char *dropperClass) const;
     virtual IPacketComparatorFunction *createComparatorFunction(const char *comparatorClass) const;
-    virtual RedResult doRandomEarlyDetection(const Packet *packet);
+
     virtual bool isOverloaded() const;
 
   public:
-    static simsignal_t pfcPausedSignal;
-    static simsignal_t pfcResumeSignal;
-    virtual ~REDPFCQueue() { delete packetDropperFunction; }
+    virtual ~BeQueue() { delete packetDropperFunction; }
 
     virtual int getMaxNumPackets() const override { return packetCapacity; }
     virtual int getNumPackets() const override;
@@ -103,8 +77,6 @@ class INET_API REDPFCQueue : public PacketQueueBase, public IPacketBuffer::ICall
 
     virtual void handlePacketRemoved(Packet *packet) override;
 
-    virtual void pfcpaused() {}
-    virtual void pfcresumed() {}
     virtual bool BufferManagement(cMessage *msg);
 };
 

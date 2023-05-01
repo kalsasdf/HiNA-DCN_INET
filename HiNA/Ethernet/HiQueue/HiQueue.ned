@@ -27,6 +27,7 @@ module HiQueue
         }
         beQueue: <default("REDPFCQueue")> like IPacketQueue {
             dataCapacity = default(160000b);
+            priority = 99;
             @display("p=249.55,616.9;is=s");
         }
         creditQueue: RateLimitQueue {

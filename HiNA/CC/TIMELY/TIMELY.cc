@@ -10,31 +10,34 @@ namespace inet {
 
 Define_Module(TIMELY);
 
-void TIMELY::initialize(){
-    //gates
-    lowerOutGate = gate("lowerOut");
-    lowerInGate = gate("lowerIn");
-    upperOutGate = gate("upperOut");
-    upperInGate = gate("upperIn");
-    // configuration
-    stopTime = par("stopTime");
-    activate = par("activate");
-    minRTT = par("minRTT");
-    Tlow = par("Tlow");
-    Thigh = par("Thigh");
-    linkspeed = par("linkspeed");
-    Rai = par("Rai");
-    max_pck_size = par("max_pck_size");
-    alpha = par("alpha");
-    beta = par("beta");
-    TIMELYseg=par("TIMELYseg");
-    currentRate = linkspeed;
+void TIMELY::initialize(int stage)
+{
+    if (stage == INITSTAGE_LOCAL){
+        //gates
+        lowerOutGate = gate("lowerOut");
+        lowerInGate = gate("lowerIn");
+        upperOutGate = gate("upperOut");
+        upperInGate = gate("upperIn");
+        // configuration
+        stopTime = par("stopTime");
+        activate = par("activate");
+        minRTT = par("minRTT");
+        Tlow = par("Tlow");
+        Thigh = par("Thigh");
+        linkspeed = par("linkspeed");
+        Rai = par("Rai");
+        max_pck_size = par("max_pck_size");
+        alpha = par("alpha");
+        beta = par("beta");
+        TIMELYseg=par("TIMELYseg");
+        currentRate = linkspeed;
 
-    senddata = new TimerMsg("senddata");
-    senddata->setKind(SENDDATA);
-
-    registerService(Protocol::udp, gate("upperIn"), gate("upperOut"));
-    registerProtocol(Protocol::udp, gate("lowerOut"), gate("lowerIn"));
+        senddata = new TimerMsg("senddata");
+        senddata->setKind(SENDDATA);
+    }else if (stage == INITSTAGE_TRANSPORT_LAYER) {
+        registerService(Protocol::udp, gate("upperIn"), gate("upperOut"));
+        registerProtocol(Protocol::udp, gate("lowerOut"), gate("lowerIn"));
+    }
 }
 
 void TIMELY::handleMessage(cMessage *msg)

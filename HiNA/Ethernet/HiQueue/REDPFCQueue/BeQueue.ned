@@ -54,37 +54,29 @@ import inet.queueing.contract.IPacketQueue;
 //
 // @see ~IPacketBuffer
 //
-simple REDPFCQueue extends PacketQueueBase like IPacketQueue
+simple BeQueue extends PacketQueueBase like IPacketQueue
 {
     parameters:
         int packetCapacity = default(-1); // maximum number of packets in the queue, no limit by default
         int dataCapacity @unit(b) = default(-1b); // maximum total length of packets in the queue, no limit by default
         string dropperClass = default("inet::queueing::PacketAtCollectionEndDropper"); // determines which packets are dropped when the queue is overloaded, packets are not dropped by default; the parameter must be the name of a C++ class which implements the IPacketDropperFunction C++ interface and is registered via Register_Class
         string comparatorClass = default(""); // determines the order of packets in the queue, insertion order by default; the parameter must be the name of a C++ class which implements the IPacketComparatorFunction C++ interface and is registered via Register_Class
+        string bufferModule = default(""); // relative module path to the IPacketBuffer module used by this queue, implicit buffer by default
         displayStringTextFormat = default("contains %p pk (%l) pushed %u\npulled %o removed %r dropped %d");
         int priority = default(-1);
-        bool usePfc = default(false);
-        int XON @unit(B) = default(0B);
-        int XOFF @unit(B) = default(0B);
-        bool useEcn = default(false);
-        int Kmax @unit(B) = default(0B);
-        int Kmin @unit(B) = default(0B);
-        double Pmax = default(0);
         int sharedBuffer @unit(b)= default(16Mb);
         int headroom @unit(b) = default(1b);
         double alpha = default(1);
-        @class(REDPFCQueue);
+        @class(BeQueue);
         @signal[packetPushStarted](type=inet::Packet);
-        @signal[packetPushEnded](type=inet::Packet?);//A question mark after the class name means that the signal is allowed to emit nullptr pointers.
+        @signal[packetPushEnded](type=inet::Packet?);
         @signal[packetPulled](type=inet::Packet);
         @signal[packetRemoved](type=inet::Packet);
         @signal[packetDropped](type=inet::Packet);
-        @signal[pfcPaused](type=inet::Packet);
-        @signal[pfcResume](type=inet::Packet);
         // the statistical value is the number of packets in the queue
-        //@statistic[queueLength](title="queue length"; source=warmup(atomic(constant0(packetPushEnded) + count(packetPushStarted) - count(packetPulled) - count(packetRemoved) - count(packetDropped))); record=last,max,timeavg,vector; unit=pk; interpolationmode=sample-hold; autoWarmupFilter=false);
+        @statistic[queueLength](title="queue length"; source=warmup(atomic(constant0(packetPushEnded) + count(packetPushStarted) - count(packetPulled) - count(packetRemoved) - count(packetDropped))); record=last,max,timeavg,vector; unit=pk; interpolationmode=sample-hold; autoWarmupFilter=false);
         // the statistical value is the total bit length of all packets in the queue
-        //@statistic[queueBitLength](title="queue bit length"; source=warmup(atomic(constant0(packetPushEnded) + sum(packetLength(packetPushStarted)) - sum(packetLength(packetPulled)) - sum(packetLength(packetRemoved)) - sum(packetLength(packetDropped)))); record=last,max,timeavg,vector; unit=b; interpolationmode=sample-hold; autoWarmupFilter=false);
+        @statistic[queueBitLength](title="queue bit length"; source=warmup(atomic(constant0(packetPushEnded) + sum(packetLength(packetPushStarted)) - sum(packetLength(packetPulled)) - sum(packetLength(packetRemoved)) - sum(packetLength(packetDropped)))); record=last,max,timeavg,vector; unit=b; interpolationmode=sample-hold; autoWarmupFilter=false);
         // the statistical value is the queueing time of packets
         @statistic[queueingTime](title="queueing times"; source=queueingTime(packetPulled); record=histogram,vector; unit=s; interpolationmode=none);
         // the statistical value is the incoming packet

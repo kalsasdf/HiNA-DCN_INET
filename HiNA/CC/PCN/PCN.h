@@ -15,7 +15,7 @@ using namespace std;
 
 namespace inet {
 
-class PCN : public cSimpleModule
+class PCN : public TransportProtocolBase
 {
 protected:
     enum SenderState{
@@ -58,14 +58,17 @@ protected:
         L3Address Sender_destAddr;
     };
 
-    L3Address srcAddr;
+    TimerMsg *senddata = nullptr;
     // configuration for .ned file
     bool activate;
+    simtime_t stopTime;
     double linkspeed;
     simtime_t min_cnp_interval;
     double omega_min;
     double omega_max;
     int64_t max_pck_size;
+
+    L3Address srcAddr;
 
     const char *packetName = "PCNData";
     cGate *lowerOutGate;
@@ -80,14 +83,10 @@ protected:
     // The destinations addresses of the flows at receiver, The flow information at receiver
     std::map<uint32_t, receiver_flowinfo> receiver_flowMap;
 
-    // The temporary parameters used for transfer values
-    TimerMsg *senddata = nullptr;
-    simtime_t stopTime;
-
 protected:
-    virtual void initialize() override;
+    virtual void initialize(int stage) override;
     virtual void handleMessage(cMessage *msg) override;
-    virtual void handleSelfMessage(cMessage *msg);
+    virtual void handleSelfMessage(cMessage *msg) override;
     virtual void refreshDisplay() const override;
     virtual ~PCN() {cancelEvent(senddata); delete senddata;}
     /**
@@ -113,6 +112,10 @@ protected:
     virtual void receive_data(Packet *pck);
 
     virtual void finish() override;
+    // ILifeCycle:
+    virtual void handleStartOperation(LifecycleOperation *operation) override{};
+    virtual void handleStopOperation(LifecycleOperation *operation) override{};
+    virtual void handleCrashOperation(LifecycleOperation *operation) override{};
 };
 
 } // namespace inet

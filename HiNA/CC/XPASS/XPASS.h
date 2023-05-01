@@ -20,7 +20,7 @@ using namespace std;
 
 namespace inet {
 
-class XPASS : public cSimpleModule
+class XPASS : public TransportProtocolBase
 {
   protected:
     enum ReceiverAcceleratingState{
@@ -39,26 +39,6 @@ class XPASS : public cSimpleModule
         CREDIT_STOP,
         CREDIT_SENDING
     };
-
-    cGate *outGate;
-    cGate *inGate;
-    cGate *upGate;
-    cGate *downGate;
-    const char *packetName = "XPASSData";
-    bool activate;
-    simtime_t stopTime;
-    double linkspeed;
-    int credit_size;
-    double targetratio;
-    double wmax;
-    uint64_t max_pck_size;
-    double maxrate;
-    double currate;
-    double initialrate;
-    double wmin;
-    long remainSize = 0;
-    L3Address srcaddr;
-    simtime_t max_idletime;
 
     // states for self-scheduling
     enum SelfpckKindValues {
@@ -113,6 +93,31 @@ class XPASS : public cSimpleModule
         uint16_t crc;
     }sender_flowinfo;
 
+    // configuration for .ned file
+    bool activate;
+    simtime_t stopTime;
+    double linkspeed;
+    double targetratio;
+    double wmax;
+    uint64_t max_pck_size;
+    double maxrate;
+    double currate;
+    double initialrate;
+    double wmin;
+
+    int credit_size = 208;//(84-58)*8,58=20(IP)+14(EthernetMac)+8(EthernetPhy)+4(EthernetFcs)+12(interframe gap,IFG)
+    simtime_t max_idletime = 0.00002;
+    long remainSize = 0;
+
+    L3Address srcaddr;
+
+    const char *packetName = "XPASSData";
+    cGate *outGate;
+    cGate *inGate;
+    cGate *upGate;
+    cGate *downGate;
+
+
     std::map<L3Address, SenderState> sender_StateMap;
 
     std::map<L3Address, ReceiverState> receiver_StateMap;
@@ -125,27 +130,27 @@ class XPASS : public cSimpleModule
 
     // for ecn based control;
     double alpha;
-    double targetecnratio;
+    double targetecnratio = 0;
     simtime_t thigh;
     simtime_t tlow;
     simtime_t minRTT;
     bool useECN;
     bool useRTT;
-    int frSteps_th;
+    int frSteps_th = 5;
     double Rai;
     double Rhai;
     double gamma;
     double rtt_beta;
     double RTT_a;
-    double ByteCounter_th;
+    double ByteCounter_th = 10000000;
     simtime_t nowRTT;
 
 
 
   protected:
-    virtual void initialize() override;
+    virtual void initialize(int stage) override;
     virtual void handleMessage(cMessage *msg) override;
-    virtual void handleSelfMessage(cMessage *msg);
+    virtual void handleSelfMessage(cMessage *msg) override;
     virtual ~XPASS() {for(auto i:receiver_flowMap){
         delete i.second.alphaTimer;
         delete i.second.rateTimer;}
@@ -185,6 +190,10 @@ class XPASS : public cSimpleModule
     virtual void updateAlpha(L3Address destaddr);
 
     virtual void finish() override;
+    // ILifeCycle:
+    virtual void handleStartOperation(LifecycleOperation *operation) override{};
+    virtual void handleStopOperation(LifecycleOperation *operation) override{};
+    virtual void handleCrashOperation(LifecycleOperation *operation) override{};
 
     virtual receiver_flowinfo feedback_control(receiver_flowinfo tinfo)
     {

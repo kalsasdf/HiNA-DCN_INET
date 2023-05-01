@@ -135,6 +135,7 @@ simple HiEthernetMac like IEtherMac
         double maxInterval @unit(s) = default(1s);
         bool TIMELY = default(false);
         bool HPCC = default(false);
+        bool PSD = default(false);
         @class(HiEthernetMac);
         @display("i=block/rxtx");
 

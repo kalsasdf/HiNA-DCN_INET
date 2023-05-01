@@ -13,7 +13,7 @@ using namespace std;
 
 namespace inet {
 
-class DCQCN : public cSimpleModule
+class DCQCN : public TransportProtocolBase
 {
 protected:
     enum SenderState{
@@ -62,12 +62,11 @@ protected:
         int TimeFrSteps = 0;
     };
 
-    L3Address srcAddr;
-    TimerMsg *senddata;
-    simtime_t stopTime;
 
+    TimerMsg *senddata;
     // configuration for .ned file
     bool activate;
+    simtime_t stopTime;
     double linkspeed;
     double initialrate;
     double gamma;
@@ -79,6 +78,8 @@ protected:
     int64_t max_pck_size;
     int ByteCounter_th;
     int frSteps_th;
+
+    L3Address srcAddr;
 
     const char *packetName = "DcqcnData";
 
@@ -92,9 +93,9 @@ protected:
     std::map<uint32_t, sender_flowinfo>::iterator iter;
 
 protected:
-    virtual void initialize() override;
+    virtual void initialize(int stage) override;
     virtual void handleMessage(cMessage *msg) override;
-    virtual void handleSelfMessage(cMessage *msg);
+    virtual void handleSelfMessage(cMessage *msg) override;
     virtual void refreshDisplay() const override;
     virtual ~DCQCN() {cancelEvent(senddata); delete senddata;
     for(auto it : sender_flowMap){
@@ -128,6 +129,10 @@ protected:
     virtual void updateAlpha(uint32_t flowid);
 
     virtual void finish() override;
+    // ILifeCycle:
+    virtual void handleStartOperation(LifecycleOperation *operation) override{};
+    virtual void handleStopOperation(LifecycleOperation *operation) override{};
+    virtual void handleCrashOperation(LifecycleOperation *operation) override{};
 };
 
 } // namespace inet

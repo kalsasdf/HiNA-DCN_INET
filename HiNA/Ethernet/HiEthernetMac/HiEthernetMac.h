@@ -14,6 +14,7 @@
 #include "inet/networklayer/ipv4/Ipv4Header_m.h"
 #include "inet/transportlayer/udp/UdpHeader_m.h"
 #include "inet/HiNA/Messages/HPCC/INTHeader_m.h"
+#include "inet/HiNA/Messages/POSEIDON/PSDINTHeader_m.h"
 #include "inet/HiNA/Ethernet/HiQueue/HiScheduler/WrrScheduler.h"
 
 namespace inet {
@@ -65,6 +66,10 @@ class INET_API HiEthernetMac : public EthernetMacBase
     bool HPCC;
     uint64_t txBytes = 0;
     //for HPCC
+
+    //for PSD
+    bool PSD;
+    //for PSD
 
     // IActivePacketSink:
     virtual void handleCanPullPacketChanged(cGate *gate) override;

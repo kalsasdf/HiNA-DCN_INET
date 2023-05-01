@@ -1,18 +1,19 @@
 // Copyright (C)
 /*
- * Developed by Angrydudu-gy
- * Begin at 2020/04/28
+ * Developed by HDH
+ * Begin at 2023/04/27
 */
-#ifndef __INET_HPCC_H
-#define __INET_HPCC_H
+#ifndef __INET_POSEIDON_H
+#define __INET_POSEIDON_H
 
 #include "../ccheaders.h"
-#include "inet/HiNA/Messages/HPCC/INTHeader_m.h"
+#include "inet/HiNA/Messages/POSEIDON/PSDINTHeader_m.h"
+#include<cmath>
 using namespace std;
 
 namespace inet {
 
-class HPCC : public TransportProtocolBase//cSimpleModule
+class POSEIDON : public TransportProtocolBase
 {
 protected:
     // states for self-scheduling
@@ -25,6 +26,7 @@ protected:
 
     enum SelfpckKindValues {
         SENDDATA,
+        TIMEOUT
     };
 
     struct sender_packetinfo{
@@ -41,31 +43,50 @@ protected:
     };
 
     TimerMsg *senddata = nullptr;
+    TimerMsg *timeout = nullptr;
     // configuration for .ned file
     bool activate;
     simtime_t stopTime;
     double linkspeed;
     int64_t max_pck_size;
-    int expectedFlows;// the expected maximum number of concurrent flows on a link
     simtime_t baseRTT;
+    double PARA_P;
+    double PARA_K;
+    double m;
+    double min_md;
 
-    bool isFirstAck = true;
+
     uint64_t packetid = 0;
     uint64_t nxtSendpacketid = 0;
-    double yita = 0.95;
-    int maxstage = 5;
-    int lastUpdateSeq = -1;//sequence number of ACK(wanted sequence at the receiver) that triggered the last update
-    int incstage = 0;//the count of Addictive Increase
+    uint64_t snd_una = 0;
+    int retransmit_cnt = 0;
+    int RETX_RESET_THRESHOLD = 5;
+    bool can_decrease = true;
+    simtime_t RTT_S = 0;
+    simtime_t RTT_D = 0;
+    simtime_t RTO = 0;
+    double RTO_alpha = 0.125;
+    double RTO_beta = 0.25;
+    double min_cwnd = 0.0001;
+    int num_dupack = 0;
+    simtime_t currentRTT = 0;
+    simtime_t t_last_decrease = 0;
+    simtime_t pacing_delay = 0;
 
-    double U;//the normalized total inflight bytes
-    uint send_window;//parameter w
-    uint csend_window;//parameter wc
+    double snd_cwnd;
+    double cwnd_prev;
     double currentRate;
-    hopInf Last[10];
-    int wint;//parameter wint
-    int wai;//additive increase(AI) part to ensure fairness
+    double max_cwnd;
+    double max_rate;
+    double min_rate;
+    int num_acked;
 
-    const char *packetName = "HPCCData";
+    cOutVector currentRTTVector;
+    cOutVector targetVector;
+    cOutVector cwndVector;
+    int timeout_num = 0;
+
+    const char *packetName = "PSDData";
     cGate *lowerOutGate;
     cGate *lowerInGate;
     cGate *upperOutGate;
@@ -73,16 +94,13 @@ protected:
 
     std::map<uint64_t, sender_packetinfo> sender_packetMap;
 
-    std::map<L3Address, int> receiver_packetMap;
-
-    simsignal_t Usignal;
-
 protected:
     virtual void initialize(int stage) override;
     virtual void handleMessage(cMessage *msg) override;
     virtual void handleSelfMessage(cMessage *msg) override;
     virtual void refreshDisplay() const override;
-    virtual ~HPCC() {cancelEvent(senddata); delete senddata;}
+    virtual ~POSEIDON() {cancelEvent(senddata); delete senddata;
+    cancelEvent(timeout); delete timeout;}
 
     virtual void sendDown(Packet *pck);
     virtual void sendUp(Packet *pck);
@@ -103,9 +121,9 @@ protected:
 
     virtual void receive_data(Packet *pck);
 
-    virtual double minval(b numa, b numb);//pick the minimal value
-
     virtual void receiveAck(Packet *pck);
+
+    virtual void time_out();
 
     virtual void finish() override;
     // ILifeCycle:
@@ -116,5 +134,5 @@ protected:
 
 } // namespace inet
 
-#endif // ifndef __INET_HPCC_H
+#endif // ifndef __INET_POSEIDON_H
 

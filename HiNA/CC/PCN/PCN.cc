@@ -10,27 +10,29 @@ namespace inet {
 
 Define_Module(PCN);
 
-void PCN::initialize()
+void PCN::initialize(int stage)
 {
-    //gates
-    lowerOutGate = gate("lowerOut");
-    lowerInGate = gate("lowerIn");
-    upperOutGate = gate("upperOut");
-    upperInGate = gate("upperIn");
-    // configuration
-    stopTime = par("stopTime");
-    activate = par("activate");
-    omega_min = par("omega_min");
-    omega_max = par("omega_max");
-    linkspeed = par("linkspeed");
-    min_cnp_interval = par("min_cnp_interval");
-    max_pck_size = par("max_pck_size");
+    if (stage == INITSTAGE_LOCAL){
+        //gates
+        lowerOutGate = gate("lowerOut");
+        lowerInGate = gate("lowerIn");
+        upperOutGate = gate("upperOut");
+        upperInGate = gate("upperIn");
+        // configuration
+        stopTime = par("stopTime");
+        activate = par("activate");
+        omega_min = par("omega_min");
+        omega_max = par("omega_max");
+        linkspeed = par("linkspeed");
+        min_cnp_interval = par("min_cnp_interval");
+        max_pck_size = par("max_pck_size");
 
-    senddata = new TimerMsg("senddata");
-    senddata->setKind(SENDDATA);
-
-    registerService(Protocol::udp, gate("upperIn"), gate("upperOut"));
-    registerProtocol(Protocol::udp, gate("lowerOut"), gate("lowerIn"));
+        senddata = new TimerMsg("senddata");
+        senddata->setKind(SENDDATA);
+    }else if (stage == INITSTAGE_TRANSPORT_LAYER) {
+        registerService(Protocol::udp, gate("upperIn"), gate("upperOut"));
+        registerProtocol(Protocol::udp, gate("lowerOut"), gate("lowerIn"));
+    }
 }
 
 void PCN::handleMessage(cMessage *msg)

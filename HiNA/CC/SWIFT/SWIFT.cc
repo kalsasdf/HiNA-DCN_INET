@@ -10,44 +10,47 @@ namespace inet {
 
 Define_Module(SWIFT);
 
-void SWIFT::initialize(){
-    //gates
-    lowerOutGate = gate("lowerOut");
-    lowerInGate = gate("lowerIn");
-    upperOutGate = gate("upperOut");
-    upperInGate = gate("upperIn");
-    // configuration
-    stopTime = par("stopTime");
-    activate = par("activate");
-    linkspeed = par("linkspeed");
-    max_pck_size = par("max_pck_size");
-    baseRTT = par("baseRTT");
-    hop_scaler = par("hop_scaler");
-    hops = par("hops");
-    ai = par("ai");
-    beta = par("beta");
-    max_mdf = par("max_mdf");
-    fs_min_cwnd = par("fs_min_cwnd");
-    fs_max_cwnd = par("fs_max_cwnd");
+void SWIFT::initialize(int stage)
+{
+    if (stage == INITSTAGE_LOCAL){
+        //gates
+        lowerOutGate = gate("lowerOut");
+        lowerInGate = gate("lowerIn");
+        upperOutGate = gate("upperOut");
+        upperInGate = gate("upperIn");
+        // configuration
+        stopTime = par("stopTime");
+        activate = par("activate");
+        linkspeed = par("linkspeed");
+        max_pck_size = par("max_pck_size");
+        baseRTT = par("baseRTT");
+        hop_scaler = par("hop_scaler");
+        hops = par("hops");
+        ai = par("ai");
+        beta = par("beta");
+        max_mdf = par("max_mdf");
+        fs_min_cwnd = par("fs_min_cwnd");
+        fs_max_cwnd = par("fs_max_cwnd");
 
-    snd_cwnd = send_window = max_cwnd = linkspeed*baseRTT.dbl()/(max_pck_size*8);
-    min_cwnd = 0.001;
-    fs_range = 4 * baseRTT.dbl();
+        snd_cwnd = max_cwnd = linkspeed*baseRTT.dbl()/(max_pck_size*8);
+        fs_range = 4 * baseRTT.dbl();
 
-    alpha = fs_range/((1.0/sqrt(fs_min_cwnd)) - (1.0/sqrt(fs_max_cwnd)));
+        alpha = fs_range/((1.0/sqrt(fs_min_cwnd)) - (1.0/sqrt(fs_max_cwnd)));
 
-    senddata = new TimerMsg("senddata");
-    senddata->setKind(SENDDATA);
+        senddata = new TimerMsg("senddata");
+        senddata->setKind(SENDDATA);
 
-    timeout = new TimerMsg("timeout");
-    timeout->setKind(TIMEOUT);
+        timeout = new TimerMsg("timeout");
+        timeout->setKind(TIMEOUT);
 
-    currentRTTVector.setName("currentRTT (s)");
-    targetVector.setName("target_delay (s)");
-    cwndVector.setName("cwnd (num)");
-
-    registerService(Protocol::udp, gate("upperIn"), gate("upperOut"));
-    registerProtocol(Protocol::udp, gate("lowerOut"), gate("lowerIn"));
+        currentRTTVector.setName("currentRTT (s)");
+        targetVector.setName("target_delay (s)");
+        cwndVector.setName("cwnd (num)");
+        WATCH(timeout_num);
+    }else if (stage == INITSTAGE_TRANSPORT_LAYER) {
+        registerService(Protocol::udp, gate("upperIn"), gate("upperOut"));
+        registerProtocol(Protocol::udp, gate("lowerOut"), gate("lowerIn"));
+    }
 }
 
 void SWIFT::handleMessage(cMessage *msg)
@@ -145,12 +148,12 @@ void SWIFT::processUpperpck(Packet *pck)
 
             if(sender_packetMap.empty()){
                 sender_packetMap[packetid]=snd_info;
-                iter=sender_packetMap.begin();//iter needs to be assigned after snd_info is inserted
             }else{
                 sender_packetMap[packetid]=snd_info;
             }
             if(SenderState==STOPPING){
                 SenderState=SENDING;
+                cancelEvent(senddata);
                 scheduleAt(simTime(),senddata);
             }
             packetid++;
@@ -237,9 +240,6 @@ void SWIFT::send_data()
     }
 
 }
-
-// Record the packet from udp to transmit it to the dest
-
 
 void SWIFT::processLowerpck(Packet *pck)
 {
@@ -506,7 +506,7 @@ void SWIFT::receive_ack(Packet *pck)
         }
 
     }else{
-        if(can_decrease){  // beta 0.8  max_mdf = 0.5  aiæ²¡æœ‰
+        if(can_decrease){  // beta 0.8  max_mdf = 0.5  aiÃ»ÓÐ
             temp_cwnd = max(1 - beta*(currentRTT-target_delay)/(currentRTT), 1-max_mdf) * temp_cwnd;
             can_decrease = false;
         }
@@ -515,8 +515,7 @@ void SWIFT::receive_ack(Packet *pck)
     snd_cwnd = temp_cwnd;
     cwndVector.recordWithTimestamp(simTime(), snd_cwnd);
 
-    snd_cwnd = snd_cwnd > max_cwnd? max_cwnd : snd_cwnd;
-    snd_cwnd = snd_cwnd > min_cwnd? snd_cwnd : min_cwnd;
+    snd_cwnd = math::clamp(snd_cwnd,min_cwnd,max_cwnd);
     EV<<"after changing cwnd is "<<snd_cwnd<<endl;
 
     if(snd_cwnd < cwnd_prev)
@@ -555,10 +554,9 @@ void SWIFT::time_out()
         snd_cwnd = (1 - max_mdf) * snd_cwnd;
         can_decrease = false;
     }
-    RTO *= 2;  // å…¸åž‹RTOæœºåˆ¶ï¼Œè¶…æ—¶åŽæ—¶é—´ä¹˜2
-    send_window=snd_cwnd;
+    RTO *= 2;  // µäÐÍRTO»úÖÆ£¬³¬Ê±ºóÊ±¼ä³Ë2
     nxtSendpacketid=snd_una;
-    send_data();  // è¶…æ—¶åŽï¼Œç«‹å³é‡å‘æœªç¡®è®¤çš„ç¬¬ä¸€ä¸ªæŠ¥æ–‡
+    scheduleAt(simTime(),senddata);  // ³¬Ê±ºó£¬Á¢¼´ÖØ·¢Î´È·ÈÏµÄµÚÒ»¸ö±¨ÎÄ
     cancelEvent(timeout);
     scheduleAt(simTime() + RTO, timeout);
 }

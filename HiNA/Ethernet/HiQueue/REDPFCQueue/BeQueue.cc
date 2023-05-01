@@ -5,26 +5,22 @@
 //
 
 
+#include "BeQueue.h"
+
 #include "inet/common/ModuleAccess.h"
 #include "inet/common/PacketEventTag.h"
 #include "inet/common/Simsignals.h"
 #include "inet/common/TimeTag.h"
 #include "inet/queueing/function/PacketComparatorFunction.h"
 #include "inet/queueing/function/PacketDropperFunction.h"
-#include "REDPFCQueue.h"
 
 namespace inet {
 
-Define_Module(REDPFCQueue);
+Define_Module(BeQueue);
 
-simsignal_t REDPFCQueue::pfcPausedSignal =
-        cComponent::registerSignal("pfcPaused");
-simsignal_t REDPFCQueue::pfcResumeSignal =
-        cComponent::registerSignal("pfcResume");
-b REDPFCQueue::sharedBuffer[100][100]={};
+b BeQueue::sharedBuffer[100][100]={};
 
-
-void REDPFCQueue::initialize(int stage)
+void BeQueue::initialize(int stage)
 {
     PacketQueueBase::initialize(stage);
     if (stage == INITSTAGE_LOCAL) {
@@ -33,21 +29,14 @@ void REDPFCQueue::initialize(int stage)
         collector = findConnectedModule<IActivePacketSink>(outputGate);
         packetCapacity = par("packetCapacity");
         dataCapacity = b(par("dataCapacity"));
+        buffer = findModuleFromPar<IPacketBuffer>(par("bufferModule"), this);
         switchid=findContainingNode(this)->getId();EV<<"switchid = "<<switchid<<endl;
         priority = par("priority");
         sharedBuffer[switchid][priority] = b(par("sharedBuffer"));
         headroom = b(par("headroom"));
-        usePfc = par("usePfc");
-        XON = par("XON");
-        XOFF = par("XOFF");
-        Kmax=par("Kmax");
-        Kmin=par("Kmin");
-        Pmax=par("Pmax");
-        useEcn=par("useEcn");
         alpha=par("alpha");
         queuelengthVector.setName("queuelength (bit)");
         sharedBufferVector.setName("sharedbuffer (bit)");
-        count = -1;
         packetComparatorFunction = createComparatorFunction(par("comparatorClass"));
         if (packetComparatorFunction != nullptr)
             queue.setup(packetComparatorFunction);
@@ -63,7 +52,7 @@ void REDPFCQueue::initialize(int stage)
         updateDisplayString();
 }
 
-IPacketDropperFunction *REDPFCQueue::createDropperFunction(const char *dropperClass) const
+IPacketDropperFunction *BeQueue::createDropperFunction(const char *dropperClass) const
 {
     if (strlen(dropperClass) == 0)
         return nullptr;
@@ -71,7 +60,7 @@ IPacketDropperFunction *REDPFCQueue::createDropperFunction(const char *dropperCl
         return check_and_cast<IPacketDropperFunction *>(createOne(dropperClass));
 }
 
-IPacketComparatorFunction *REDPFCQueue::createComparatorFunction(const char *comparatorClass) const
+IPacketComparatorFunction *BeQueue::createComparatorFunction(const char *comparatorClass) const
 {
     if (strlen(comparatorClass) == 0)
         return nullptr;
@@ -79,25 +68,25 @@ IPacketComparatorFunction *REDPFCQueue::createComparatorFunction(const char *com
         return check_and_cast<IPacketComparatorFunction *>(createOne(comparatorClass));
 }
 
-bool REDPFCQueue::isOverloaded() const
+bool BeQueue::isOverloaded() const
 {
     return (packetCapacity != -1 && getNumPackets() > packetCapacity) ||
            (dataCapacity != b(-1) && getTotalLength() > dataCapacity);
 }
 
-int REDPFCQueue::getNumPackets() const
+int BeQueue::getNumPackets() const
 {
     return queue.getLength();
 }
 
-Packet *REDPFCQueue::getPacket(int index) const
+Packet *BeQueue::getPacket(int index) const
 {
     if (index < 0 || index >= queue.getLength())
         throw cRuntimeError("index %i out of range", index);
     return check_and_cast<Packet *>(queue.get(index));
 }
 
-void REDPFCQueue::handleMessage(cMessage *message)
+void BeQueue::handleMessage(cMessage *message)
 {
     auto packet = check_and_cast<Packet *>(message);
     if(BufferManagement(message))
@@ -109,7 +98,7 @@ void REDPFCQueue::handleMessage(cMessage *message)
     }
 }
 
-void REDPFCQueue::pushPacket(Packet *packet, cGate *gate)
+void BeQueue::pushPacket(Packet *packet, cGate *gate)
 {
     Enter_Method("pushPacket");
     take(packet);
@@ -117,26 +106,17 @@ void REDPFCQueue::pushPacket(Packet *packet, cGate *gate)
     emit(packetPushStartedSignal, packet, &packetPushStartedDetails);
     EV_INFO << "Pushing packet" << EV_FIELD(packet) << EV_ENDL;
     queue.insert(packet);
-
-    int iface = packet->addTagIfAbsent<InterfaceInd>()->getInterfaceId();
-    EV<<"iface = "<<iface;
-    if(usePfc){
-        if(XOFF>(maxSize-headroom.get())/8){
-            XOFF -= (maxSize-headroom.get())/8;
-            XON -= (maxSize-headroom.get())/8;
-        }
-        if(queue.getByteLength()>=XOFF&&std::find(paused.begin(),paused.end(),iface)==paused.end()){
-            paused.push_back(iface);
-            auto pck = new Packet("pause");
-            auto newtag=pck->addTagIfAbsent<HiTag>();
-            newtag->setOp(ETHERNET_PFC_PAUSE);
-            newtag->setPriority(priority);
-            newtag->setInterfaceId(iface);
-            emit(pfcPausedSignal,pck);
-            delete pck;
-        }
-    }
-
+//    if (buffer != nullptr)
+//        buffer->addPacket(packet);
+//    else if (packetDropperFunction != nullptr) {
+//        while (isOverloaded()) {
+//            auto packet = packetDropperFunction->selectPacket(this);
+//            EV_INFO << "Dropping packet" << EV_FIELD(packet) << EV_ENDL;
+//            queue.remove(packet);
+//            dropPacket(packet, QUEUE_OVERFLOW);
+//        }
+//    }
+//    ASSERT(!isOverloaded());
     if (collector != nullptr && getNumPackets() != 0)
         collector->handleCanPullPacketChanged(outputGate->getPathEndGate());
     cNamedObject packetPushEndedDetails("atomicOperationEnded");
@@ -144,20 +124,22 @@ void REDPFCQueue::pushPacket(Packet *packet, cGate *gate)
     updateDisplayString();
 }
 
-Packet *REDPFCQueue::pullPacket(cGate *gate)
+Packet *BeQueue::pullPacket(cGate *gate)
 {
     Enter_Method("pullPacket");
     auto packet = check_and_cast<Packet *>(queue.front());
     EV_INFO << "Pulling packet" << EV_FIELD(packet) << EV_ENDL;
-    EV<<"queuelength = "<<queue.getBitLength()<<"b"<<endl;
     if(queue.getBitLength()-dataCapacity.get()>=packet->getBitLength()){
         sharedBuffer[switchid][priority]+=b(packet->getBitLength());
     }else if(queue.getBitLength()>=dataCapacity.get()){
         sharedBuffer[switchid][priority]+=b(queue.getBitLength()-dataCapacity.get());
     }
-    queue.pop();
-    EV<<"after pop queuelength = "<<queue.getBitLength()<<endl;
-
+    if (buffer != nullptr) {
+        queue.remove(packet);
+        buffer->removePacket(packet);
+    }
+    else
+        queue.pop();
     auto queueingTime = simTime() - packet->getArrivalTime();
     auto packetEvent = new PacketQueuedEvent();
     packetEvent->setQueuePacketLength(getNumPackets());
@@ -165,93 +147,31 @@ Packet *REDPFCQueue::pullPacket(cGate *gate)
     insertPacketEvent(this, packet, PEK_QUEUED, queueingTime, packetEvent);
     increaseTimeTag<QueueingTimeTag>(packet, queueingTime, queueingTime);
     emit(packetPulledSignal, packet);
-    lastResult = doRandomEarlyDetection(packet);
-    switch (lastResult) {
-    case RANDOMLY_ABOVE_LIMIT:
-    case ABOVE_MAX_LIMIT: {
-        if (useEcn) {
-            IpEcnCode ecn = EcnMarker::getEcn(packet);EV<<"ecn = "<<ecn<<endl;
-            if (ecn != IP_ECN_NOT_ECT) {
-                // if next packet should be marked and it is not
-                if (markNext && ecn != IP_ECN_CE) {EV<<"set ECN"<<endl;
-                    EcnMarker::setEcn(packet, IP_ECN_CE);
-                    markNext = false;
-                }
-                else {
-                    if (ecn == IP_ECN_CE)
-                        markNext = true;
-                    else{EV<<"set ECN"<<endl;
-                        EcnMarker::setEcn(packet, IP_ECN_CE);
-                    }
-
-                }
-            }
-        }
-    }
-    case RANDOMLY_BELOW_LIMIT:
-    case BELOW_MIN_LIMIT:
-        break;
-    default:
-        throw cRuntimeError("Unknown RED result");
-    }
-    if(usePfc&&queue.getByteLength()<=XON){
-        for(auto it : paused){
-            auto pck = new Packet("resume");
-            auto newtag=pck->addTagIfAbsent<HiTag>();
-            newtag->setOp(ETHERNET_PFC_RESUME);
-            newtag->setPriority(priority);
-            newtag->setInterfaceId(it);
-            emit(pfcPausedSignal,pck);
-            delete pck;
-        }
-        paused.clear();
-    }
     animatePullPacket(packet, outputGate);
     updateDisplayString();
     return packet;
 }
 
-REDPFCQueue::RedResult REDPFCQueue::doRandomEarlyDetection(const Packet *packet)
-{
-    int64_t queueLength = queue.getByteLength();
-    if (Kmin <= queueLength && queueLength < Kmax) {
-        count++;
-        const double pb = Pmax * (queueLength - Kmin) / (Kmax - Kmin);
-        if (dblrand() < pb) {EV<<"RANDOMLY ABOVE LIMIT"<<endl;
-            count = 0;
-            return RANDOMLY_ABOVE_LIMIT;
-        }
-        else{EV<<"RANDOMLY BELOW LIMIT"<<endl;
-            return RANDOMLY_BELOW_LIMIT;
-        }
-    }
-    else if (queueLength >= Kmax) {EV<<"ABOVE MAX LIMIT"<<endl;
-        count = 0;
-        return ABOVE_MAX_LIMIT;
-    }
-    else {
-        count = -1;
-    }
-    EV<<"BELOW MIN LIMIT"<<endl;
-    return BELOW_MIN_LIMIT;
-}
-
-void REDPFCQueue::removePacket(Packet *packet)
+void BeQueue::removePacket(Packet *packet)
 {
     Enter_Method("removePacket");
     EV_INFO << "Removing packet" << EV_FIELD(packet) << EV_ENDL;
     queue.remove(packet);
+    if (buffer != nullptr)
+        buffer->removePacket(packet);
     emit(packetRemovedSignal, packet);
     updateDisplayString();
 }
 
-void REDPFCQueue::removeAllPackets()
+void BeQueue::removeAllPackets()
 {
     Enter_Method("removeAllPackets");
     EV_INFO << "Removing all packets" << EV_ENDL;
     std::vector<Packet *> packets;
     for (int i = 0; i < getNumPackets(); i++)
         packets.push_back(check_and_cast<Packet *>(queue.pop()));
+    if (buffer != nullptr)
+        buffer->removeAllPackets();
     for (auto packet : packets) {
         emit(packetRemovedSignal, packet);
         delete packet;
@@ -259,7 +179,7 @@ void REDPFCQueue::removeAllPackets()
     updateDisplayString();
 }
 
-bool REDPFCQueue::canPushSomePacket(cGate *gate) const
+bool BeQueue::canPushSomePacket(cGate *gate) const
 {
     if (packetDropperFunction)
         return true;
@@ -270,7 +190,7 @@ bool REDPFCQueue::canPushSomePacket(cGate *gate) const
     return true;
 }
 
-bool REDPFCQueue::canPushPacket(Packet *packet, cGate *gate) const
+bool BeQueue::canPushPacket(Packet *packet, cGate *gate) const
 {
     if (packetDropperFunction)
         return true;
@@ -281,7 +201,7 @@ bool REDPFCQueue::canPushPacket(Packet *packet, cGate *gate) const
     return true;
 }
 
-void REDPFCQueue::handlePacketRemoved(Packet *packet)
+void BeQueue::handlePacketRemoved(Packet *packet)
 {
     Enter_Method("handlePacketRemoved");
     if (queue.contains(packet)) {
@@ -292,11 +212,11 @@ void REDPFCQueue::handlePacketRemoved(Packet *packet)
     }
 }
 
-bool REDPFCQueue::BufferManagement(cMessage *msg){
-
+bool BeQueue::BufferManagement(cMessage *msg){
     Packet *packet = check_and_cast<Packet*>(msg);
     int64_t queueLength = queue.getBitLength();
     queuelengthVector.recordWithTimestamp(simTime(), queueLength);
+
 
     if(!isOverloaded())
     {

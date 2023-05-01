@@ -195,7 +195,7 @@ void HPCC::send_data()
     sendDown(packet);
     send_window-=snd_info.length;
     nxtSendpacketid = packetid+1;
-    while(sender_packetMap.find(nxtSendpacketid)!=sender_packetMap.end())
+    while(sender_packetMap.find(nxtSendpacketid)==sender_packetMap.end())
         nxtSendpacketid++;
 
     if(sender_packetMap.find(nxtSendpacketid)==sender_packetMap.end()){

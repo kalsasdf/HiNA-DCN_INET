@@ -171,7 +171,9 @@ void SWIFT::send_data()
 {
     int packetid = nxtSendpacketid;
     sender_packetinfo snd_info = sender_packetMap.find(packetid)->second;
-    EV<<"send_data(), prepare to send packet to destination "<<snd_info.destAddr.toIpv4()<<endl;
+    if(sender_packetMap.find(packetid)==sender_packetMap.end())
+        throw cRuntimeError("packet doesn't exist");
+    EV<<"send_data(), packetid = "<<packetid<<", prepare to send packet to destination "<<snd_info.destAddr.toIpv4()<<endl;
     std::ostringstream str;
     str << packetName << "-" <<packetid;
     Packet *packet = new Packet(str.str().c_str());
@@ -452,6 +454,7 @@ void SWIFT::receive_ack(Packet *pck)
         num_dupack = 0;
         num_acked = 0;
         retransmit_cnt = 0;
+        sender_packetMap.erase(ackid);EV<<"erase "<<ackid<<endl;
     }else if(string(pck->getFullName()).find("SACK") != string::npos){
         auto SACK_msg = pck->peekAtFront<SACK>();
         uint n = SACK_msg->getSackItemArraySize();
@@ -555,10 +558,12 @@ void SWIFT::time_out()
         can_decrease = false;
     }
     RTO *= 2;  // 典型RTO机制，超时后时间乘2
-    nxtSendpacketid=snd_una;
-    scheduleAt(simTime(),senddata);  // 超时后，立即重发未确认的第一个报文
-    cancelEvent(timeout);
-    scheduleAt(simTime() + RTO, timeout);
+    if(SenderState!=STOPPING){
+        nxtSendpacketid=snd_una;
+        scheduleAt(simTime(),senddata);  // 超时后，立即重发未确认的第一个报文
+        cancelEvent(timeout);
+        scheduleAt(simTime() + RTO, timeout);
+    }
 }
 
 void SWIFT::sendDown(Packet *pck)

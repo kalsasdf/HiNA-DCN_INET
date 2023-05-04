@@ -42,7 +42,6 @@ class INET_API REDPFCQueue : public PacketQueueBase, public IPacketBuffer::ICall
     IActivePacketSink *collector = nullptr;
 
     cPacketQueue queue;
-//    IPacketBuffer *buffer = nullptr;
 
     IPacketDropperFunction *packetDropperFunction = nullptr;
     IPacketComparatorFunction *packetComparatorFunction = nullptr;

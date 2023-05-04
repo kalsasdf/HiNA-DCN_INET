@@ -119,13 +119,10 @@ void REDPFCQueue::pushPacket(Packet *packet, cGate *gate)
     queue.insert(packet);
 
     int iface = packet->addTagIfAbsent<InterfaceInd>()->getInterfaceId();
-    EV<<"iface = "<<iface;
+    EV<<"iface = "<<iface<<endl;
     if(usePfc){
-        if(XOFF>(maxSize-headroom.get())/8){
-            XOFF -= (maxSize-headroom.get())/8;
-            XON -= (maxSize-headroom.get())/8;
-        }
-        if(queue.getByteLength()>=XOFF&&std::find(paused.begin(),paused.end(),iface)==paused.end()){
+        if((queue.getByteLength()>=XOFF||(queue.getBitLength()>dataCapacity.get()&&sharedBuffer[switchid][priority]<headroom))&&std::find(paused.begin(),paused.end(),iface)==paused.end()){
+            EV<<"queuelength = "<<queue.getByteLength()<<endl;
             paused.push_back(iface);
             auto pck = new Packet("pause");
             auto newtag=pck->addTagIfAbsent<HiTag>();
@@ -194,7 +191,7 @@ Packet *REDPFCQueue::pullPacket(cGate *gate)
     default:
         throw cRuntimeError("Unknown RED result");
     }
-    if(usePfc&&queue.getByteLength()<=XON){
+    if(usePfc&&queue.getByteLength()<=XON&&sharedBuffer[switchid][priority]>headroom){
         for(auto it : paused){
             auto pck = new Packet("resume");
             auto newtag=pck->addTagIfAbsent<HiTag>();

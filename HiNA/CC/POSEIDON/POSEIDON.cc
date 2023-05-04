@@ -380,11 +380,14 @@ void POSEIDON::time_out()
         can_decrease = false;
     }
     RTO *= 2;  // 典型RTO机制，超时后时间乘2
-    nxtSendpacketid=snd_una;
-    cancelEvent(senddata);
-    scheduleAt(simTime(),senddata);  // 超时后，立即重发未确认的第一个报文
-    cancelEvent(timeout);
-    scheduleAt(simTime() + RTO, timeout);
+    if(SenderState!=STOPPING){
+        nxtSendpacketid=snd_una;
+        cancelEvent(senddata);
+        scheduleAt(simTime(),senddata);  // 超时后，立即重发未确认的第一个报文
+        cancelEvent(timeout);
+        scheduleAt(simTime() + RTO, timeout);
+    }
+
 }
 
 void POSEIDON::sendDown(Packet *pck)

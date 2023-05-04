@@ -191,7 +191,7 @@ Packet *REDPFCQueue::pullPacket(cGate *gate)
     default:
         throw cRuntimeError("Unknown RED result");
     }
-    if(usePfc&&queue.getByteLength()<=XON&&sharedBuffer[switchid][priority]>headroom){
+    if(usePfc&&queue.getByteLength()<=XON&&(queue.getBitLength()<dataCapacity.get()||sharedBuffer[switchid][priority]>headroom)){
         for(auto it : paused){
             auto pck = new Packet("resume");
             auto newtag=pck->addTagIfAbsent<HiTag>();

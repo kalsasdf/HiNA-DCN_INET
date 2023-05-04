@@ -1,5 +1,6 @@
 [HiNA-DCN inet项目.docx](https://github.com/kalsasdf/HiNA-DCN_INET/files/11364703/HiNA-DCN.inet.docx)
 
+2023-5-4 修复超时重传没考虑STOPPING状态的问题；优化共享缓存PFC的阈值判断
 
 2023-5-1 新增POSEIDON；统一UdpCC模块代码格式；修复使用共享缓存时，队列长度数据为负的问题
 

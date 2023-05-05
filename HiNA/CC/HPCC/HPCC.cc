@@ -195,8 +195,6 @@ void HPCC::send_data()
     sendDown(packet);
     send_window-=snd_info.length;
     nxtSendpacketid+=1;
-    while(sender_packetMap.find(nxtSendpacketid)==sender_packetMap.end())
-        nxtSendpacketid++;
 
     if(sender_packetMap.find(nxtSendpacketid)==sender_packetMap.end()){
         EV<<"packet run out, stopping"<<endl;
@@ -241,65 +239,65 @@ void HPCC::receive_data(Packet *pck)
     for (auto& region : pck->peekData()->getAllTags<HiTag>()){
         curRcvNum = region.getTag()->getPacketId();
     }
-//
-//    if(receiver_packetMap.find(srcAddr)==receiver_packetMap.end()){
-//        receiver_packetMap[srcAddr]=0;
-//        if(curRcvNum==receiver_packetMap[srcAddr]){
-//            receiver_packetMap[srcAddr]++;
-//            EV_DETAIL<<"packet is ordered, send ACK!"<<endl;
-//            std::ostringstream str;
-//            str <<"ACK-" <<curRcvNum;
-//            Packet *intinfo = new Packet(str.str().c_str());
-//            const auto& payload = makeShared<ByteCountChunk>(B(1));
-//            auto tag = payload->addTag<HiTag>();
-//            tag->setPacketId(curRcvNum);
-//            intinfo->insertAtBack(payload);
-//
-//            intinfo->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::udp);
-//
-//            intinfo->insertAtFront(INT_msg);
-//            intinfo->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(&Protocol::ipv4);
-//
-//            auto addressReq = intinfo->addTagIfAbsent<L3AddressReq>();
-//            addressReq->setSrcAddress(desAddr);
-//            addressReq->setDestAddress(srcAddr);
-//
-//            EV_INFO << "Sending INT from "<<desAddr<<" to "<< srcAddr <<endl;//could include more details
-//            EV_DETAIL<<"INT sequence is "<<curRcvNum<<endl;
-//            sendDown(intinfo);
-//            EV_DETAIL<<"received a packet of new flow successfully, The transport path = "<<INT_msg->getPathID()<<endl;//gy
-//            sendUp(pck);
-//        }
-//        else{
-//            EV_DETAIL<<"packet is out of order, send NAK!"<<endl;
-//            std::ostringstream str;
-//            str <<"NACK-" <<receiver_packetMap[srcAddr];
-//            Packet *intinfo = new Packet(str.str().c_str());
-//            const auto& payload = makeShared<ByteCountChunk>(B(1));
-//            auto tag = payload->addTag<HiTag>();
-//            tag->setPacketId(receiver_packetMap[srcAddr]);
-//            intinfo->insertAtBack(payload);
-//
-//            intinfo->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::udp);
-//
-//            intinfo->insertAtFront(INT_msg);
-//            intinfo->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(&Protocol::ipv4);
-//
-//            auto addressReq = intinfo->addTagIfAbsent<L3AddressReq>();
-//            addressReq->setSrcAddress(desAddr);
-//            addressReq->setDestAddress(srcAddr);
-//
-//            EV_INFO << "Sending INT from "<<desAddr<<" to "<< srcAddr <<endl;//could include more details
-//            EV_DETAIL<<"INT sequence is "<<curRcvNum<<endl;
-//            sendDown(intinfo);//send int and inform the src go back N
-//            //print INTinfo
-//            EV_DETAIL<<"received a out of order packet of new flow, The transport path : nhop = "<<INT_msg->getNHop()<<endl;
-//            delete pck;
-//        }
-//    }
-//    else{
-//        if(curRcvNum == receiver_packetMap[srcAddr])//ordered
-//        {
+
+    if(receiver_packetMap.find(srcAddr)==receiver_packetMap.end()){
+        receiver_packetMap[srcAddr]=0;
+        if(curRcvNum==receiver_packetMap[srcAddr]){
+            receiver_packetMap[srcAddr]++;
+            EV_DETAIL<<"packet is ordered, send ACK!"<<endl;
+            std::ostringstream str;
+            str <<"ACK-" <<curRcvNum;
+            Packet *intinfo = new Packet(str.str().c_str());
+            const auto& payload = makeShared<ByteCountChunk>(B(1));
+            auto tag = payload->addTag<HiTag>();
+            tag->setPacketId(curRcvNum);
+            intinfo->insertAtBack(payload);
+
+            intinfo->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::udp);
+
+            intinfo->insertAtFront(INT_msg);
+            intinfo->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(&Protocol::ipv4);
+
+            auto addressReq = intinfo->addTagIfAbsent<L3AddressReq>();
+            addressReq->setSrcAddress(desAddr);
+            addressReq->setDestAddress(srcAddr);
+
+            EV_INFO << "Sending INT from "<<desAddr<<" to "<< srcAddr <<endl;//could include more details
+            EV_DETAIL<<"INT sequence is "<<curRcvNum<<endl;
+            sendDown(intinfo);
+            EV_DETAIL<<"received a packet of new flow successfully, The transport path = "<<INT_msg->getPathID()<<endl;//gy
+            sendUp(pck);
+        }
+        else{
+            EV_DETAIL<<"packet is out of order, send NAK!"<<endl;
+            std::ostringstream str;
+            str <<"NACK-" <<receiver_packetMap[srcAddr];
+            Packet *intinfo = new Packet(str.str().c_str());
+            const auto& payload = makeShared<ByteCountChunk>(B(1));
+            auto tag = payload->addTag<HiTag>();
+            tag->setPacketId(receiver_packetMap[srcAddr]);
+            intinfo->insertAtBack(payload);
+
+            intinfo->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::udp);
+
+            intinfo->insertAtFront(INT_msg);
+            intinfo->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(&Protocol::ipv4);
+
+            auto addressReq = intinfo->addTagIfAbsent<L3AddressReq>();
+            addressReq->setSrcAddress(desAddr);
+            addressReq->setDestAddress(srcAddr);
+
+            EV_INFO << "Sending INT from "<<desAddr<<" to "<< srcAddr <<endl;//could include more details
+            EV_DETAIL<<"INT sequence is "<<curRcvNum<<endl;
+            sendDown(intinfo);//send int and inform the src go back N
+            //print INTinfo
+            EV_DETAIL<<"received a out of order packet of new flow, The transport path : nhop = "<<INT_msg->getNHop()<<endl;
+            delete pck;
+        }
+    }
+    else{
+        if(curRcvNum == receiver_packetMap[srcAddr])//ordered
+        {
             receiver_packetMap[srcAddr]++;
             EV_DETAIL<<"packet is ordered, send ACK!"<<endl;
             std::ostringstream str;
@@ -324,142 +322,142 @@ void HPCC::receive_data(Packet *pck)
             sendDown(intinfo);
             EV_DETAIL<<"received a packet of new flow successfully, The transport path = "<<INT_msg->getPathID()<<endl;
             sendUp(pck);
-//        }
-//        else//out of order
-//        {
-//            EV_DETAIL<<"packet is out of order, send NAK!"<<endl;
-//            std::ostringstream str;
-//            str <<"NACK-" <<receiver_packetMap[srcAddr];
-//            Packet *intinfo = new Packet(str.str().c_str());
-//            const auto& payload = makeShared<ByteCountChunk>(B(1));
-//            auto tag = payload->addTag<HiTag>();
-//            tag->setPacketId(receiver_packetMap[srcAddr]);
-//            intinfo->insertAtBack(payload);
-//
-//            intinfo->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::udp);
-//
-//            intinfo->insertAtFront(INT_msg);
-//            intinfo->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(&Protocol::ipv4);
-//
-//            auto addressReq = intinfo->addTagIfAbsent<L3AddressReq>();
-//            addressReq->setSrcAddress(desAddr);
-//            addressReq->setDestAddress(srcAddr);
-//
-//            EV_INFO << "Sending INT from "<<desAddr<<" to "<< srcAddr <<endl;//could include more details
-//            EV_DETAIL<<"INT sequence is "<<curRcvNum<<endl;
-//            sendDown(intinfo);//send int and inform the src go back N
-//            //print INTinfo
-//            EV_DETAIL<<"received a out of order packet of new flow, The transport path : nhop = "<<INT_msg->getNHop()<<endl;
-//            delete pck;
-//        }
-//    }
+        }
+        else//out of order
+        {
+            EV_DETAIL<<"packet is out of order, send NAK!"<<endl;
+            std::ostringstream str;
+            str <<"NACK-" <<receiver_packetMap[srcAddr];
+            Packet *intinfo = new Packet(str.str().c_str());
+            const auto& payload = makeShared<ByteCountChunk>(B(1));
+            auto tag = payload->addTag<HiTag>();
+            tag->setPacketId(receiver_packetMap[srcAddr]);
+            intinfo->insertAtBack(payload);
+
+            intinfo->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::udp);
+
+            intinfo->insertAtFront(INT_msg);
+            intinfo->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(&Protocol::ipv4);
+
+            auto addressReq = intinfo->addTagIfAbsent<L3AddressReq>();
+            addressReq->setSrcAddress(desAddr);
+            addressReq->setDestAddress(srcAddr);
+
+            EV_INFO << "Sending INT from "<<desAddr<<" to "<< srcAddr <<endl;//could include more details
+            EV_DETAIL<<"INT sequence is "<<curRcvNum<<endl;
+            sendDown(intinfo);//send int and inform the src go back N
+            //print INTinfo
+            EV_DETAIL<<"received a out of order packet of new flow, The transport path : nhop = "<<INT_msg->getNHop()<<endl;
+            delete pck;
+        }
+    }
 }
 
 void HPCC::receiveAck(Packet *pck)
 {
-//    int ackid;
-//    for (auto& region : pck->peekData()->getAllTags<HiTag>()){
-//        ackid = region.getTag()->getPacketId();
-//    }
-//
-//    if(string(pck->getFullName()).find("NACK") != string::npos){
-//        EV<<"this is "<<pck->getFullName()<<endl;
-//        nxtSendpacketid = ackid;//go back N
-//        while(!senddata->isScheduled()){
-//            cancelEvent(senddata);
-//            scheduleAt(simTime(),senddata);
-//        }
-//
-//    }else{
-//        sender_packetMap.erase(ackid);
-//    }
-//
-//    const auto& INT_msg = pck->peekAtFront<INTHeader>();
-//    int size = INT_msg->getHopInfsArraySize();
-//    hopInf curINTs[size];
-//    for(int i = 0; i < size; i++)
-//    {
-//        curINTs[i] = INT_msg->getHopInfs(i);
-//    }
-//    EV<<"the INT size is "<<size<<" the ack sequence is "<<ackid<<endl;
-//
-//
-//    //function MEASUREINFLIGHT(ack)
-//    double u = 0;
-//    simtime_t tao;
-//    for(int i = 0; i < size; i++)
-//    {
-//        double Rate = (curINTs[i].txBytes - Last[i].txBytes)*8 / (curINTs[i].TS.dbl() - Last[i].TS.dbl());
-//        EV<<"tx bytes is "<<curINTs[i].txBytes<<", last txbytes is "<<Last[i].txBytes<<", INT inf "<<i<<", Rate is "<<Rate<<endl;
-//        EV<<"TS is "<<curINTs[i].TS.dbl()<<", last TS is "<<Last[i].TS.dbl()<<endl;
-//        EV<<"txrate is "<<curINTs[i].txRate<<", last txrate is "<<Last[i].txRate<<endl;
-//        EV<<"queuelength is "<<curINTs[i].queueLength<<", last queuelength is "<<Last[i].queueLength<<endl;
-//        double u1 = (minval(curINTs[i].queueLength, Last[i].queueLength)) /(curINTs[i].txRate * baseRTT.dbl()) + Rate/curINTs[i].txRate;
-//        EV<<" u1 is "<<u1<<endl;
-//        if(u1 > u)
-//        {
-//            u = u1;
-//            tao = curINTs[i].TS - Last[i].TS;
-//        }
-//    }
-//    EV<<"total link u ="<<u<<endl;
-//    if (tao > baseRTT)
-//        tao = baseRTT;
-//    U = (1-(tao.dbl()/baseRTT.dbl()))*U + (tao.dbl()/baseRTT.dbl())*u;
-//    emit(Usignal,U);
-//    EV<<"the ACK computed U is "<<U<<endl;
-//
-//    if(isFirstAck){
-//        for(int i = 0; i < size; i++)
-//        {
-//            Last[i]  = INT_msg->getHopInfs(i);
-//        }
-//        isFirstAck=false;
-//        delete pck;
-//        return;
-//    }
-//
-//    EV<<"csend_window = "<<csend_window<<endl;
-//    //function COMPUTEWIND(U,updatewc)
-//    if(U >= yita || incstage >= maxstage)
-//    {
-//        //update the parameter
-//        send_window = csend_window/(U/yita) + wai;
-//        EV<<" the wai is "<<wai<<" the snd wind is "<<send_window<<endl;
-//        if(ackid > lastUpdateSeq)
-//        {
-//            incstage = 0;
-//            csend_window = send_window;
-//            lastUpdateSeq = nxtSendpacketid;//the next packet to send
-//            EV<<"update the csendwind! the last UpdateSeq is"<<lastUpdateSeq<<" the incstage is"<< incstage<<endl;
-//        }
-//    }
-//    else
-//    {
-//        send_window = csend_window + wai;
-//        if(send_window > wint)
-//            send_window = wint;
-//
-//        EV<<" the wai is "<<wai<<" the snd wind is "<<send_window<<endl;
-//        if(ackid > lastUpdateSeq)
-//        {
-//            incstage++;
-//            EV<<"update the csendwind! the last UpdateSeq is "<<lastUpdateSeq<<" the incstage is "<< incstage<<endl;
-//            csend_window = send_window;
-//            lastUpdateSeq = nxtSendpacketid;//the next packet to send
-//        }
-//    }
-//    if(send_window<0)
-//        throw cRuntimeError("send_windows<0");
-//
-//    currentRate = send_window / baseRTT.dbl();
-//    EV<<"the ACK computed rate is "<<currentRate<<endl;
-//
-//    for(int i = 0; i < size; i++)
-//    {
-//        Last[i]  = INT_msg->getHopInfs(i);
-//    }
-//
+    int ackid;
+    for (auto& region : pck->peekData()->getAllTags<HiTag>()){
+        ackid = region.getTag()->getPacketId();
+    }
+
+    if(string(pck->getFullName()).find("NACK") != string::npos){
+        EV<<"this is "<<pck->getFullName()<<endl;
+        nxtSendpacketid = ackid;//go back N
+        while(!senddata->isScheduled()){
+            cancelEvent(senddata);
+            scheduleAt(simTime(),senddata);
+        }
+
+    }else{
+        sender_packetMap.erase(ackid);
+    }
+
+    const auto& INT_msg = pck->peekAtFront<INTHeader>();
+    int size = INT_msg->getHopInfsArraySize();
+    hopInf curINTs[size];
+    for(int i = 0; i < size; i++)
+    {
+        curINTs[i] = INT_msg->getHopInfs(i);
+    }
+    EV<<"the INT size is "<<size<<" the ack sequence is "<<ackid<<endl;
+
+
+    //function MEASUREINFLIGHT(ack)
+    double u = 0;
+    simtime_t tao;
+    for(int i = 0; i < size; i++)
+    {
+        double Rate = (curINTs[i].txBytes - Last[i].txBytes)*8 / (curINTs[i].TS.dbl() - Last[i].TS.dbl());
+        EV<<"tx bytes is "<<curINTs[i].txBytes<<", last txbytes is "<<Last[i].txBytes<<", INT inf "<<i<<", Rate is "<<Rate<<endl;
+        EV<<"TS is "<<curINTs[i].TS.dbl()<<", last TS is "<<Last[i].TS.dbl()<<endl;
+        EV<<"txrate is "<<curINTs[i].txRate<<", last txrate is "<<Last[i].txRate<<endl;
+        EV<<"queuelength is "<<curINTs[i].queueLength<<", last queuelength is "<<Last[i].queueLength<<endl;
+        double u1 = (minval(curINTs[i].queueLength, Last[i].queueLength)) /(curINTs[i].txRate * baseRTT.dbl()) + Rate/curINTs[i].txRate;
+        EV<<" u1 is "<<u1<<endl;
+        if(u1 > u)
+        {
+            u = u1;
+            tao = curINTs[i].TS - Last[i].TS;
+        }
+    }
+    EV<<"total link u ="<<u<<endl;
+    if (tao > baseRTT)
+        tao = baseRTT;
+    U = (1-(tao.dbl()/baseRTT.dbl()))*U + (tao.dbl()/baseRTT.dbl())*u;
+    emit(Usignal,U);
+    EV<<"the ACK computed U is "<<U<<endl;
+
+    if(isFirstAck){
+        for(int i = 0; i < size; i++)
+        {
+            Last[i]  = INT_msg->getHopInfs(i);
+        }
+        isFirstAck=false;
+        delete pck;
+        return;
+    }
+
+    EV<<"csend_window = "<<csend_window<<endl;
+    //function COMPUTEWIND(U,updatewc)
+    if(U >= yita || incstage >= maxstage)
+    {
+        //update the parameter
+        send_window = csend_window/(U/yita) + wai;
+        EV<<" the wai is "<<wai<<" the snd wind is "<<send_window<<endl;
+        if(ackid > lastUpdateSeq)
+        {
+            incstage = 0;
+            csend_window = send_window;
+            lastUpdateSeq = nxtSendpacketid;//the next packet to send
+            EV<<"update the csendwind! the last UpdateSeq is"<<lastUpdateSeq<<" the incstage is"<< incstage<<endl;
+        }
+    }
+    else
+    {
+        send_window = csend_window + wai;
+        if(send_window > wint)
+            send_window = wint;
+
+        EV<<" the wai is "<<wai<<" the snd wind is "<<send_window<<endl;
+        if(ackid > lastUpdateSeq)
+        {
+            incstage++;
+            EV<<"update the csendwind! the last UpdateSeq is "<<lastUpdateSeq<<" the incstage is "<< incstage<<endl;
+            csend_window = send_window;
+            lastUpdateSeq = nxtSendpacketid;//the next packet to send
+        }
+    }
+    if(send_window<0)
+        throw cRuntimeError("send_windows<0");
+
+    currentRate = send_window / baseRTT.dbl();
+    EV<<"the ACK computed rate is "<<currentRate<<endl;
+
+    for(int i = 0; i < size; i++)
+    {
+        Last[i]  = INT_msg->getHopInfs(i);
+    }
+
     if(SenderState==PAUSING){
         SenderState=SENDING;
         scheduleAt(simTime(),senddata);

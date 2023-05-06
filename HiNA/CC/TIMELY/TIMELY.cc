@@ -82,35 +82,42 @@ void TIMELY::handleSelfMessage(cMessage *pck)
 void TIMELY::processUpperpck(Packet *pck)
 {
     if (string(pck->getFullName()).find("Data") != string::npos&&activate==true){
-        sender_flowinfo snd_info;
+        int flowid;
+        simtime_t cretime;
+        int priority;
         for (auto& region : pck->peekData()->getAllTags<HiTag>()){
-            snd_info.flowid = region.getTag()->getFlowId();
-            snd_info.cretime = region.getTag()->getCreationtime();
-            snd_info.priority = region.getTag()->getPriority();
+            flowid = region.getTag()->getFlowId();
+            cretime = region.getTag()->getCreationtime();
+            priority = region.getTag()->getPriority();
         }
-        auto addressReq = pck->addTagIfAbsent<L3AddressReq>();
-        srcAddr = addressReq->getSrcAddress();
-        L3Address destAddr = addressReq->getDestAddress();
-
-        auto udpHeader = pck->removeAtFront<UdpHeader>();
-
-        snd_info.remainLength = pck->getByteLength();
-        snd_info.destAddr = destAddr;
-        snd_info.srcPort = udpHeader->getSrcPort();
-        snd_info.destPort = udpHeader->getDestPort();
-        snd_info.pckseq = 0;
-        snd_info.crcMode = udpHeader->getCrcMode();
-        snd_info.crc = udpHeader->getCrc();
-        EV << "store new flow, id = "<<snd_info.flowid<<
-                ", creationtime = "<<snd_info.cretime<<
-                ", flow length = "<<snd_info.remainLength<<endl;
-        if(sender_flowMap.empty()){
-            sender_flowMap[snd_info.flowid]=snd_info;
-            iter=sender_flowMap.begin();//iter needs to be assigned after snd_info is inserted
+        if(sender_flowMap.find(flowid)!=sender_flowMap.end()){
+            sender_flowMap[flowid].remainLength+=pck->getByteLength();
         }else{
-            sender_flowMap[snd_info.flowid]=snd_info;
+            sender_flowinfo snd_info;
+            snd_info.flowid = flowid;
+            EV << "store new flow, id = "<<snd_info.flowid<<
+                    ", creationtime = "<<snd_info.cretime<<endl;
+            auto addressReq = pck->addTagIfAbsent<L3AddressReq>();
+            srcAddr = addressReq->getSrcAddress();
+            L3Address destAddr = addressReq->getDestAddress();
+
+            auto udpHeader = pck->removeAtFront<UdpHeader>();
+
+            snd_info.remainLength = pck->getByteLength();
+            snd_info.destAddr = destAddr;
+            snd_info.srcPort = udpHeader->getSrcPort();
+            snd_info.destPort = udpHeader->getDestPort();
+            snd_info.priority = priority;
+            snd_info.pckseq = 0;
+            snd_info.crcMode = udpHeader->getCrcMode();
+            snd_info.crc = udpHeader->getCrc();
+            if(sender_flowMap.empty()){
+                sender_flowMap[snd_info.flowid]=snd_info;
+                iter=sender_flowMap.begin();//iter needs to be assigned after snd_info is inserted
+            }else{
+                sender_flowMap[snd_info.flowid]=snd_info;
+            }
         }
-        // send packet timer
         delete pck;
         if(SenderState==STOPPING){
             SenderState=SENDING;

@@ -119,6 +119,7 @@ void DCQCN::processUpperpck(Packet *pck)
             snd_info.destAddr = destAddr;
             snd_info.srcPort = udpHeader->getSrcPort();
             snd_info.destPort = udpHeader->getDestPort();
+            snd_info.priority = priority;
             snd_info.pckseq = 0;
             snd_info.crcMode = udpHeader->getCrcMode();
             snd_info.crc = udpHeader->getCrc();

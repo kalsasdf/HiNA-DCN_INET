@@ -94,38 +94,45 @@ void DCQCN::handleSelfMessage(cMessage *pck)
 void DCQCN::processUpperpck(Packet *pck)
 {
     if (string(pck->getFullName()).find("Data") != string::npos&&activate==true){
-        sender_flowinfo snd_info;
+        int flowid;
+        simtime_t cretime;
+        int priority;
         for (auto& region : pck->peekData()->getAllTags<HiTag>()){
-            snd_info.flowid = region.getTag()->getFlowId();
-            snd_info.cretime = region.getTag()->getCreationtime();
-            snd_info.priority = region.getTag()->getPriority();
+            flowid = region.getTag()->getFlowId();
+            cretime = region.getTag()->getCreationtime();
+            priority = region.getTag()->getPriority();
+        }
+        if(sender_flowMap.find(flowid)!=sender_flowMap.end()){
+            sender_flowMap[flowid].remainLength+=pck->getByteLength();
+        }else{
+            sender_flowinfo snd_info;
+            snd_info.flowid = flowid;
             EV << "store new flow, id = "<<snd_info.flowid<<
                     ", creationtime = "<<snd_info.cretime<<endl;
-        }
-        auto addressReq = pck->addTagIfAbsent<L3AddressReq>();
-        srcAddr = addressReq->getSrcAddress();
-        L3Address destAddr = addressReq->getDestAddress();
+            auto addressReq = pck->addTagIfAbsent<L3AddressReq>();
+            srcAddr = addressReq->getSrcAddress();
+            L3Address destAddr = addressReq->getDestAddress();
 
-        auto udpHeader = pck->removeAtFront<UdpHeader>();
+            auto udpHeader = pck->removeAtFront<UdpHeader>();
 
-        snd_info.remainLength = pck->getByteLength();
-        snd_info.destAddr = destAddr;
-        snd_info.srcPort = udpHeader->getSrcPort();
-        snd_info.destPort = udpHeader->getDestPort();
-        snd_info.pckseq = 0;
-        snd_info.crcMode = udpHeader->getCrcMode();
-        snd_info.crc = udpHeader->getCrc();
-        snd_info.currentRate = linkspeed*initialrate;
-        snd_info.targetRate = snd_info.currentRate;
-        snd_info.rateTimer =  new TimerMsg("rateTimer");
-        snd_info.alphaTimer = new TimerMsg("alphaTimer");
-        if(sender_flowMap.empty()){
-            sender_flowMap[snd_info.flowid]=snd_info;
-            iter=sender_flowMap.begin();//iter needs to be assigned after snd_info is inserted
-        }else{
-            sender_flowMap[snd_info.flowid]=snd_info;
+            snd_info.remainLength = pck->getByteLength();
+            snd_info.destAddr = destAddr;
+            snd_info.srcPort = udpHeader->getSrcPort();
+            snd_info.destPort = udpHeader->getDestPort();
+            snd_info.pckseq = 0;
+            snd_info.crcMode = udpHeader->getCrcMode();
+            snd_info.crc = udpHeader->getCrc();
+            snd_info.currentRate = linkspeed*initialrate;
+            snd_info.targetRate = snd_info.currentRate;
+            snd_info.rateTimer =  new TimerMsg("rateTimer");
+            snd_info.alphaTimer = new TimerMsg("alphaTimer");
+            if(sender_flowMap.empty()){
+                sender_flowMap[snd_info.flowid]=snd_info;
+                iter=sender_flowMap.begin();//iter needs to be assigned after snd_info is inserted
+            }else{
+                sender_flowMap[snd_info.flowid]=snd_info;
+            }
         }
-        // send packet timer
         delete pck;
         if(SenderState==STOPPING){
             SenderState=SENDING;
@@ -208,6 +215,7 @@ void DCQCN::send_data()
         }
         sender_flowMap[snd_info.flowid] =snd_info;
     }
+    simtime_t d = simtime_t((packet->getByteLength()+58)*8/snd_info.currentRate);EV<<"send interval = "<<d<<endl;
     simtime_t nxtSendTime = simtime_t((packet->getByteLength()+58)*8/snd_info.currentRate) + simTime();
     //58=20(IP)+14(EthernetMac)+8(EthernetPhy)+4(EthernetFcs)+12(interframe gap,IFG)
     scheduleAt(nxtSendTime,senddata);
@@ -240,7 +248,7 @@ void DCQCN::receive_data(Packet *pck)
     for (auto& region : pck->peekData()->getAllTags<HiTag>()){
         flowid = region.getTag()->getFlowId();
     }
-    EV<<"receive packet, "<<", ecn = "<<ecn<<endl;
+    EV<<"receive packet, ecn = "<<ecn<<endl;
     if (ecn == 3&&simTime()-lastCnpTime[flowid]>min_cnp_interval) // ecn==1, enabled; ecn==3, marked.
     {
         Packet *cnp = new Packet("CNP");

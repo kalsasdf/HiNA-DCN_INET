@@ -98,11 +98,11 @@ protected:
     virtual void handleSelfMessage(cMessage *msg) override;
     virtual void refreshDisplay() const override;
     virtual ~DCQCN() {cancelEvent(senddata); delete senddata;
-    for(auto it : sender_flowMap){
-    cancelEvent(it.second.rateTimer);
-    delete it.second.rateTimer;
-    cancelEvent(it.second.alphaTimer);
-    delete it.second.alphaTimer;
+    for(auto it = sender_flowMap.begin();it!=sender_flowMap.end();it++){
+    cancelEvent(it->second.rateTimer);
+    delete it->second.rateTimer;
+    cancelEvent(it->second.alphaTimer);
+    delete it->second.alphaTimer;
     }
     }
 

@@ -85,6 +85,7 @@ class XPASS : public TransportProtocolBase
         uint32_t flowid;
         simtime_t cretime;
         uint64_t flowsize;
+        int priority;
         // for UDP header information
         L3Address destaddr;
         int srcPort;
@@ -152,8 +153,12 @@ class XPASS : public TransportProtocolBase
     virtual void handleMessage(cMessage *msg) override;
     virtual void handleSelfMessage(cMessage *msg) override;
     virtual ~XPASS() {for(auto i:receiver_flowMap){
+        cancelEvent(i.second.alphaTimer);
         delete i.second.alphaTimer;
-        delete i.second.rateTimer;}
+        cancelEvent(i.second.rateTimer);
+        delete i.second.rateTimer;
+        cancelEvent(i.second.sendcredit);
+        delete i.second.sendcredit;}
     }
 
     /**

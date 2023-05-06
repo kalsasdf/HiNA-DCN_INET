@@ -387,13 +387,14 @@ void HPCC::receiveAck(Packet *pck)
     simtime_t tao;
     for(int i = 0; i < size; i++)
     {
-        double Rate = (curINTs[i].txBytes - Last[i].txBytes)*8 / (curINTs[i].TS.dbl() - Last[i].TS.dbl());
-        EV<<"tx bytes is "<<curINTs[i].txBytes<<", last txbytes is "<<Last[i].txBytes<<", INT inf "<<i<<", Rate is "<<Rate<<endl;
+        EV<<"tx bytes is "<<curINTs[i].txBytes<<", last txbytes is "<<Last[i].txBytes<<", INT inf "<<i<<endl;
         EV<<"TS is "<<curINTs[i].TS.dbl()<<", last TS is "<<Last[i].TS.dbl()<<endl;
+        double Rate = (curINTs[i].txBytes - Last[i].txBytes)*8 / (curINTs[i].TS.dbl() - Last[i].TS.dbl());
+        EV<<"Rate = "<<Rate<<endl;
         EV<<"txrate is "<<curINTs[i].txRate<<", last txrate is "<<Last[i].txRate<<endl;
         EV<<"queuelength is "<<curINTs[i].queueLength<<", last queuelength is "<<Last[i].queueLength<<endl;
         double u1 = (minval(curINTs[i].queueLength, Last[i].queueLength)) /(curINTs[i].txRate * baseRTT.dbl()) + Rate/curINTs[i].txRate;
-        EV<<" u1 is "<<u1<<endl;
+        EV<<" u1 = "<<u1<<endl;
         if(u1 > u)
         {
             u = u1;

@@ -126,7 +126,11 @@ void DCQCN::processUpperpck(Packet *pck)
             snd_info.currentRate = linkspeed*initialrate;
             snd_info.targetRate = snd_info.currentRate;
             snd_info.rateTimer =  new TimerMsg("rateTimer");
+            snd_info.rateTimer->setKind(RATETIMER);
+            snd_info.rateTimer->setFlowId(flowid);
             snd_info.alphaTimer = new TimerMsg("alphaTimer");
+            snd_info.alphaTimer->setKind(ALPHATIMER);
+            snd_info.alphaTimer->setFlowId(flowid);
             if(sender_flowMap.empty()){
                 sender_flowMap[snd_info.flowid]=snd_info;
                 iter=sender_flowMap.begin();//iter needs to be assigned after snd_info is inserted
@@ -290,11 +294,6 @@ void DCQCN::receive_cnp(Packet *pck)
         sndinfo.iRhai = 0;
         cancelEvent(sndinfo.alphaTimer);
         cancelEvent(sndinfo.rateTimer);
-
-        sndinfo.alphaTimer->setKind(ALPHATIMER);
-
-        sndinfo.rateTimer->setKind(RATETIMER);
-        sndinfo.rateTimer->setFlowId(flowid);
         // update alpha
         scheduleAt(simTime()+AlphaTimer_th,sndinfo.alphaTimer);
 

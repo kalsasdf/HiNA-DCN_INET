@@ -12,10 +12,6 @@ import inet.HiNA.Ethernet.HiQueue.HiScheduler.WrrScheduler;
 module HiQueue
 {
     parameters:
-        bool usePfc = default(false);
-        *.usePfc = this.usePfc;
-        bool useEcn = default(false);
-        *.useEcn = this.useEcn;
         @display("bgb=692.05493,771.147");
     gates:
         input in;

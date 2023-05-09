@@ -48,10 +48,6 @@ module HiEthernetInterface extends NetworkInterface like IEthernetInterface
         bool duplexMode = default(true);      // selects full-duplex (true) or half-duplex (false) operation
         bool csmacdSupport = default(!duplexMode);  // by default CSMA/CD is turned off, so only point-to-point duplex links are supported.
         double bitrate @unit(bps) = default(0 bps);
-        bool usePfc = default(false);
-        *.usePfc = this.usePfc;
-        bool useEcn = default(false);
-        *.useEcn = this.useEcn;
         bool isSwitch = default(false);
         string fcsMode @enum("declared","computed") = default("declared");
         *.interfaceTableModule = default(absPath(this.interfaceTableModule));

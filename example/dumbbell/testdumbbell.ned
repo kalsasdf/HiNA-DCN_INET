@@ -15,8 +15,6 @@
 
 package inet.examples.HiNA.test.dumbbell;
 
-
-import inet.common.misc.ThruputMeter;
 import inet.HiNA.HiSwitch.HiSwitch;
 import inet.HiNA.HiHost.HiHost;
 import inet.networklayer.configurator.ipv4.Ipv4NetworkConfigurator;
@@ -34,7 +32,7 @@ network testdumbbell
     types:
         channel agchannel extends DatarateChannel
         {
-            delay = 2us;
+            delay = 50ns;//1meter=5ns
             datarate = 10Gbps;
         }
     submodules:

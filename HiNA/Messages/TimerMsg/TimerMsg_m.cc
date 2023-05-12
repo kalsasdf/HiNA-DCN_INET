@@ -28,7 +28,7 @@
 #include <sstream>
 #include <memory>
 #include <type_traits>
-#include "TimerMsg_m.h"
+#include "inet\HiNA\Messages\TimerMsg\TimerMsg_m.h"
 
 namespace omnetpp {
 
@@ -182,6 +182,7 @@ void TimerMsg::copy(const TimerMsg& other)
     this->FlowId = other.FlowId;
     this->PacketId = other.PacketId;
     this->Priority = other.Priority;
+    this->seq = other.seq;
 }
 
 void TimerMsg::parsimPack(omnetpp::cCommBuffer *b) const
@@ -192,6 +193,7 @@ void TimerMsg::parsimPack(omnetpp::cCommBuffer *b) const
     doParsimPacking(b,this->FlowId);
     doParsimPacking(b,this->PacketId);
     doParsimPacking(b,this->Priority);
+    doParsimPacking(b,this->seq);
 }
 
 void TimerMsg::parsimUnpack(omnetpp::cCommBuffer *b)
@@ -202,6 +204,7 @@ void TimerMsg::parsimUnpack(omnetpp::cCommBuffer *b)
     doParsimUnpacking(b,this->FlowId);
     doParsimUnpacking(b,this->PacketId);
     doParsimUnpacking(b,this->Priority);
+    doParsimUnpacking(b,this->seq);
 }
 
 const L3Address& TimerMsg::getDestAddr() const
@@ -254,6 +257,16 @@ void TimerMsg::setPriority(uint32_t Priority)
     this->Priority = Priority;
 }
 
+int TimerMsg::getSeq() const
+{
+    return this->seq;
+}
+
+void TimerMsg::setSeq(int seq)
+{
+    this->seq = seq;
+}
+
 class TimerMsgDescriptor : public omnetpp::cClassDescriptor
 {
   private:
@@ -264,6 +277,7 @@ class TimerMsgDescriptor : public omnetpp::cClassDescriptor
         FIELD_FlowId,
         FIELD_PacketId,
         FIELD_Priority,
+        FIELD_seq,
     };
   public:
     TimerMsgDescriptor();
@@ -330,7 +344,7 @@ const char *TimerMsgDescriptor::getProperty(const char *propertyName) const
 int TimerMsgDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
-    return base ? 5+base->getFieldCount() : 5;
+    return base ? 6+base->getFieldCount() : 6;
 }
 
 unsigned int TimerMsgDescriptor::getFieldTypeFlags(int field) const
@@ -347,8 +361,9 @@ unsigned int TimerMsgDescriptor::getFieldTypeFlags(int field) const
         FD_ISEDITABLE,    // FIELD_FlowId
         FD_ISEDITABLE,    // FIELD_PacketId
         FD_ISEDITABLE,    // FIELD_Priority
+        FD_ISEDITABLE,    // FIELD_seq
     };
-    return (field >= 0 && field < 5) ? fieldTypeFlags[field] : 0;
+    return (field >= 0 && field < 6) ? fieldTypeFlags[field] : 0;
 }
 
 const char *TimerMsgDescriptor::getFieldName(int field) const
@@ -365,8 +380,9 @@ const char *TimerMsgDescriptor::getFieldName(int field) const
         "FlowId",
         "PacketId",
         "Priority",
+        "seq",
     };
-    return (field >= 0 && field < 5) ? fieldNames[field] : nullptr;
+    return (field >= 0 && field < 6) ? fieldNames[field] : nullptr;
 }
 
 int TimerMsgDescriptor::findField(const char *fieldName) const
@@ -378,6 +394,7 @@ int TimerMsgDescriptor::findField(const char *fieldName) const
     if (strcmp(fieldName, "FlowId") == 0) return baseIndex + 2;
     if (strcmp(fieldName, "PacketId") == 0) return baseIndex + 3;
     if (strcmp(fieldName, "Priority") == 0) return baseIndex + 4;
+    if (strcmp(fieldName, "seq") == 0) return baseIndex + 5;
     return base ? base->findField(fieldName) : -1;
 }
 
@@ -395,8 +412,9 @@ const char *TimerMsgDescriptor::getFieldTypeString(int field) const
         "uint32_t",    // FIELD_FlowId
         "int",    // FIELD_PacketId
         "uint32_t",    // FIELD_Priority
+        "int",    // FIELD_seq
     };
-    return (field >= 0 && field < 5) ? fieldTypeStrings[field] : nullptr;
+    return (field >= 0 && field < 6) ? fieldTypeStrings[field] : nullptr;
 }
 
 const char **TimerMsgDescriptor::getFieldPropertyNames(int field) const
@@ -484,6 +502,7 @@ std::string TimerMsgDescriptor::getFieldValueAsString(omnetpp::any_ptr object, i
         case FIELD_FlowId: return ulong2string(pp->getFlowId());
         case FIELD_PacketId: return long2string(pp->getPacketId());
         case FIELD_Priority: return ulong2string(pp->getPriority());
+        case FIELD_seq: return long2string(pp->getSeq());
         default: return "";
     }
 }
@@ -503,6 +522,7 @@ void TimerMsgDescriptor::setFieldValueAsString(omnetpp::any_ptr object, int fiel
         case FIELD_FlowId: pp->setFlowId(string2ulong(value)); break;
         case FIELD_PacketId: pp->setPacketId(string2long(value)); break;
         case FIELD_Priority: pp->setPriority(string2ulong(value)); break;
+        case FIELD_seq: pp->setSeq(string2long(value)); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'TimerMsg'", field);
     }
 }
@@ -522,6 +542,7 @@ omnetpp::cValue TimerMsgDescriptor::getFieldValue(omnetpp::any_ptr object, int f
         case FIELD_FlowId: return (omnetpp::intval_t)(pp->getFlowId());
         case FIELD_PacketId: return pp->getPacketId();
         case FIELD_Priority: return (omnetpp::intval_t)(pp->getPriority());
+        case FIELD_seq: return pp->getSeq();
         default: throw omnetpp::cRuntimeError("Cannot return field %d of class 'TimerMsg' as cValue -- field index out of range?", field);
     }
 }
@@ -541,6 +562,7 @@ void TimerMsgDescriptor::setFieldValue(omnetpp::any_ptr object, int field, int i
         case FIELD_FlowId: pp->setFlowId(omnetpp::checked_int_cast<uint32_t>(value.intValue())); break;
         case FIELD_PacketId: pp->setPacketId(omnetpp::checked_int_cast<int>(value.intValue())); break;
         case FIELD_Priority: pp->setPriority(omnetpp::checked_int_cast<uint32_t>(value.intValue())); break;
+        case FIELD_seq: pp->setSeq(omnetpp::checked_int_cast<int>(value.intValue())); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'TimerMsg'", field);
     }
 }

@@ -97,25 +97,23 @@ void DCQCN::processUpperpck(Packet *pck)
         int flowid;
         simtime_t cretime;
         int priority;
+        uint messageLength;
         for (auto& region : pck->peekData()->getAllTags<HiTag>()){
             flowid = region.getTag()->getFlowId();
             cretime = region.getTag()->getCreationtime();
             priority = region.getTag()->getPriority();
+            messageLength = region.getTag()->getFlowSize();
         }
-        if(sender_flowMap.find(flowid)!=sender_flowMap.end()){
-            sender_flowMap[flowid].remainLength+=pck->getByteLength();
-        }else{
+        if(sender_flowMap.find(flowid)==sender_flowMap.end()){
             sender_flowinfo snd_info;
-            snd_info.flowid = flowid;
-            EV << "store new flow, id = "<<snd_info.flowid<<
-                    ", creationtime = "<<snd_info.cretime<<endl;
             auto addressReq = pck->addTagIfAbsent<L3AddressReq>();
             srcAddr = addressReq->getSrcAddress();
             L3Address destAddr = addressReq->getDestAddress();
-
             auto udpHeader = pck->removeAtFront<UdpHeader>();
 
-            snd_info.remainLength = pck->getByteLength();
+            snd_info.flowid = flowid;
+            snd_info.remainLength = messageLength;
+            snd_info.cretime = cretime;
             snd_info.destAddr = destAddr;
             snd_info.srcPort = udpHeader->getSrcPort();
             snd_info.destPort = udpHeader->getDestPort();
@@ -137,6 +135,8 @@ void DCQCN::processUpperpck(Packet *pck)
             }else{
                 sender_flowMap[snd_info.flowid]=snd_info;
             }
+            EV << "store new flow, id = "<<snd_info.flowid<<
+                    ", creationtime = "<<snd_info.cretime<<endl;
         }
         delete pck;
         if(SenderState==STOPPING){
@@ -174,6 +174,8 @@ void DCQCN::send_data()
     tag->setPriority(snd_info.priority);
     tag->setCreationtime(snd_info.cretime);
     tag->setPacketId(snd_info.pckseq);
+    if(snd_info.remainLength==0)
+        tag->setIsLastPck(true);
     snd_info.pckseq += 1;
 
     packet->insertAtBack(payload);
@@ -220,7 +222,7 @@ void DCQCN::send_data()
         }
         sender_flowMap[snd_info.flowid] =snd_info;
     }
-    simtime_t d = simtime_t((packet->getByteLength()+58)*8/snd_info.currentRate);EV<<"send interval = "<<d<<endl;
+
     simtime_t nxtSendTime = simtime_t((packet->getByteLength()+58)*8/snd_info.currentRate) + simTime();
     //58=20(IP)+14(EthernetMac)+8(EthernetPhy)+4(EthernetFcs)+12(interframe gap,IFG)
     scheduleAt(nxtSendTime,senddata);
@@ -229,7 +231,7 @@ void DCQCN::send_data()
 
 void DCQCN::processLowerpck(Packet *pck)
 {
-    if (!strcmp(pck->getFullName(),"CNP"))
+    if (strcmp(pck->getFullName(),"CNP")==0)
     {
         receive_cnp(pck);
     }
@@ -253,7 +255,7 @@ void DCQCN::receive_data(Packet *pck)
     for (auto& region : pck->peekData()->getAllTags<HiTag>()){
         flowid = region.getTag()->getFlowId();
     }
-    EV<<"receive packet, ecn = "<<ecn<<endl;
+    EV<<"receive packet, ecn = "<<ecn<<", flowid = "<<flowid<<endl;
     if (ecn == 3&&simTime()-lastCnpTime[flowid]>min_cnp_interval) // ecn==1, enabled; ecn==3, marked.
     {
         Packet *cnp = new Packet("CNP");
@@ -292,8 +294,11 @@ void DCQCN::receive_cnp(Packet *pck)
         sndinfo.ByteFrSteps = 0;
         sndinfo.TimeFrSteps = 0;
         sndinfo.iRhai = 0;
+        sender_flowMap[flowid]=sndinfo;
         cancelEvent(sndinfo.alphaTimer);
         cancelEvent(sndinfo.rateTimer);
+
+
         // update alpha
         scheduleAt(simTime()+AlphaTimer_th,sndinfo.alphaTimer);
 

@@ -2,8 +2,8 @@
 // Generated file, do not edit! Created by opp_msgtool 6.0 from inet/HiNA/Messages/HiTag/HiTag.msg.
 //
 
-#ifndef __INET_HITAG_M_H
-#define __INET_HITAG_M_H
+#ifndef __INET_INET_HINA_MESSAGES_HITAG_HITAG_M_H
+#define __INET_INET_HINA_MESSAGES_HITAG_HITAG_M_H
 
 #if defined(__clang__)
 #  pragma clang diagnostic ignored "-Wreserved-id-macro"
@@ -44,7 +44,7 @@ class HiTag;
 namespace inet {
 
 /**
- * Class generated from <tt>inet/HiNA/Messages/HiTag/HiTag.msg:13</tt> by opp_msgtool.
+ * Class generated from <tt>inet\HiNA\Messages\HiTag\HiTag.msg:13</tt> by opp_msgtool.
  * <pre>
  * class HiTag extends TagBase
  * {
@@ -56,7 +56,8 @@ namespace inet {
  *     uint64_t PacketSize;
  *     bool reverse = false;//信用协议反向路由用
  *     simtime_t creationtime;
- *     bool isLastPck = false;//for TIMELY
+ *     bool isLastPck = false;
+ *     uint32_t senderPriority = -1;//for HOMA
  * 
  *     //for PFC
  *     int16_t op;
@@ -76,6 +77,7 @@ class INET_API HiTag : public ::inet::TagBase
     bool reverse = false;
     ::omnetpp::simtime_t creationtime = SIMTIME_ZERO;
     bool isLastPck_ = false;
+    uint32_t senderPriority = -1;
     int16_t op = 0;
     int16_t interfaceId = 0;
 
@@ -121,6 +123,9 @@ class INET_API HiTag : public ::inet::TagBase
     virtual bool isLastPck() const;
     virtual void setIsLastPck(bool isLastPck);
 
+    virtual uint32_t getSenderPriority() const;
+    virtual void setSenderPriority(uint32_t senderPriority);
+
     virtual int16_t getOp() const;
     virtual void setOp(int16_t op);
 
@@ -141,5 +146,5 @@ template<> inline inet::HiTag *fromAnyPtr(any_ptr ptr) { return check_and_cast<i
 
 }  // namespace omnetpp
 
-#endif // ifndef __INET_HITAG_M_H
+#endif // ifndef __INET_INET_HINA_MESSAGES_HITAG_HITAG_M_H
 

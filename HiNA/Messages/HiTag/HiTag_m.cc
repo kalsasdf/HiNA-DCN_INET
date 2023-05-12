@@ -28,7 +28,7 @@
 #include <sstream>
 #include <memory>
 #include <type_traits>
-#include "HiTag_m.h"
+#include "inet\HiNA\Messages\HiTag\HiTag_m.h"
 
 namespace omnetpp {
 
@@ -186,6 +186,7 @@ void HiTag::copy(const HiTag& other)
     this->reverse = other.reverse;
     this->creationtime = other.creationtime;
     this->isLastPck_ = other.isLastPck_;
+    this->senderPriority = other.senderPriority;
     this->op = other.op;
     this->interfaceId = other.interfaceId;
 }
@@ -202,6 +203,7 @@ void HiTag::parsimPack(omnetpp::cCommBuffer *b) const
     doParsimPacking(b,this->reverse);
     doParsimPacking(b,this->creationtime);
     doParsimPacking(b,this->isLastPck_);
+    doParsimPacking(b,this->senderPriority);
     doParsimPacking(b,this->op);
     doParsimPacking(b,this->interfaceId);
 }
@@ -218,6 +220,7 @@ void HiTag::parsimUnpack(omnetpp::cCommBuffer *b)
     doParsimUnpacking(b,this->reverse);
     doParsimUnpacking(b,this->creationtime);
     doParsimUnpacking(b,this->isLastPck_);
+    doParsimUnpacking(b,this->senderPriority);
     doParsimUnpacking(b,this->op);
     doParsimUnpacking(b,this->interfaceId);
 }
@@ -312,6 +315,16 @@ void HiTag::setIsLastPck(bool isLastPck)
     this->isLastPck_ = isLastPck;
 }
 
+uint32_t HiTag::getSenderPriority() const
+{
+    return this->senderPriority;
+}
+
+void HiTag::setSenderPriority(uint32_t senderPriority)
+{
+    this->senderPriority = senderPriority;
+}
+
 int16_t HiTag::getOp() const
 {
     return this->op;
@@ -346,6 +359,7 @@ class HiTagDescriptor : public omnetpp::cClassDescriptor
         FIELD_reverse,
         FIELD_creationtime,
         FIELD_isLastPck,
+        FIELD_senderPriority,
         FIELD_op,
         FIELD_interfaceId,
     };
@@ -414,7 +428,7 @@ const char *HiTagDescriptor::getProperty(const char *propertyName) const
 int HiTagDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
-    return base ? 11+base->getFieldCount() : 11;
+    return base ? 12+base->getFieldCount() : 12;
 }
 
 unsigned int HiTagDescriptor::getFieldTypeFlags(int field) const
@@ -435,10 +449,11 @@ unsigned int HiTagDescriptor::getFieldTypeFlags(int field) const
         FD_ISEDITABLE,    // FIELD_reverse
         FD_ISEDITABLE,    // FIELD_creationtime
         FD_ISEDITABLE,    // FIELD_isLastPck
+        FD_ISEDITABLE,    // FIELD_senderPriority
         FD_ISEDITABLE,    // FIELD_op
         FD_ISEDITABLE,    // FIELD_interfaceId
     };
-    return (field >= 0 && field < 11) ? fieldTypeFlags[field] : 0;
+    return (field >= 0 && field < 12) ? fieldTypeFlags[field] : 0;
 }
 
 const char *HiTagDescriptor::getFieldName(int field) const
@@ -459,10 +474,11 @@ const char *HiTagDescriptor::getFieldName(int field) const
         "reverse",
         "creationtime",
         "isLastPck",
+        "senderPriority",
         "op",
         "interfaceId",
     };
-    return (field >= 0 && field < 11) ? fieldNames[field] : nullptr;
+    return (field >= 0 && field < 12) ? fieldNames[field] : nullptr;
 }
 
 int HiTagDescriptor::findField(const char *fieldName) const
@@ -478,8 +494,9 @@ int HiTagDescriptor::findField(const char *fieldName) const
     if (strcmp(fieldName, "reverse") == 0) return baseIndex + 6;
     if (strcmp(fieldName, "creationtime") == 0) return baseIndex + 7;
     if (strcmp(fieldName, "isLastPck") == 0) return baseIndex + 8;
-    if (strcmp(fieldName, "op") == 0) return baseIndex + 9;
-    if (strcmp(fieldName, "interfaceId") == 0) return baseIndex + 10;
+    if (strcmp(fieldName, "senderPriority") == 0) return baseIndex + 9;
+    if (strcmp(fieldName, "op") == 0) return baseIndex + 10;
+    if (strcmp(fieldName, "interfaceId") == 0) return baseIndex + 11;
     return base ? base->findField(fieldName) : -1;
 }
 
@@ -501,10 +518,11 @@ const char *HiTagDescriptor::getFieldTypeString(int field) const
         "bool",    // FIELD_reverse
         "omnetpp::simtime_t",    // FIELD_creationtime
         "bool",    // FIELD_isLastPck
+        "uint32_t",    // FIELD_senderPriority
         "int16_t",    // FIELD_op
         "int16_t",    // FIELD_interfaceId
     };
-    return (field >= 0 && field < 11) ? fieldTypeStrings[field] : nullptr;
+    return (field >= 0 && field < 12) ? fieldTypeStrings[field] : nullptr;
 }
 
 const char **HiTagDescriptor::getFieldPropertyNames(int field) const
@@ -596,6 +614,7 @@ std::string HiTagDescriptor::getFieldValueAsString(omnetpp::any_ptr object, int 
         case FIELD_reverse: return bool2string(pp->getReverse());
         case FIELD_creationtime: return simtime2string(pp->getCreationtime());
         case FIELD_isLastPck: return bool2string(pp->isLastPck());
+        case FIELD_senderPriority: return ulong2string(pp->getSenderPriority());
         case FIELD_op: return long2string(pp->getOp());
         case FIELD_interfaceId: return long2string(pp->getInterfaceId());
         default: return "";
@@ -623,6 +642,7 @@ void HiTagDescriptor::setFieldValueAsString(omnetpp::any_ptr object, int field, 
         case FIELD_reverse: pp->setReverse(string2bool(value)); break;
         case FIELD_creationtime: pp->setCreationtime(string2simtime(value)); break;
         case FIELD_isLastPck: pp->setIsLastPck(string2bool(value)); break;
+        case FIELD_senderPriority: pp->setSenderPriority(string2ulong(value)); break;
         case FIELD_op: pp->setOp(string2long(value)); break;
         case FIELD_interfaceId: pp->setInterfaceId(string2long(value)); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'HiTag'", field);
@@ -648,6 +668,7 @@ omnetpp::cValue HiTagDescriptor::getFieldValue(omnetpp::any_ptr object, int fiel
         case FIELD_reverse: return pp->getReverse();
         case FIELD_creationtime: return pp->getCreationtime().dbl();
         case FIELD_isLastPck: return pp->isLastPck();
+        case FIELD_senderPriority: return (omnetpp::intval_t)(pp->getSenderPriority());
         case FIELD_op: return pp->getOp();
         case FIELD_interfaceId: return pp->getInterfaceId();
         default: throw omnetpp::cRuntimeError("Cannot return field %d of class 'HiTag' as cValue -- field index out of range?", field);
@@ -675,6 +696,7 @@ void HiTagDescriptor::setFieldValue(omnetpp::any_ptr object, int field, int i, c
         case FIELD_reverse: pp->setReverse(value.boolValue()); break;
         case FIELD_creationtime: pp->setCreationtime(value.doubleValue()); break;
         case FIELD_isLastPck: pp->setIsLastPck(value.boolValue()); break;
+        case FIELD_senderPriority: pp->setSenderPriority(omnetpp::checked_int_cast<uint32_t>(value.intValue())); break;
         case FIELD_op: pp->setOp(omnetpp::checked_int_cast<int16_t>(value.intValue())); break;
         case FIELD_interfaceId: pp->setInterfaceId(omnetpp::checked_int_cast<int16_t>(value.intValue())); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'HiTag'", field);

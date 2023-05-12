@@ -278,33 +278,28 @@ void HiUdpApp::processPacket(Packet *pck)
 {
     auto addressReq = pck->addTagIfAbsent<L3AddressInd>();
     L3Address this_flow_src = addressReq->getSrcAddress();
+    auto appbitpersec = pck->getBitLength() / (simTime()-last_pck_time).dbl();
+    goodputVector.recordWithTimestamp(simTime(), appbitpersec);
+    EV_INFO << "Received packet: " << UdpSocket::getReceivedPacketInfo(pck) << endl;
 
+    bool last = false;
     for (auto& region : pck->peekData()->getAllTags<HiTag>()){
         this_flow_id = region.getTag()->getFlowId();
         this_flow_creation_time = region.getTag()->getCreationtime();
+        last = region.getTag()->isLastPck();
         EV << "this_flow_id = "<<this_flow_id<<", this_flow_creation_time = "<<this_flow_creation_time<<"s"<<endl;
     }
 
-    auto appbitpersec = pck->getBitLength() / (simTime()-last_pck_time).dbl();
-    goodputVector.recordWithTimestamp(last_pck_time, appbitpersec);
-
-    EV_INFO << "Received packet: " << UdpSocket::getReceivedPacketInfo(pck) << endl;
-
-    if (last_flow_creation_time != this_flow_creation_time)
+    if (last)
     {
+        flow_completion_time[numReceived] = simTime() - this_flow_creation_time;
+        FCT_Vector.record(flow_completion_time[numReceived]);
+        sumFct+=flow_completion_time[numReceived];
+        EV << "newflow, last_flow_completion_time = "<<flow_completion_time[numReceived]<<"s, flowid = "<<this_flow_id<<endl;
         numReceived++;
-        flow_completion_time[numReceived-1] = last_pck_time - last_flow_creation_time;
-        FCT_Vector.record(flow_completion_time[numReceived-1]);
-        sumFct+=flow_completion_time[numReceived-1];
-        EV << "newflow, last_flow_completion_time = "<<flow_completion_time[numReceived-1]<<"s, flowid = "<<last_flow_id<<endl;
     }
-
-    last_flow_creation_time = this_flow_creation_time;
     last_pck_time = simTime();
-    last_flow_id=this_flow_id;
     BytesRcvd+=pck->getByteLength();
-
-    emit(packetReceivedSignal, pck);
     delete pck;
 }
 
@@ -848,7 +843,7 @@ void HiUdpApp::updateNextFlow(const char* TM)
     }
     else if(std::string(TM).find("LongFlow") != std::string::npos)
     {
-        messageLength=100000;
+        messageLength=1000000;
     }
     else if(std::string(TM).find("sendscript") != std::string::npos){
         messageLength = commands[commandIndex].numBytes;

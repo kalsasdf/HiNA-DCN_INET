@@ -80,10 +80,8 @@ class INET_API HiUdpApp : public ClockUserModuleMixin<ApplicationBase>, public U
 
     simtime_t sumFct=0;
     simtime_t this_flow_creation_time=0;
-    simtime_t last_flow_creation_time=0;
-    simtime_t last_pck_time=0;
+    simtime_t last_pck_time = 0;
     int this_flow_id=0;
-    int last_flow_id=0;
 
     virtual int numInitStages() const override { return NUM_INIT_STAGES; }
     virtual void initialize(int stage) override;

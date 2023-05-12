@@ -136,6 +136,7 @@ void POSEIDON::processUpperpck(Packet *pck)
             snd_info.priority = priority;
             if(i==maxPckNum-1){
                 snd_info.length = lastPckLen;
+                snd_info.last = true;
             }else{
                 snd_info.length = max_pck_size;
             }
@@ -175,6 +176,7 @@ void POSEIDON::send_data()
     tag->setPriority(snd_info.priority);
     tag->setCreationtime(snd_info.cretime);
     tag->setPacketId(packetid);
+    tag->setIsLastPck(snd_info.last);
 
     packet->insertAtBack(payload);
 

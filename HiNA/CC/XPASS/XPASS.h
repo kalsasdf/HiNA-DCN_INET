@@ -10,7 +10,6 @@
 
 #include <map>
 #include <queue>
-
 #include <stdlib.h>
 #include <string.h>
 
@@ -48,7 +47,7 @@ class XPASS : public TransportProtocolBase
         SENDSTOP
     };
 
-    typedef struct receiver {
+    struct receiver_flowinfo{
         L3Address destaddr;
         double max_speed;
         double current_speed;
@@ -79,9 +78,9 @@ class XPASS : public TransportProtocolBase
         TimerMsg *alphaTimer = new TimerMsg("alphaTimer");
         TimerMsg *rateTimer = new TimerMsg("rateTimer");
         TimerMsg *sendcredit = new TimerMsg("sendcredit");
-    } receiver_flowinfo;
+    };
 
-    typedef struct sender{
+    struct sender_flowinfo{
         uint32_t flowid;
         simtime_t cretime;
         uint64_t flowsize;
@@ -92,7 +91,7 @@ class XPASS : public TransportProtocolBase
         int destPort;
         CrcMode crcMode;
         uint16_t crc;
-    }sender_flowinfo;
+    };
 
     // configuration for .ned file
     bool activate;

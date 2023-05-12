@@ -106,10 +106,12 @@ void XPASS::processUpperpck(Packet *pck)
         int flowid;
         simtime_t cretime;
         int priority;
+        uint messageLength;
         for (auto& region : pck->peekData()->getAllTags<HiTag>()){
             flowid = region.getTag()->getFlowId();
             cretime = region.getTag()->getCreationtime();
             priority = region.getTag()->getPriority();
+            messageLength = region.getTag()->getFlowSize();
         }
         auto addressReq = pck->addTagIfAbsent<L3AddressReq>();
         auto udpHeader = pck->peekAtFront<UdpHeader>();
@@ -119,20 +121,10 @@ void XPASS::processUpperpck(Packet *pck)
             sender_StateMap[destAddr] = CSTOP_SENT;
         }
 
-        sender_flowinfo snd_info;
-        for (auto& region : pck->peekData()->getAllTags<HiTag>()){
-            snd_info.flowid = region.getTag()->getFlowId();
-            snd_info.flowsize = region.getTag()->getFlowSize();
-            snd_info.cretime = region.getTag()->getCreationtime();
-            EV << "store new flow, id = "<<snd_info.flowid<<", size = "<<snd_info.flowsize<<
-                    ", creationtime = "<<snd_info.cretime<<endl;
-        }
-        if(sender_flowMap.find(flowid)!=sender_flowMap.end()){
-            sender_flowMap[flowid].flowsize+=pck->getByteLength();
-        }else{
+        if(sender_flowMap.find(flowid)==sender_flowMap.end()){
             sender_flowinfo snd_info;
             snd_info.flowid = flowid;
-            snd_info.flowsize = pck->getByteLength();
+            snd_info.flowsize = messageLength;
             snd_info.cretime = cretime;
             snd_info.priority = priority;
             snd_info.destaddr = destAddr;
@@ -143,13 +135,12 @@ void XPASS::processUpperpck(Packet *pck)
             EV << "store new flow, id = "<<snd_info.flowid<<", size = "<<snd_info.flowsize<<
                     ", creationtime = "<<snd_info.cretime<<endl;
             sender_flowMap[snd_info.flowid] = snd_info;
-
+            remainSize += snd_info.flowsize;
         }
-        remainSize += snd_info.flowsize;
+        delete pck;
 
         if(sender_StateMap[destAddr]==CSTOP_SENT)
             send_credreq(destAddr);
-        delete pck;
     }
     else
     {
@@ -314,6 +305,7 @@ void XPASS::receive_credit(Packet *pck)
         str << packetName << "-" <<flowid<<"-"<<packetid;
         Packet *packet = new Packet(str.str().c_str());
         int packetLength;
+        bool last = false;
         if (sndflow.flowsize >= max_pck_size)
         {
             remainSize -=  max_pck_size;
@@ -322,6 +314,7 @@ void XPASS::receive_credit(Packet *pck)
         }
         else if(remainSize>=max_pck_size)
         {
+            last = true;
             sender_flowMap.erase(flowid);
             sender_flowMap.begin()->second.flowsize-=(max_pck_size-sndflow.flowsize);
             remainSize -= max_pck_size;
@@ -337,6 +330,8 @@ void XPASS::receive_credit(Packet *pck)
         tag->setFlowId(flowid);
         tag->setPacketId(packetid);
         tag->setCreationtime(sndflow.cretime);
+        if(last)
+            tag->setIsLastPck(true);
 
         packet->insertAtBack(payload);
 

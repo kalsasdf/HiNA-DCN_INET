@@ -23,4 +23,5 @@ class TimerMsg extends cMessage{
      uint32_t FlowId;
      int PacketId;
    	 uint32_t Priority;
+   	 int seq;
 }

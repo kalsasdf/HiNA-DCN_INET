@@ -85,25 +85,23 @@ void TIMELY::processUpperpck(Packet *pck)
         int flowid;
         simtime_t cretime;
         int priority;
+        uint messageLength;
         for (auto& region : pck->peekData()->getAllTags<HiTag>()){
             flowid = region.getTag()->getFlowId();
             cretime = region.getTag()->getCreationtime();
             priority = region.getTag()->getPriority();
+            messageLength = region.getTag()->getFlowSize();
         }
-        if(sender_flowMap.find(flowid)!=sender_flowMap.end()){
-            sender_flowMap[flowid].remainLength+=pck->getByteLength();
-        }else{
+        if(sender_flowMap.find(flowid)==sender_flowMap.end()){
             sender_flowinfo snd_info;
-            snd_info.flowid = flowid;
-            EV << "store new flow, id = "<<snd_info.flowid<<
-                    ", creationtime = "<<snd_info.cretime<<endl;
             auto addressReq = pck->addTagIfAbsent<L3AddressReq>();
             srcAddr = addressReq->getSrcAddress();
             L3Address destAddr = addressReq->getDestAddress();
-
             auto udpHeader = pck->removeAtFront<UdpHeader>();
 
-            snd_info.remainLength = pck->getByteLength();
+            snd_info.flowid = flowid;
+            snd_info.remainLength = messageLength;
+            snd_info.cretime = cretime;
             snd_info.destAddr = destAddr;
             snd_info.srcPort = udpHeader->getSrcPort();
             snd_info.destPort = udpHeader->getDestPort();
@@ -117,6 +115,8 @@ void TIMELY::processUpperpck(Packet *pck)
             }else{
                 sender_flowMap[snd_info.flowid]=snd_info;
             }
+            EV << "store new flow, id = "<<snd_info.flowid<<
+                    ", creationtime = "<<snd_info.cretime<<endl;
         }
         delete pck;
         if(SenderState==STOPPING){

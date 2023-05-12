@@ -26,6 +26,7 @@ protected:
 
     enum SelfpckKindValues {
         SENDDATA,
+        CNPTIMER
     };
 
     struct sender_flowinfo{
@@ -45,17 +46,17 @@ protected:
     };
 
     struct receiver_flowinfo{
-        simtime_t nowHTT; // Half Trip Time, from sender to receiver.
-        simtime_t lastCnpTime;
+        simtime_t intervaltime;
+        simtime_t lastPckTime;
         bool ecnPakcetReceived;
         double recRate;
         int recNum;
         int64_t recData;
         int ecnNum;
-        int cnp_interval_num;
         uint32_t flowid;
         L3Address Sender_srcAddr;
         L3Address Sender_destAddr;
+        TimerMsg *cnptimer = new TimerMsg("cnptimer");
     };
 
     TimerMsg *senddata = nullptr;
@@ -88,7 +89,12 @@ protected:
     virtual void handleMessage(cMessage *msg) override;
     virtual void handleSelfMessage(cMessage *msg) override;
     virtual void refreshDisplay() const override;
-    virtual ~PCN() {cancelEvent(senddata); delete senddata;}
+    virtual ~PCN() {cancelEvent(senddata); delete senddata;
+    for(auto i: receiver_flowMap){
+        cancelEvent(i.second.cnptimer);
+        delete i.second.cnptimer;
+    }
+    }
     /**
      * Should be redefined to send out the packet; e.g. <tt>send(pck,"out")</tt>.
      */

@@ -44,6 +44,7 @@ protected:
         uint16_t crc;
         uint32_t priority;
         simtime_t cretime;
+        bool last = false;
     };
 
     struct receiver_info{

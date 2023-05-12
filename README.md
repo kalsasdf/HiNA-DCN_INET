@@ -1,5 +1,7 @@
-[HiNA-DCN inet项目.docx](https://github.com/kalsasdf/HiNA-DCN_INET/files/11402183/HiNA-DCN.inet.docx)
 
+[HiNA-DCN inet项目.docx](https://github.com/kalsasdf/HiNA-DCN_INET/files/11459707/HiNA-DCN.inet.docx)
+
+2023-5-12 新增HOMA；使用HiTag中的isLastPck标识优化了测量FCT的功能
 
 2023-5-4 修复超时重传没考虑STOPPING状态的问题；优化共享缓存PFC的阈值判断
 

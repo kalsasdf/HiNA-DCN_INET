@@ -76,6 +76,7 @@ void DCQCN::handleSelfMessage(cMessage *pck)
         {
             sender_flowinfo sndinfo = sender_flowMap.find(timer->getFlowId())->second;
             sndinfo.TimeFrSteps++;
+            sender_flowMap[timer->getFlowId()]=sndinfo;
             increaseTxRate(timer->getFlowId());
             cancelEvent(sndinfo.rateTimer);
             sndinfo.rateTimer->setKind(RATETIMER);
@@ -122,6 +123,7 @@ void DCQCN::processUpperpck(Packet *pck)
             snd_info.crcMode = udpHeader->getCrcMode();
             snd_info.crc = udpHeader->getCrc();
             snd_info.currentRate = linkspeed*initialrate;
+            snd_info.maxTxRate = linkspeed;
             snd_info.targetRate = snd_info.currentRate;
             snd_info.rateTimer =  new TimerMsg("rateTimer");
             snd_info.rateTimer->setKind(RATETIMER);
@@ -214,8 +216,11 @@ void DCQCN::send_data()
             snd_info.ByteCounter += packet->getByteLength();
             if (snd_info.ByteCounter >= ByteCounter_th)
             {
-                snd_info.ByteFrSteps++;
-                snd_info.ByteCounter = 0;
+//                snd_info.ByteFrSteps++;
+//                snd_info.ByteCounter = 0;
+//                sender_flowMap[snd_info.flowid]=sndinfo;
+                sender_flowMap[snd_info.flowid].ByteFrSteps++;
+                sender_flowMap[snd_info.flowid].ByteCounter = 0;
                 EV<<"byte counter expired, byte fr steps = "<<snd_info.ByteFrSteps<<endl;
                 increaseTxRate(snd_info.flowid);
             }
@@ -255,7 +260,7 @@ void DCQCN::receive_data(Packet *pck)
     for (auto& region : pck->peekData()->getAllTags<HiTag>()){
         flowid = region.getTag()->getFlowId();
     }
-    EV<<"receive packet, ecn = "<<ecn<<", flowid = "<<flowid<<endl;
+    EV<<"receive packet, ecn = "<<ecn<<", flowid = "<<flowid<<", cnpinterval = "<<simTime()-lastCnpTime[flowid]<<endl;
     if (ecn == 3&&simTime()-lastCnpTime[flowid]>min_cnp_interval) // ecn==1, enabled; ecn==3, marked.
     {
         Packet *cnp = new Packet("CNP");
@@ -280,14 +285,15 @@ void DCQCN::receive_cnp(Packet *pck)
     for (auto& region : pck->peekData()->getAllTags<HiTag>()){
         flowid = region.getTag()->getFlowId();
     }
+    EV<<"receive cnp, flowid = "<<flowid<<endl;
     if(sender_flowMap.find(flowid)!=sender_flowMap.end()){
         sender_flowinfo sndinfo = sender_flowMap.find(flowid)->second;
         // cut rate
         sndinfo.targetRate = sndinfo.currentRate;
         sndinfo.currentRate = sndinfo.currentRate * (1 - sndinfo.alpha/2);
         sndinfo.alpha = (1 - gamma) * sndinfo.alpha + gamma;
-        EV<<"after cutting, the current rate = "<<sndinfo.currentRate<<
-                ", target rate = "<<sndinfo.targetRate<<endl;
+        EV<<"after decreasing, the current rate = "<<sndinfo.currentRate<<
+                ", target rate = "<<sndinfo.targetRate<<", alpha = "<<sndinfo.alpha<<endl;
 
         // reset timers and counter
         sndinfo.ByteCounter = 0;
@@ -311,6 +317,7 @@ void DCQCN::receive_cnp(Packet *pck)
 void DCQCN::increaseTxRate(uint32_t flowid)
 {
     sender_flowinfo sndinfo = sender_flowMap.find(flowid)->second;
+    EV<<"enter increasing, ByteFrSteps = "<<sndinfo.ByteFrSteps<<", TimeFrSteps = "<<sndinfo.TimeFrSteps<<endl;
 
     if (max(sndinfo.ByteFrSteps,sndinfo.TimeFrSteps) < frSteps_th)
     {
@@ -324,7 +331,7 @@ void DCQCN::increaseTxRate(uint32_t flowid)
     {
         sndinfo.SenderAcceleratingState = Additive_Increase;
     }
-    EV<<"entering incease rate, sender state = "<<sndinfo.SenderAcceleratingState<<endl;
+    EV<<"sender state = "<<sndinfo.SenderAcceleratingState<<", current rate = "<<sndinfo.currentRate<<", target rate = "<<sndinfo.targetRate<<endl;
 
     if (sndinfo.SenderAcceleratingState == Fast_Recovery)
     {// Fast Recovery
@@ -353,6 +360,7 @@ void DCQCN::updateAlpha(uint32_t flowid)
 {
     sender_flowinfo sndinfo = sender_flowMap.find(flowid)->second;
     sndinfo.alpha = (1 - gamma) * sndinfo.alpha;
+    EV<<"updateAlpha, new alpha = "<<sndinfo.alpha<<endl;
     sender_flowMap[flowid] = sndinfo;
     scheduleAt(simTime() + AlphaTimer_th, sndinfo.alphaTimer);
 }

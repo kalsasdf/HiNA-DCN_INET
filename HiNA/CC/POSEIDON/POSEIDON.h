@@ -65,7 +65,7 @@ protected:
     bool can_decrease = true;
     simtime_t RTT_S = 0;
     simtime_t RTT_D = 0;
-    simtime_t RTO = 0;
+    simtime_t RTO = 0.1;
     double RTO_alpha = 0.125;
     double RTO_beta = 0.25;
     double min_cwnd = 0.0001;

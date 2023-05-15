@@ -73,7 +73,7 @@ protected:
 
     simtime_t RTT_S = 0;
     simtime_t RTT_D = 0;
-    simtime_t RTO = 0;
+    simtime_t RTO = 0.1;
     simtime_t t_last_decrease = 0;
     double RTO_alpha = 0.125;
     double RTO_beta = 0.25;

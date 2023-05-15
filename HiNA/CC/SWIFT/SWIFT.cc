@@ -208,6 +208,8 @@ void SWIFT::send_data()
     EV<<"packet length = "<<packet->getByteLength()<<endl;
 
     sendDown(packet);
+    cancelEvent(timeout);
+    scheduleAt(simTime() + RTO, timeout);
 
     if(FAST_RECOVERY){
         if(!sacks_array_snd.empty())
@@ -231,6 +233,7 @@ void SWIFT::send_data()
     }
     else if(snd_cwnd>=1){
         if(snd_cwnd-(nxtSendpacketid-snd_una)>0){
+            EV<<"snd_cwnd = "<<snd_cwnd<<", sended window - "<<packetid-snd_una<<endl;
             scheduleAt(simTime(),senddata);
         }
         else{
@@ -239,6 +242,7 @@ void SWIFT::send_data()
         }
     }
     else if(snd_cwnd<1){
+        EV<<"snd_cwnd < 1, nxtSendtime = "<<simTime()+pacing_delay<<endl;
         cancelEvent(senddata);
         scheduleAt(simTime()+pacing_delay,senddata);
     }
@@ -537,7 +541,7 @@ void SWIFT::receive_ack(Packet *pck)
     {
         pacing_delay = 0;
     }
-//    send_window=snd_cwnd;
+    EV<<"pacing_delay = "<<pacing_delay<<"s"<<endl;
     if(SenderState==PAUSING){
         SenderState=SENDING;
         scheduleAt(simTime(),senddata);
@@ -548,8 +552,8 @@ void SWIFT::receive_ack(Packet *pck)
 void SWIFT::time_out()
 {
     timeout_num++;
-
     retransmit_cnt++;
+    EV<<"time out, retransmit_cnt = "<<retransmit_cnt<<endl;
 
     if(retransmit_cnt > RETX_RESET_THRESHOLD)
         snd_cwnd = min_cwnd;
@@ -558,6 +562,14 @@ void SWIFT::time_out()
     {
         snd_cwnd = (1 - max_mdf) * snd_cwnd;
         can_decrease = false;
+    }
+    if(snd_cwnd < 1)
+    {
+        pacing_delay = currentRTT / snd_cwnd;
+
+    }else if (snd_cwnd >=1)
+    {
+        pacing_delay = 0;
     }
     RTO *= 2;  // 典型RTO机制，超时后时间乘2
     if(SenderState!=STOPPING){

@@ -216,9 +216,6 @@ void DCQCN::send_data()
             snd_info.ByteCounter += packet->getByteLength();
             if (snd_info.ByteCounter >= ByteCounter_th)
             {
-//                snd_info.ByteFrSteps++;
-//                snd_info.ByteCounter = 0;
-//                sender_flowMap[snd_info.flowid]=sndinfo;
                 sender_flowMap[snd_info.flowid].ByteFrSteps++;
                 sender_flowMap[snd_info.flowid].ByteCounter = 0;
                 EV<<"byte counter expired, byte fr steps = "<<snd_info.ByteFrSteps<<endl;

@@ -207,6 +207,8 @@ void POSEIDON::send_data()
 
     sendDown(packet);
     nxtSendpacketid = packetid+1;
+    cancelEvent(timeout);
+    scheduleAt(simTime() + RTO, timeout);
 
     if(sender_packetMap.find(nxtSendpacketid)==sender_packetMap.end()){
         EV<<"packet run out, stopping"<<endl;
@@ -214,6 +216,7 @@ void POSEIDON::send_data()
     }
     else if(snd_cwnd>=1){
         if(snd_cwnd-(nxtSendpacketid-snd_una)>0){
+            EV<<"snd_cwnd = "<<snd_cwnd<<", sended window - "<<packetid-snd_una<<endl;
             cancelEvent(senddata);
             scheduleAt(simTime(),senddata);
         }
@@ -223,6 +226,7 @@ void POSEIDON::send_data()
         }
     }
     else if(snd_cwnd<1){
+        EV<<"snd_cwnd < 1, nxtSendtime = "<<simTime()+pacing_delay<<endl;
         cancelEvent(senddata);
         scheduleAt(simTime()+pacing_delay,senddata);
     }
@@ -359,7 +363,7 @@ void POSEIDON::receiveAck(Packet *pck)
         pacing_delay = 0;
     }
     currentRate = snd_cwnd*1538*8/baseRTT;
-    EV<<"currentRTT = "<<currentRTT<<"s, the ACK computed rate is "<<currentRate<<endl;
+    EV<<"currentRTT = "<<currentRTT<<"s, "<<"pacing_delay = "<<pacing_delay<<"s, the ACK computed rate is "<<currentRate<<endl;
 
     if(SenderState==PAUSING){
         SenderState=SENDING;
@@ -371,8 +375,8 @@ void POSEIDON::receiveAck(Packet *pck)
 void POSEIDON::time_out()
 {
     timeout_num++;
-
     retransmit_cnt++;
+    EV<<"time out, retransmit_cnt = "<<retransmit_cnt<<endl;
 
     if(retransmit_cnt > RETX_RESET_THRESHOLD){
         snd_cwnd = min_cwnd;
@@ -380,6 +384,14 @@ void POSEIDON::time_out()
     {
         snd_cwnd = (1 - min_md) * snd_cwnd;
         can_decrease = false;
+    }
+    if(snd_cwnd < 1)
+    {
+        pacing_delay = currentRTT / snd_cwnd;
+
+    }else if (snd_cwnd >=1)
+    {
+        pacing_delay = 0;
     }
     RTO *= 2;  // 典型RTO机制，超时后时间乘2
     if(SenderState!=STOPPING){

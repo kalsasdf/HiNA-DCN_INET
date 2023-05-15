@@ -295,7 +295,7 @@ void HiUdpApp::processPacket(Packet *pck)
         flow_completion_time[numReceived] = simTime() - this_flow_creation_time;
         FCT_Vector.record(flow_completion_time[numReceived]);
         sumFct+=flow_completion_time[numReceived];
-        EV << "newflow, last_flow_completion_time = "<<flow_completion_time[numReceived]<<"s, flowid = "<<this_flow_id<<endl;
+        EV << "flow ends, this_flow_creation_time = "<<this_flow_creation_time<<"s, fct = "<<flow_completion_time[numReceived]<<"s, flowid = "<<this_flow_id<<endl;
         numReceived++;
     }
     last_pck_time = simTime();
@@ -843,7 +843,7 @@ void HiUdpApp::updateNextFlow(const char* TM)
     }
     else if(std::string(TM).find("LongFlow") != std::string::npos)
     {
-        messageLength=1000000;
+        messageLength=100000000;
     }
     else if(std::string(TM).find("sendscript") != std::string::npos){
         messageLength = commands[commandIndex].numBytes;

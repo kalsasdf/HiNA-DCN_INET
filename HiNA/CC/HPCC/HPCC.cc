@@ -131,11 +131,7 @@ void HPCC::processUpperpck(Packet *pck)
                 snd_info.length = max_pck_size;
             }
 
-            if(sender_packetMap.empty()){
-                sender_packetMap[packetid]=snd_info;
-            }else{
-                sender_packetMap[packetid]=snd_info;
-            }
+            sender_packetMap[packetid]=snd_info;
             if(SenderState==STOPPING){
                 SenderState=SENDING;
                 scheduleAt(simTime(),senddata);

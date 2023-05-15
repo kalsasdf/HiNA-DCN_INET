@@ -194,7 +194,7 @@ void HiUdpApp::processSend()
         }else{
             sendPacket(messageLength);
             flowid++;
-            simtime_t txTime = simtime_t((messageLength+ceil(messageLength/1472)*66)*8/linkSpeed);
+            simtime_t txTime = simtime_t((messageLength+ceil(double(messageLength)/1472)*66)*8/linkSpeed);
             //66=8(UDP)+20(IP)+14(EthernetMac)+8(EthernetPhy)+4(EthernetFcs)+12(interframe gap,IFG)
             simtime_t d = simTime() + txTime/workLoad;
             if(std::string(trafficMode).find("sendscript") != std::string::npos&&++commandIndex < (int)commands.size()){
@@ -215,7 +215,7 @@ void HiUdpApp::processSend()
         if(count==0){
             sendPacket(messageLength-num*65527);
             flowid++;
-            simtime_t txTime = simtime_t((messageLength+ceil(messageLength/1472)*66)*8/linkSpeed);
+            simtime_t txTime = simtime_t((messageLength+ceil(double(messageLength)/1472)*66)*8/linkSpeed);
             //66=8(UDP)+20(IP)+14(EthernetMac)+8(EthernetPhy)+4(EthernetFcs)+12(interframe gap,IFG)
             simtime_t d = simTime() + txTime/workLoad;
             if(std::string(trafficMode).find("sendscript") != std::string::npos&&++commandIndex < (int)commands.size()){
@@ -843,7 +843,7 @@ void HiUdpApp::updateNextFlow(const char* TM)
     }
     else if(std::string(TM).find("LongFlow") != std::string::npos)
     {
-        messageLength=100000000;
+        messageLength=10000;
     }
     else if(std::string(TM).find("sendscript") != std::string::npos){
         messageLength = commands[commandIndex].numBytes;

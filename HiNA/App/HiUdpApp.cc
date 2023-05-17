@@ -351,12 +351,11 @@ void HiUdpApp::parseScript(const char *script)
 //            SCRIPT_FILE.close();
 //        }
 //    }
-//    delete[] buffer;
     // else{} 为空时，script指向空串 ""，表示既未指定脚本文件路径、又没有指定ini字符串参数
     // ------------------------------------------------------------------------
     const char *s = script;
 
-    EV_DEBUG << "parse script \"" << script << "\"\n";
+    EV << "parse script \"" << script << "\"\n";
     while (*s) {
         // parse time
         while (isspace(*s))
@@ -402,8 +401,8 @@ void HiUdpApp::parseScript(const char *script)
         while (isspace(*s))
             s++;
     }
-
-    EV_DEBUG << "parser finished\n";
+    //    delete[] buffer;
+    EV << "parser finished\n";
 }
 
 void HiUdpApp::updateNextFlow(const char* TM)

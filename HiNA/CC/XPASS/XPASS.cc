@@ -236,6 +236,7 @@ void XPASS::receive_credreq(Packet *pck)
             rcvflow = receiver_flowMap[l3addr->getSrcAddress()];
         }
         EV<<"receive credreq, nowRTT = "<<rcvflow.nowRTT<<endl;
+        cancelEvent(rcvflow.sendcredit);
         scheduleAt(simTime(),rcvflow.sendcredit);
         receiver_StateMap[l3addr->getSrcAddress()]=CREDIT_SENDING;
         delete pck;

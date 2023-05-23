@@ -1,6 +1,6 @@
 [HiNA-DCN inet项目.docx](https://github.com/kalsasdf/HiNA-DCN_INET/files/11478140/HiNA-DCN.inet.docx)
 
-2023-5-23 将非标准结构的包的payload字段enableImplicitChunkSerailization置为true，使其可以在release模式下的仿真中点开而不需要额外的序列化文件
+2023-5-23 修复所有TimerMsg在仿真结束后没能正确删除而弹出的警告；将非标准结构的包（如credit、ack等）的payload字段enableImplicitChunkSerailization置为true，使其可以在release模式下的仿真中点开而不需要额外的序列化文件
 
 2023-5-12 新增HOMA；使用HiTag中的isLastPck标识优化了测量FCT的功能
 

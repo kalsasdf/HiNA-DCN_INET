@@ -232,6 +232,7 @@ void PCN::receive_data(Packet *pck)
         rcvinfo.recNum = 1;
         rcvinfo.recData = pck->getBitLength();
         rcvinfo.lastPckTime = simTime();
+        rcvinfo.cnptimer = new TimerMsg("cnptimer");
         rcvinfo.cnptimer->setKind(CNPTIMER);
         rcvinfo.cnptimer->setFlowId(flowid);
         scheduleAt(simTime()+min_cnp_interval,rcvinfo.cnptimer);
@@ -293,6 +294,7 @@ void PCN::send_cnp(uint32_t flowid)
         recRateChunk->setRecRate(rcvinfo.recRate);
         auto tag = recRateChunk->addTag<HiTag>();
         tag->setFlowId(flowid);
+
         cnp->insertAtFront(recRateChunk);
         EV_INFO << "recRate = "<< rcvinfo.recRate <<endl;
 

@@ -56,7 +56,7 @@ protected:
         uint32_t flowid;
         L3Address Sender_srcAddr;
         L3Address Sender_destAddr;
-        TimerMsg *cnptimer = new TimerMsg("cnptimer");
+        TimerMsg *cnptimer;
     };
 
     TimerMsg *senddata = nullptr;

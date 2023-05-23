@@ -842,7 +842,7 @@ void HiUdpApp::updateNextFlow(const char* TM)
     }
     else if(std::string(TM).find("LongFlow") != std::string::npos)
     {
-        messageLength=10000;
+        messageLength=10000000;
     }
     else if(std::string(TM).find("sendscript") != std::string::npos){
         messageLength = commands[commandIndex].numBytes;

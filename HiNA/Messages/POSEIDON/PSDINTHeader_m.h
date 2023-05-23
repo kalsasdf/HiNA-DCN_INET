@@ -2,8 +2,8 @@
 // Generated file, do not edit! Created by opp_msgtool 6.0 from inet/HiNA/Messages/POSEIDON/PSDINTHeader.msg.
 //
 
-#ifndef __INET_INET_HINA_MESSAGES_POSEIDON_PSDINTHEADER_M_H
-#define __INET_INET_HINA_MESSAGES_POSEIDON_PSDINTHEADER_M_H
+#ifndef __INET_PSDINTHEADER_M_H
+#define __INET_PSDINTHEADER_M_H
 
 #if defined(__clang__)
 #  pragma clang diagnostic ignored "-Wreserved-id-macro"
@@ -42,7 +42,7 @@ class PSDINTHeader;
 namespace inet {
 
 /**
- * Class generated from <tt>inet\HiNA\Messages\POSEIDON\PSDINTHeader.msg:21</tt> by opp_msgtool.
+ * Class generated from <tt>inet/HiNA/Messages/POSEIDON/PSDINTHeader.msg:21</tt> by opp_msgtool.
  * <pre>
  * class PSDINTHeader extends FieldsChunk
  * {
@@ -93,5 +93,5 @@ template<> inline inet::PSDINTHeader *fromAnyPtr(any_ptr ptr) { return check_and
 
 }  // namespace omnetpp
 
-#endif // ifndef __INET_INET_HINA_MESSAGES_POSEIDON_PSDINTHEADER_M_H
+#endif // ifndef __INET_PSDINTHEADER_M_H
 

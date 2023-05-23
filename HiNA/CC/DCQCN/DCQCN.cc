@@ -260,10 +260,13 @@ void DCQCN::receive_data(Packet *pck)
     EV<<"receive packet, ecn = "<<ecn<<", flowid = "<<flowid<<", cnpinterval = "<<simTime()-lastCnpTime[flowid]<<endl;
     if (ecn == 3&&simTime()-lastCnpTime[flowid]>min_cnp_interval) // ecn==1, enabled; ecn==3, marked.
     {
-        Packet *cnp = new Packet("CNP");
+        std::ostringstream str;
+        str << "CNP-" <<flowid;
+        Packet *cnp = new Packet(str.str().c_str());
         const auto& payload = makeShared<ByteCountChunk>(B(1));
         auto tag = payload->addTag<HiTag>();
         tag->setFlowId(flowid);
+        payload->enableImplicitChunkSerialization = true;
         cnp->insertAtBack(payload);
         cnp->addTagIfAbsent<L3AddressReq>()->setDestAddress(rcv_srcAddr);
         cnp->addTagIfAbsent<L3AddressReq>()->setSrcAddress(rcv_destAddr);

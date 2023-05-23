@@ -75,9 +75,9 @@ class XPASS : public TransportProtocolBase
         double normalized_gradient;
         double targetRate;
         double modeflag;
-        TimerMsg *alphaTimer = new TimerMsg("alphaTimer");
-        TimerMsg *rateTimer = new TimerMsg("rateTimer");
-        TimerMsg *sendcredit = new TimerMsg("sendcredit");
+        TimerMsg *alphaTimer;
+        TimerMsg *rateTimer;
+        TimerMsg *sendcredit;
     };
 
     struct sender_flowinfo{

@@ -2,8 +2,8 @@
 // Generated file, do not edit! Created by opp_msgtool 6.0 from inet/HiNA/Messages/HiTag/HiTag.msg.
 //
 
-#ifndef __INET_INET_HINA_MESSAGES_HITAG_HITAG_M_H
-#define __INET_INET_HINA_MESSAGES_HITAG_HITAG_M_H
+#ifndef __INET_HITAG_M_H
+#define __INET_HITAG_M_H
 
 #if defined(__clang__)
 #  pragma clang diagnostic ignored "-Wreserved-id-macro"
@@ -44,7 +44,7 @@ class HiTag;
 namespace inet {
 
 /**
- * Class generated from <tt>inet\HiNA\Messages\HiTag\HiTag.msg:13</tt> by opp_msgtool.
+ * Class generated from <tt>inet/HiNA/Messages/HiTag/HiTag.msg:13</tt> by opp_msgtool.
  * <pre>
  * class HiTag extends TagBase
  * {
@@ -146,5 +146,5 @@ template<> inline inet::HiTag *fromAnyPtr(any_ptr ptr) { return check_and_cast<i
 
 }  // namespace omnetpp
 
-#endif // ifndef __INET_INET_HINA_MESSAGES_HITAG_HITAG_M_H
+#endif // ifndef __INET_HITAG_M_H
 

@@ -162,7 +162,7 @@ void HPCC::send_data()
     tag->setCreationtime(snd_info.cretime);
     tag->setPacketId(packetid);
     tag->setIsLastPck(snd_info.last);
-
+    payload->enableImplicitChunkSerialization = true;
     packet->insertAtBack(payload);
 
     //generate and insert a new udpHeader, set source and destination port
@@ -249,6 +249,7 @@ void HPCC::receive_data(Packet *pck)
             const auto& payload = makeShared<ByteCountChunk>(B(1));
             auto tag = payload->addTag<HiTag>();
             tag->setPacketId(curRcvNum);
+            payload->enableImplicitChunkSerialization = true;
             intinfo->insertAtBack(payload);
 
             intinfo->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::udp);
@@ -274,6 +275,7 @@ void HPCC::receive_data(Packet *pck)
             const auto& payload = makeShared<ByteCountChunk>(B(1));
             auto tag = payload->addTag<HiTag>();
             tag->setPacketId(receiver_packetMap[srcAddr]);
+            payload->enableImplicitChunkSerialization = true;
             intinfo->insertAtBack(payload);
 
             intinfo->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::udp);
@@ -304,6 +306,7 @@ void HPCC::receive_data(Packet *pck)
             const auto& payload = makeShared<ByteCountChunk>(B(1));
             auto tag = payload->addTag<HiTag>();
             tag->setPacketId(curRcvNum);
+            payload->enableImplicitChunkSerialization = true;
             intinfo->insertAtBack(payload);
 
             intinfo->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::udp);
@@ -330,6 +333,7 @@ void HPCC::receive_data(Packet *pck)
             const auto& payload = makeShared<ByteCountChunk>(B(1));
             auto tag = payload->addTag<HiTag>();
             tag->setPacketId(receiver_packetMap[srcAddr]);
+            payload->enableImplicitChunkSerialization = true;
             intinfo->insertAtBack(payload);
 
             intinfo->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::udp);

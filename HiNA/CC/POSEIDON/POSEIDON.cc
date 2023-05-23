@@ -170,7 +170,7 @@ void POSEIDON::send_data()
     auto tag = payload->addTag<HiTag>();
     tag->setFlowId(snd_info.flowid);
     tag->setPriority(snd_info.priority);
-    tag->setCreationtime(snd_info.cretime);
+    tag->setCreationtime(simTime());
     tag->setPacketId(packetid);
     tag->setIsLastPck(snd_info.last);
 
@@ -264,6 +264,7 @@ void POSEIDON::receive_data(Packet *pck)
     const auto& payload = makeShared<ByteCountChunk>(B(1));
     auto tag = payload->addTag<HiTag>();
     tag->setPacketId(curRcvNum);
+    payload->enableImplicitChunkSerialization = true;
     intinfo->insertAtBack(payload);
 
     intinfo->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::udp);

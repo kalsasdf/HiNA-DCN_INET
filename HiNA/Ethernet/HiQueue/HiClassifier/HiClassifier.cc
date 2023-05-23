@@ -46,17 +46,14 @@ void HiClassifier::handleMessage(cMessage *msg)
     if(!strcmp(packet->getFullName(),"credit"))
     {
         EV<<"send to creditqueue"<<endl;
-//        sendDelayed(packet,0.00000005,"creditOut");
         send(packet, "creditOut");
     }
     else if (index >= 0){
         EV<<"send to "<<index<<endl;
-//        sendDelayed(packet,0.00000005,"out",index);
         send(packet, "out", index);
     }
     else{
         EV<<"send to default queue"<<endl;
-//        sendDelayed(packet,0.00000005,"defaultOut");
         send(packet, "defaultOut");
     }
 

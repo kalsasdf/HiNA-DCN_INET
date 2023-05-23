@@ -178,7 +178,7 @@ void SWIFT::send_data()
     auto tag = payload->addTag<HiTag>();
     tag->setFlowId(snd_info.flowid);
     tag->setPriority(snd_info.priority);
-    tag->setCreationtime(snd_info.cretime);
+    tag->setCreationtime(simTime());
     tag->setPacketId(packetid);
     tag->setIsLastPck(snd_info.last);
 
@@ -284,6 +284,7 @@ void SWIFT::receive_data(Packet *pck)
             const auto& payload = makeShared<ByteCountChunk>(B(1));
             auto tag=payload->addTag<HiTag>();
             tag->setPacketId(curRcvNum);
+            payload->enableImplicitChunkSerialization = true;
             ack->insertAtBack(payload);
 
             auto addressReq = ack->addTagIfAbsent<L3AddressReq>();
@@ -308,6 +309,7 @@ void SWIFT::receive_data(Packet *pck)
             const auto& payload = makeShared<ByteCountChunk>(B(1));
             auto tag=payload->addTag<HiTag>();
             tag->setPacketId(receiver_Map[srcAddr].rcv_nxt);
+            payload->enableImplicitChunkSerialization = true;
             sack->insertAtBack(payload);
 
             auto content = makeShared<SACK>();
@@ -352,6 +354,7 @@ void SWIFT::receive_data(Packet *pck)
             const auto& payload = makeShared<ByteCountChunk>(B(1));
             auto tag=payload->addTag<HiTag>();
             tag->setPacketId(curRcvNum);
+            payload->enableImplicitChunkSerialization = true;
             ack->insertAtBack(payload);
 
             auto addressReq = ack->addTagIfAbsent<L3AddressReq>();
@@ -404,6 +407,7 @@ void SWIFT::receive_data(Packet *pck)
             const auto& payload = makeShared<ByteCountChunk>(B(1));
             auto tag=payload->addTag<HiTag>();
             tag->setPacketId(receiver_Map[srcAddr].rcv_nxt);
+            payload->enableImplicitChunkSerialization = true;
             sack->insertAtBack(payload);
 
             auto content = makeShared<SACK>();
@@ -517,11 +521,9 @@ void SWIFT::receive_ack(Packet *pck)
         }
     }
 
-    snd_cwnd = temp_cwnd;
-    cwndVector.recordWithTimestamp(simTime(), snd_cwnd);
-
-    snd_cwnd = math::clamp(snd_cwnd,min_cwnd,max_cwnd);
+    snd_cwnd = math::clamp(temp_cwnd,min_cwnd,max_cwnd);
     EV<<"after changing cwnd is "<<snd_cwnd<<endl;
+    cwndVector.recordWithTimestamp(simTime(), snd_cwnd);
 
     if(snd_cwnd < cwnd_prev)
     {

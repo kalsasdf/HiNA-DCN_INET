@@ -224,10 +224,13 @@ void XPASS::receive_credreq(Packet *pck)
             rcvflow.iRhai=0;
             rcvflow.previousincrease = false;
             rcvflow.ReceiverState=Normal;
+            rcvflow.rateTimer = new TimerMsg("rateTimer");
             rcvflow.rateTimer->setKind(RATETIMER);
             rcvflow.rateTimer->setDestAddr(l3addr->getSrcAddress());
+            rcvflow.alphaTimer = new TimerMsg("alphaTimer");
             rcvflow.alphaTimer->setKind(ALPHATIMER);
             rcvflow.alphaTimer->setDestAddr(l3addr->getSrcAddress());
+            rcvflow.sendcredit = new TimerMsg("sendcredit");
             rcvflow.sendcredit->setKind(SENDCRED);
             rcvflow.sendcredit->setDestAddr(l3addr->getSrcAddress());
 
@@ -255,7 +258,7 @@ void XPASS::send_credit(L3Address destaddr)
     tag->setPacketId(rcvflow.now_send_cdt_seq);
     content->enableImplicitChunkSerialization = true;
 
-    credit->insertAtFront(content);
+    credit->insertAtBack(content);
 
     credit->setTimestamp(simTime());
     credit->addTagIfAbsent<L3AddressReq>()->setDestAddress(rcvflow.destaddr);
@@ -270,6 +273,7 @@ void XPASS::send_credit(L3Address destaddr)
     if(receiver_StateMap[destaddr]==CREDIT_SENDING){
         rcvflow.sendcredit->setDestAddr(destaddr);
         scheduleAt(simTime() + (simtime_t)((credit_size+(jitter_bytes+58)*8)/rcvflow.current_speed),rcvflow.sendcredit);
+        //58=20(IP)+14(EthernetMac)+8(EthernetPhy)+4(EthernetFcs)+12(interframe gap,IFG)
         EV<<"currate = "<<rcvflow.current_speed<<", next time = "<<simTime() + (credit_size+jitter_bytes*8)/rcvflow.current_speed<<"s"<<endl;
     }
 }
@@ -330,7 +334,7 @@ void XPASS::receive_credit(Packet *pck)
         tag->setReverse(true);
         tag->setFlowId(flowid);
         tag->setPacketId(packetid);
-        tag->setCreationtime(sndflow.cretime);
+        tag->setCreationtime(simTime());
         if(last)
             tag->setIsLastPck(true);
 

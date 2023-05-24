@@ -151,6 +151,7 @@ class XPASS : public TransportProtocolBase
     virtual void initialize(int stage) override;
     virtual void handleMessage(cMessage *msg) override;
     virtual void handleSelfMessage(cMessage *msg) override;
+    virtual void refreshDisplay() const override;
     virtual ~XPASS() {for(auto i:receiver_flowMap){
         cancelEvent(i.second.alphaTimer);
         delete i.second.alphaTimer;

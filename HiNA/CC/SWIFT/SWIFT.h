@@ -5,8 +5,8 @@
  *      Author: luca
  */
 
-#ifndef INET_ANGRYDUDU_TIMELY_TIMELY_H_
-#define INET_ANGRYDUDU_TIMELY_TIMELY_H_
+#ifndef INET__SWIFT_H_
+#define INET__SWIFT_H_
 
 #include "../ccheaders.h"
 #include "inet/HiNA/Messages/SWIFT/SACK_m.h"
@@ -152,4 +152,4 @@ protected:
 
 
 
-#endif /* INET_ANGRYDUDU_TIMELY_TIMELY_H_ */
+#endif /* INET_SWIFT_H_ */

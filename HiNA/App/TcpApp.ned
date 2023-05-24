@@ -96,6 +96,7 @@ simple TcpApp like IApp
         int dscp = default(-1); // if not -1, set the DSCP (IPv4/IPv6) field of sent packets to this value
         int tos = default(-1); // if not -1, set the Type Of Service (IPv4) / Traffic Class (IPv6) field of sent packets to this value
         string trafficMode = default("LongFlow");
+        int longflow = default(10000);
         double linkSpeed @unit(bps) = default(1e9bps);
         double workLoad = default(1);
         string sendScript = default("");//With sendScript, the format is "<time> <numBytes>;<time> <numBytes>;..."

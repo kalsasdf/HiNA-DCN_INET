@@ -52,15 +52,16 @@ class INET_API HiUdpApp : public ClockUserModuleMixin<ApplicationBase>, public U
     std::vector<L3Address> connectAddresses;
     std::vector<std::string> destAddressStr;
     int localPort = -1, connectPort = -1;
-    simtime_t startTime;
-    simtime_t stopTime;
+    simtime_t startTime=0;
+    simtime_t stopTime=0;
     const char *packetName = nullptr;
-    uint messageLength;
-    uint32_t AppPriority;
+    uint longflow=0;
+    uint32_t AppPriority=0;
     const char *trafficMode = nullptr;
-    double linkSpeed;
-    double workLoad;
+    double linkSpeed=0;
+    double workLoad=0;
 
+    uint messageLength=0;
     // state
     UdpSocket socket;
     cMessage *selfMsg = nullptr;

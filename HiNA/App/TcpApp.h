@@ -37,7 +37,6 @@ namespace inet {
 class INET_API TcpApp : public TcpAppBase
 {
   protected:
-    // parameters
     struct Command {
         simtime_t tSend;
         long numBytes = 0;
@@ -47,14 +46,16 @@ class INET_API TcpApp : public TcpAppBase
     CommandVector commands;
     int commandIndex = -1;
 
-    simtime_t tOpen;
-    simtime_t tSend;
-    simtime_t tClose;
+    // parameters
+    simtime_t tOpen=0;
+    simtime_t tSend=0;
+    simtime_t tClose=0;
     const char *packetName = nullptr;
     const char *trafficMode = nullptr;
-    double packetLength;
-    double linkSpeed;
-    double workLoad;
+    uint longflow=0;
+    double packetLength=0;
+    double linkSpeed=0;
+    double workLoad=0;
 
     // state
     cMessage *selfMsg = nullptr;

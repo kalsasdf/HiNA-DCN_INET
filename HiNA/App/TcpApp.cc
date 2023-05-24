@@ -55,6 +55,7 @@ void TcpApp::initialize(int stage)
         workLoad = par("workLoad");
         linkSpeed = par("linkSpeed");
         trafficMode = par("trafficMode");
+        longflow = par("longflow");
         commandIndex = 0;
 
         const char *script = par("sendScript");
@@ -313,7 +314,7 @@ void TcpApp::updateNextFlow(const char* TM)
     if(std::string(TM).find("sendscript") != std::string::npos){
         packetLength = commands[commandIndex].numBytes;
     }else if(std::string(TM).find("LongFlow") != std::string::npos){
-        packetLength=10000;
+        packetLength=longflow;
     }
     else
     {

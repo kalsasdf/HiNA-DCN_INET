@@ -60,6 +60,7 @@ void HiUdpApp::initialize(int stage)
         stopTime = par("stopTime");
         packetName = par("packetName");
         AppPriority = par("AppPrioirty");
+        longflow = par("longflow");
         commandIndex = 0;
         const char *script = par("sendScript");
         parseScript(script);
@@ -842,7 +843,7 @@ void HiUdpApp::updateNextFlow(const char* TM)
     }
     else if(std::string(TM).find("LongFlow") != std::string::npos)
     {
-        messageLength=10000000;
+        messageLength=longflow;
     }
     else if(std::string(TM).find("sendscript") != std::string::npos){
         messageLength = commands[commandIndex].numBytes;

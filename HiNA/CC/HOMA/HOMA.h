@@ -18,17 +18,9 @@ using namespace std;
 
 namespace inet {
 
-class IInterfaceTable;
-
-class HOMA : public cSimpleModule
+class HOMA : public TransportProtocolBase
 {
   protected:
-    enum SenderState
-    {
-        GRANT_WAITING,
-        US_SENT
-    };
-
     enum ReceiverState
     {
         GRANT_STOP,
@@ -55,8 +47,9 @@ class HOMA : public cSimpleModule
         int64_t unscheduleFlowSize; //Unscheduled流大小
         int64_t scheduleFlowSize; //Schedule流大小
         ReceiverState ReceiverState;
-        TimerMsg *sendresend = new TimerMsg("sendresend");
-        TimerMsg *timeout = new TimerMsg("timeout");
+        int SenderPriority = -1;
+        TimerMsg *sendresend;
+        TimerMsg *timeout;
     };
 
     //发送方流信息表
@@ -71,12 +64,11 @@ class HOMA : public cSimpleModule
         simtime_t cretime; //流创建时间
         int64_t flowsize; //流大小
 
-        SenderState SenderState;
         int64_t sendRtt; //已发送的Unscheduled部分长度
         int64_t unsSize; //Unscheduled总部分长度
         int64_t sSize; //schedule部分总长度
         uint16_t unscheduledPrio; //unscheduled部分使用的优先级
-        TimerMsg *sendunschedule = new TimerMsg("sendunschedule");
+        TimerMsg *sendunschedule;
     };
 
 
@@ -114,21 +106,21 @@ class HOMA : public cSimpleModule
     std::map<uint32_t, receiver_flowinfo> receiver_flowMap;
 
   protected:
-    virtual void initialize() override;
+    virtual void initialize(int stage) override;
     virtual void handleMessage(cMessage *msg) override;
-    virtual void handleSelfMessage(cMessage *msg);
+    virtual void handleSelfMessage(cMessage *msg) override;
+    virtual void refreshDisplay() const override;
     virtual ~HOMA() {
-        for(auto i: receiver_flowMap){
-            cancelEvent(i.second.sendresend);
-            delete i.second.sendresend;
-            cancelEvent(i.second.timeout);
-            delete i.second.timeout;
+        for(auto i = receiver_flowMap.begin();i != receiver_flowMap.end();i++){
+            cancelEvent(i->second.sendresend);
+            delete i->second.sendresend;
+            cancelEvent(i->second.timeout);
+            delete i->second.timeout;
         }
         for(auto i: sender_flowMap){
             cancelEvent(i.second.sendunschedule);
             delete i.second.sendunschedule;
         }
-
     }
 
     /**
@@ -162,6 +154,11 @@ class HOMA : public cSimpleModule
     virtual void receive_unscheduledata(Packet *pck);
 
     virtual void finish() override;
+
+    // ILifeCycle:
+    virtual void handleStartOperation(LifecycleOperation *operation) override{};
+    virtual void handleStopOperation(LifecycleOperation *operation) override{};
+    virtual void handleCrashOperation(LifecycleOperation *operation) override{};
 
     virtual uint16_t getMesgPrio(uint32_t msgSize);
     virtual void setPrioCutOffs();

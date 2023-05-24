@@ -53,6 +53,7 @@ simple HiUdpApp like IApp
         double stopTime @unit(s) = default(-1s);  // time of finishing sending, -1s means forever
         double linkSpeed @unit(bps) = default(1e9bps);
         double workLoad = default(1);
+        int longflow = default(10000);
         string trafficMode = default("LongFlow");// CacheFollower, DataMining, WebServer, WebSearch.
         string sendScript = default("");        
         int timeToLive = default(-1); // if not -1, set the TTL (IPv4) or Hop Limit (IPv6) field of sent packets to this value

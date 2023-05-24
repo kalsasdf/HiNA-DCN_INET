@@ -557,6 +557,11 @@ void XPASS::sendUp(Packet *pck)
 
 }
 
+void XPASS::refreshDisplay() const
+{
+
+}
+
 void XPASS::finish()
 {
 

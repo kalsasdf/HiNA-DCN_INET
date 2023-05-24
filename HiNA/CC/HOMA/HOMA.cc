@@ -11,28 +11,30 @@ namespace inet {
 
 Define_Module(HOMA);
 
-void HOMA::initialize()
+void HOMA::initialize(int stage)
 {
-    //statistics
-    outGate = gate("lowerOut");
-    inGate = gate("lowerIn");
-    upGate = gate("upperOut");
-    downGate = gate("upperIn");
-    // configuration
-    activate = par("activate");
-    linkspeed = par("linkspeed");
-    max_pck_size = par("max_pck_size");
-    baseRTT = par("baseRTT");
+    if (stage == INITSTAGE_LOCAL){
+        //statistics
+        outGate = gate("lowerOut");
+        inGate = gate("lowerIn");
+        upGate = gate("upperOut");
+        downGate = gate("upperIn");
+        // configuration
+        activate = par("activate");
+        linkspeed = par("linkspeed");
+        max_pck_size = par("max_pck_size");
+        baseRTT = par("baseRTT");
 
-    rttbytes = baseRTT.dbl()*linkspeed/8;
+        rttbytes = baseRTT.dbl()*linkspeed/8;
 
-    setPrioCutOffs(); // set priority cutoffs for unscheduled packets
+        setPrioCutOffs(); // set priority cutoffs for unscheduled packets
 
-    registerService(Protocol::udp, gate("upperIn"), gate("upperOut"));
-    registerProtocol(Protocol::udp, gate("lowerOut"), gate("lowerIn"));
-
-    receiver_flowMap.clear();
-    sender_flowMap.clear();
+        receiver_flowMap.clear();
+        sender_flowMap.clear();
+    }else if (stage == INITSTAGE_TRANSPORT_LAYER) {
+        registerService(Protocol::udp, gate("upperIn"), gate("upperOut"));
+        registerProtocol(Protocol::udp, gate("lowerOut"), gate("lowerIn"));
+    }
 }
 
 void HOMA::handleMessage(cMessage *msg)
@@ -106,8 +108,8 @@ void HOMA::processUpperpck(Packet *pck)
             snd_info.crcMode = udpHeader->getCrcMode();
             snd_info.crc = udpHeader->getCrc();
             snd_info.sendRtt = 0;
-            snd_info.SenderState = US_SENT;
             snd_info.unscheduledPrio = getMesgPrio(snd_info.unsSize);
+            snd_info.sendunschedule = new TimerMsg("sendunschedule");
             snd_info.sendunschedule->setKind(SENDUNSCHEDULE);
             snd_info.sendunschedule->setFlowId(snd_info.flowid);
             if(snd_info.flowsize < rttbytes)
@@ -166,36 +168,25 @@ void HOMA::processLowerpck(Packet *pck)
 
 void HOMA::send_unschedule(uint32_t flowid)
 {
-    int64_t this_pck_bytes = 0;
-
     sender_flowinfo snd_info = sender_flowMap.find(flowid)->second;
     std::ostringstream str;
 
     str << "homaUnscheduleData" << "-" <<snd_info.flowid<< "-" <<snd_info.pckseq;
     Packet *packet = new Packet(str.str().c_str());
+    int64_t this_pck_bytes = (snd_info.sendRtt+max_pck_size<=snd_info.unsSize)?max_pck_size:snd_info.unsSize-snd_info.sendRtt;
+    snd_info.sendRtt += this_pck_bytes;
 
-    if(snd_info.SenderState == US_SENT)
-    {
-        this_pck_bytes = (snd_info.sendRtt+max_pck_size<=snd_info.unsSize)?max_pck_size:snd_info.unsSize-snd_info.sendRtt;
-        snd_info.sendRtt += this_pck_bytes;
-        if(snd_info.sendRtt == snd_info.unsSize)
-        {
-            snd_info.SenderState = GRANT_WAITING;
-        }
-    }
-
-    //设置接收端传输层标签
     const auto& payload = makeShared<ByteCountChunk>(B(this_pck_bytes));
     auto tag = payload->addTag<HiTag>();
-    if(snd_info.SenderState == GRANT_WAITING&&snd_info.sSize==0) tag->setIsLastPck(true);
+    if(snd_info.sendRtt == snd_info.unsSize&&snd_info.sSize==0) tag->setIsLastPck(true);
     tag->setFlowId(snd_info.flowid);
     tag->setPacketId(snd_info.pckseq);
     tag->setCreationtime(snd_info.cretime);
-    tag->setPriority(snd_info.unscheduledPrio);
+    tag->setPriority(0);
+    tag->setFlowSize(snd_info.flowsize);
     packet->insertAtBack(payload);
     snd_info.pckseq++;
 
-    //设置发送端网络层标签
     auto addressReq = packet->addTagIfAbsent<L3AddressReq>();
     addressReq->setSrcAddress(srcAddr);
     addressReq->setDestAddress(snd_info.destAddr);
@@ -213,13 +204,14 @@ void HOMA::send_unschedule(uint32_t flowid)
 
     EV << "prepare to send unschedule packet, remaining unschedule data size = " << snd_info.unsSize-snd_info.sendRtt <<endl;
     sendDown(packet);
-
-    if (snd_info.SenderState == US_SENT)
-    {
-        //发送自消息
-        scheduleAt(simTime(),snd_info.sendunschedule);
-    }
     sender_flowMap[flowid] = snd_info;
+    if (snd_info.sendRtt < snd_info.unsSize)
+    {
+        send_unschedule(flowid);
+        //发送自消息
+//        scheduleAt(simTime(),snd_info.sendunschedule);
+    }
+
 }
 
 void HOMA::receive_unscheduledata(Packet* pck)
@@ -232,6 +224,7 @@ void HOMA::receive_unscheduledata(Packet* pck)
    int flowid;
    bool last;
    int now_received_data_seq;
+   uint flowsize;
    receiver_flowinfo rcv_info;
 
    //提取标签信息
@@ -240,6 +233,7 @@ void HOMA::receive_unscheduledata(Packet* pck)
        flowid = region.getTag()->getFlowId();
        last = region.getTag()->isLastPck();
        now_received_data_seq = region.getTag()->getPacketId();
+       flowsize = region.getTag()->getFlowSize();
    }
 
    auto it = receiver_flowMap.find(flowid);
@@ -253,22 +247,43 @@ void HOMA::receive_unscheduledata(Packet* pck)
       rcv_info.destAddr = destAddr;
       rcv_info.unscheduleFlowSize = length;
       rcv_info.flowid = flowid;
+      for(int i = 0; i < 8; i ++)
+      {
+          if(!priorityUse[i])
+          {
+              rcv_info.SenderPriority = i;
+              priorityUse[i] = true;
+              break;
+          }
+      }
+      rcv_info.sendresend = new TimerMsg("sendresend");
+      rcv_info.sendresend->setKind(SENDRESEND);
+      rcv_info.sendresend->setFlowId(flowid);
+      rcv_info.timeout = new TimerMsg("timeout");
+      rcv_info.timeout->setKind(TIMEOUT);
+      rcv_info.timeout->setFlowId(flowid);
    }
-   if(last) rcv_info.ReceiverState = GRANT_STOP;
-   else rcv_info.ReceiverState = GRANT_SENDING;
    rcv_info.now_received_data_seq = now_received_data_seq;
    rcv_info.now_send_grt_seq = -1;
    rcv_info.scheduleFlowSize = 0;
    rcv_info.if_get[rcv_info.now_received_data_seq] = true;
-   rcv_info.sendresend->setKind(SENDRESEND);
-   rcv_info.sendresend->setFlowId(flowid);
-   rcv_info.timeout->setKind(TIMEOUT);
-   rcv_info.timeout->setFlowId(flowid);
-   receiver_flowMap[flowid] = rcv_info;
+   if(last) {
+       rcv_info.ReceiverState = GRANT_STOP;
+       priorityUse[rcv_info.SenderPriority] = false;
+       cancelEvent(rcv_info.sendresend);
+       delete rcv_info.sendresend;
+       cancelEvent(rcv_info.timeout);
+       delete rcv_info.timeout;
+       receiver_flowMap.erase(flowid);
+   }
+   else {
+       rcv_info.ReceiverState = GRANT_SENDING;
+       receiver_flowMap[flowid] = rcv_info;
+   }
 
    if(rcv_info.ReceiverState == GRANT_SENDING)
    {
-       EV << "The flow " << flowid << " unschedule data has been all received, send GRANT" << endl;
+       EV << "The flow " << flowid << " unschedule data received, send GRANT" << endl;
 
        send_grant(flowid);
    }
@@ -280,16 +295,7 @@ void HOMA::receive_unscheduledata(Packet* pck)
 void HOMA::send_grant(uint32_t flowid)
 {
     receiver_flowinfo rcv_info = receiver_flowMap[flowid];
-    int SenderPriority = -1;
-    for(int i = 0; i < 8; i ++)
-    {
-        if(!priorityUse[i])
-        {
-            SenderPriority = i;
-            priorityUse[i] = true;
-            break;
-        }
-    }
+
 
     //若所有优先级都已发送一个GRANT，此时稍作等待
 //    if(SenderPriority == -1)
@@ -307,7 +313,7 @@ void HOMA::send_grant(uint32_t flowid)
         tag->setPriority(7);
         tag->setFlowId(rcv_info.flowid);
         tag->setPacketId(rcv_info.now_send_grt_seq);
-        tag->setSenderPriority(SenderPriority);
+        tag->setSenderPriority(rcv_info.SenderPriority);
 
         grant->insertAtFront(content);
 
@@ -417,22 +423,29 @@ void HOMA::receive_scheduledata(Packet* pck)
     receiver_flowinfo rcv_info = receiver_flowMap.find(flowid) -> second;
     //解除该优先级的限制
     rcv_info.now_received_data_seq = now_received_data_seq;
-    priorityUse[priority] = false;
+
     rcv_info.scheduleFlowSize += length;
     rcv_info.if_get[rcv_info.now_received_data_seq] = true;
-    if(last) rcv_info.ReceiverState = GRANT_STOP;
-    receiver_flowMap[flowid] = rcv_info;
+    if(last){
+        rcv_info.ReceiverState = GRANT_STOP;
+        priorityUse[priority] = false;
+        cancelEvent(rcv_info.sendresend);
+        delete rcv_info.sendresend;
+        cancelEvent(rcv_info.timeout);
+        delete rcv_info.timeout;
+        receiver_flowMap.erase(flowid);
+    }
+    else receiver_flowMap[flowid] = rcv_info;
 
     if(rcv_info.ReceiverState == GRANT_SENDING)
     {
         EV << "The flow " << flowid << " unschedule data has been all received, send GRANT" << endl;
 
         send_grant(flowid);
+        //检测是否发生丢包（在超时时间内未收到即认为丢包，此时需要发送RESEND指令
+        cancelEvent(rcv_info.timeout);
+        scheduleAt(simTime() + timeout, rcv_info.timeout);
     }
-
-    //检测是否发生丢包（在超时时间内未收到即认为丢包，此时需要发送RESEND指令
-    cancelEvent(rcv_info.timeout);
-    scheduleAt(simTime() + timeout, rcv_info.timeout);
 
     sendUp(pck);
 }
@@ -444,7 +457,7 @@ void HOMA::send_resend(uint32_t flowid, long seq)
 
     const auto& content = makeShared<ByteCountChunk>(B(1));
     auto tag = content -> addTag<HiTag>();
-    tag->setPriority(7);
+    tag->setPriority(0);
     tag->setFlowId(rcv_info.flowid);
     //此时packetid为期待重传的包
     tag->setPacketId(seq);
@@ -475,12 +488,12 @@ void HOMA::receive_resend(Packet* pck)
     }
     sender_flowinfo snd_info = sender_flowMap.find(flowid) -> second;
     //若此时正在传输数据，发送BUSY包
-    if(snd_info.SenderState == US_SENT)
-    {
-        send_busy(flowid, seq);
-    }
-    else
-    {
+//    if(snd_info.SenderState == US_SENT)
+//    {
+//        send_busy(flowid, seq);
+//    }
+//    else
+//    {
         std::ostringstream str;
         str << "homaScheduleData" << "-" << flowid << "-" <<seq;
         Packet *packet = new Packet(str.str().c_str());
@@ -504,7 +517,7 @@ void HOMA::receive_resend(Packet* pck)
 
         EV << "resend pckid = " << seq << endl;
         sendDown(packet);
-    }
+//    }
 }
 
 void HOMA::send_busy(uint32_t flowid, long seq)
@@ -601,6 +614,11 @@ uint16_t HOMA::getMesgPrio(uint32_t msgSize)
         }
     }
     return high;
+}
+
+void HOMA::refreshDisplay() const
+{
+
 }
 
 void HOMA::finish()

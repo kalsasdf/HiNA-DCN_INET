@@ -37,7 +37,7 @@ bool ABMQueue::BufferManagement(cMessage *msg){
 //        alpha = alphas[priority];
 //    }
     EV << "alpha = " << alpha << endl;
-    b RemainingBufferSize = sharedBuffer[switchid][priority];  // 当前交换机共享缓存剩余大小
+    b RemainingBufferSize = sharedBuffer[switchid];  // 当前交换机共享缓存剩余大小
     EV << "currentqueuelength is " << queueLength << "b, RemainingBufferSize " << RemainingBufferSize.get() << "b, Packet Length is" << packet->getByteLength() <<"B"<<endl;
     uint32_t numberofP = congestedNum[switchid][priority] ? congestedNum[switchid][priority] : 1 ;
     maxSize = double(alpha*(RemainingBufferSize.get())/numberofP) * DeqRate ;
@@ -55,7 +55,7 @@ bool ABMQueue::BufferManagement(cMessage *msg){
         return false; // drop
     }
     else{
-        sharedBuffer[switchid][priority] = RemainingBufferSize - b(packet->getBitLength());
+        sharedBuffer[switchid] = RemainingBufferSize - b(packet->getBitLength());
         return true;
     }
 }

@@ -21,7 +21,7 @@ simsignal_t REDPFCQueue::pfcPausedSignal =
         cComponent::registerSignal("pfcPaused");
 simsignal_t REDPFCQueue::pfcResumeSignal =
         cComponent::registerSignal("pfcResume");
-b REDPFCQueue::sharedBuffer[100][100]={};
+b REDPFCQueue::sharedBuffer[100]={};
 
 
 void REDPFCQueue::initialize(int stage)
@@ -35,7 +35,7 @@ void REDPFCQueue::initialize(int stage)
         dataCapacity = b(par("dataCapacity"));
         switchid=findContainingNode(this)->getId();EV<<"switchid = "<<switchid<<endl;
         priority = par("priority");
-        sharedBuffer[switchid][priority] = b(par("sharedBuffer"));
+        sharedBuffer[switchid] = b(par("sharedBuffer"));
         headroom = b(par("headroom"));
         usePfc = par("usePfc");
         XON = par("XON");
@@ -121,7 +121,7 @@ void REDPFCQueue::pushPacket(Packet *packet, cGate *gate)
     int iface = packet->addTagIfAbsent<InterfaceInd>()->getInterfaceId();
     EV<<"iface = "<<iface<<endl;
     if(usePfc){
-        if((queue.getByteLength()>=XOFF||(queue.getBitLength()>dataCapacity.get()&&sharedBuffer[switchid][priority]<headroom))&&std::find(paused.begin(),paused.end(),iface)==paused.end()){
+        if((queue.getByteLength()>=XOFF||(queue.getBitLength()>dataCapacity.get()&&sharedBuffer[switchid]<headroom))&&std::find(paused.begin(),paused.end(),iface)==paused.end()){
             EV<<"queuelength = "<<queue.getByteLength()<<endl;
             paused.push_back(iface);
             auto pck = new Packet("pause");
@@ -148,9 +148,9 @@ Packet *REDPFCQueue::pullPacket(cGate *gate)
     EV_INFO << "Pulling packet" << EV_FIELD(packet) << EV_ENDL;
     EV<<"queuelength = "<<queue.getBitLength()<<"b"<<endl;
     if(queue.getBitLength()-dataCapacity.get()>=packet->getBitLength()){
-        sharedBuffer[switchid][priority]+=b(packet->getBitLength());
+        sharedBuffer[switchid]+=b(packet->getBitLength());
     }else if(queue.getBitLength()>=dataCapacity.get()){
-        sharedBuffer[switchid][priority]+=b(queue.getBitLength()-dataCapacity.get());
+        sharedBuffer[switchid]+=b(queue.getBitLength()-dataCapacity.get());
     }
     queue.pop();
     EV<<"after pop queuelength = "<<queue.getBitLength()<<endl;
@@ -191,7 +191,7 @@ Packet *REDPFCQueue::pullPacket(cGate *gate)
     default:
         throw cRuntimeError("Unknown RED result");
     }
-    if(usePfc&&queue.getByteLength()<=XON&&(queue.getBitLength()<dataCapacity.get()||sharedBuffer[switchid][priority]>headroom)){
+    if(usePfc&&queue.getByteLength()<=XON&&(queue.getBitLength()<dataCapacity.get()||sharedBuffer[switchid]>headroom)){
         for(auto it : paused){
             auto pck = new Packet("resume");
             auto newtag=pck->addTagIfAbsent<HiTag>();
@@ -300,17 +300,17 @@ bool REDPFCQueue::BufferManagement(cMessage *msg){
         return true;
     }
 
-    b RemainingBufferSize = sharedBuffer[switchid][priority];
+    b RemainingBufferSize = sharedBuffer[switchid];
     sharedBufferVector.recordWithTimestamp(simTime(), RemainingBufferSize.get());
     EV << "currentqueuelength = " << queueLength << "b, RemainingBufferSize  = " << RemainingBufferSize.get() << "b, Packet Length is" << packet->getByteLength() <<"B"<<endl;
 
     maxSize = double(alpha*RemainingBufferSize.get()) ;
-    if (queueLength + packet->getBitLength() >  maxSize){
+    if (queueLength-dataCapacity.get() + packet->getBitLength() >  maxSize){
         EV << "it's false" <<endl;
         return false; // drop
     }
     else{
-        sharedBuffer[switchid][priority] = RemainingBufferSize - b(packet->getBitLength());
+        sharedBuffer[switchid] = RemainingBufferSize - b(packet->getBitLength());
         return true;
     }
 }

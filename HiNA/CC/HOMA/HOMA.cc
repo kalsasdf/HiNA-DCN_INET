@@ -310,12 +310,12 @@ void HOMA::send_grant(uint32_t flowid)
         rcv_info.now_send_grt_seq ++;
         const auto& content = makeShared<ByteCountChunk>(B(1));
         auto tag = content -> addTag<HiTag>();
-        tag->setPriority(7);
+        tag->setPriority(0);
         tag->setFlowId(rcv_info.flowid);
         tag->setPacketId(rcv_info.now_send_grt_seq);
         tag->setSenderPriority(rcv_info.SenderPriority);
 
-        grant->insertAtFront(content);
+        grant->insertAtBack(content);
 
         grant->addTagIfAbsent<L3AddressReq>()->setDestAddress(rcv_info.destAddr);
         grant->addTagIfAbsent<L3AddressReq>()->setSrcAddress(srcAddr);
@@ -356,7 +356,7 @@ void HOMA::receive_grant(Packet *pck)
         int64_t this_pck_bytes = 0;
         bool last = false;
         std::ostringstream str;
-        str << "homaScheduleData" << "-" << flowid << "-" << snd_info.pckseq << " priority is " << priority << endl;
+        str << "homaScheduleData" << "-" << flowid << "-" << snd_info.pckseq << " - " << priority << endl;
         Packet *packet = new Packet(str.str().c_str());
         this_pck_bytes = max_pck_size;
         if(snd_info.sSize <= this_pck_bytes)

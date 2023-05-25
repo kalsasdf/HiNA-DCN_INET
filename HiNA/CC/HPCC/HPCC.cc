@@ -162,7 +162,7 @@ void HPCC::send_data()
     tag->setCreationtime(snd_info.cretime);
     tag->setPacketId(packetid);
     tag->setIsLastPck(snd_info.last);
-    payload->enableImplicitChunkSerialization = true;
+
     packet->insertAtBack(payload);
 
     //generate and insert a new udpHeader, set source and destination port
@@ -179,6 +179,7 @@ void HPCC::send_data()
     auto content = makeShared<INTHeader>();
     content->setNHop(0);
     content->setPathID(0);
+    content->enableImplicitChunkSerialization = true;
     packet->insertAtFront(content);
 
     packet->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(l3Protocol);

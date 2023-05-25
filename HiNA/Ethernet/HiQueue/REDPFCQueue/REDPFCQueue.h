@@ -33,7 +33,7 @@ class INET_API REDPFCQueue : public PacketQueueBase, public IPacketBuffer::ICall
   public:
     int packetCapacity = -1;
     b dataCapacity = b(-1);
-    static b sharedBuffer[100][100];
+    static b sharedBuffer[100];
     b headroom;
     double alpha;
     uint64_t maxSize;

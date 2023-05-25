@@ -184,6 +184,7 @@ void POSEIDON::send_data()
     udpHeader->setCrc(snd_info.crc);
     udpHeader->setCrcMode(snd_info.crcMode);
     udpHeader->setTotalLengthField(B(udpHeader->getChunkLength()+packet->getTotalLength()));
+    udpHeader->enableImplicitChunkSerialization = true;
     insertTransportProtocolHeader(packet, Protocol::udp, udpHeader);
 
     //insert POSEIDON header(INTHeader)

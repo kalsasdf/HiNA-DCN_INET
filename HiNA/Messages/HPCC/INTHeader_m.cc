@@ -28,7 +28,7 @@
 #include <sstream>
 #include <memory>
 #include <type_traits>
-#include "INTHeader_m.h"
+#include "inet\HiNA\Messages\HPCC\INTHeader_m.h"
 
 namespace omnetpp {
 

@@ -22,4 +22,7 @@ class PSDINTHeader extends FieldsChunk
     chunkLength = B (2);
     omnetpp::simtime_t TS;	//时间戳
     omnetpp::simtime_t MPD;	//时间戳
+    //double txRate;			//端口的速率
+   // uint64 txBytes;				//byte= 8 bit
+    //omnetpp::simtime_t TS2;	//时间戳
 }

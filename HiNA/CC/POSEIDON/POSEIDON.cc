@@ -4,6 +4,7 @@
  * Begin at 2023/04/27
 */
 #include "POSEIDON.h"
+#include"../HPCC/HPCC.h"
 
 namespace inet {
 
@@ -184,12 +185,13 @@ void POSEIDON::send_data()
     udpHeader->setCrc(snd_info.crc);
     udpHeader->setCrcMode(snd_info.crcMode);
     udpHeader->setTotalLengthField(B(udpHeader->getChunkLength()+packet->getTotalLength()));
-    udpHeader->enableImplicitChunkSerialization = true;
+
     insertTransportProtocolHeader(packet, Protocol::udp, udpHeader);
 
     //insert POSEIDON header(INTHeader)
     auto content = makeShared<PSDINTHeader>();
     content->setTS(simTime());
+    content->enableImplicitChunkSerialization = true;
     packet->insertAtFront(content);
 
     packet->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(l3Protocol);
@@ -360,7 +362,7 @@ void POSEIDON::receiveAck(Packet *pck)
     {
         pacing_delay = 0;
     }
-    currentRate = snd_cwnd*1538*8/baseRTT;
+    currentRate = snd_cwnd*1538*8/currentRTT;
     EV<<"currentRTT = "<<currentRTT<<"s, "<<"pacing_delay = "<<pacing_delay<<"s, the ACK computed rate is "<<currentRate<<endl;
 
     if(SenderState==PAUSING){

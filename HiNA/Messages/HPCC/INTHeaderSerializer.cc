@@ -34,7 +34,7 @@ const Ptr<Chunk> INTHeaderSerializer::deserialize(MemoryInputStream& stream) con
     auto intHeader = makeShared<INTHeader>();
     intHeader->setNHop(stream.readUint8());
     intHeader->setPathID(stream.readUint8());
-    int length = stream.readByte();
+    int length = stream.getRemainingLength().get();
     int counter = 0;
     for(int i=0;i<length;i+=64){
         hopInf si;

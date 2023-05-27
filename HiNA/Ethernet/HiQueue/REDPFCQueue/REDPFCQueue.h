@@ -58,6 +58,7 @@ class INET_API REDPFCQueue : public PacketQueueBase, public IPacketBuffer::ICall
     bool markNext = false;
     double count = NaN;
     int switchid;
+    int ecncount=0;
     enum RedResult { RANDOMLY_ABOVE_LIMIT, RANDOMLY_BELOW_LIMIT, ABOVE_MAX_LIMIT, BELOW_MIN_LIMIT };
     mutable RedResult lastResult;
 
@@ -78,6 +79,7 @@ class INET_API REDPFCQueue : public PacketQueueBase, public IPacketBuffer::ICall
     static simsignal_t pfcPausedSignal;
     static simsignal_t pfcResumeSignal;
     virtual ~REDPFCQueue() { delete packetDropperFunction; }
+    virtual void finish() override;
 
     virtual int getMaxNumPackets() const override { return packetCapacity; }
     virtual int getNumPackets() const override;

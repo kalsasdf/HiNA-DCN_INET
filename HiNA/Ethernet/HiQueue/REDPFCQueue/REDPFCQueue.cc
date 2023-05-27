@@ -48,6 +48,7 @@ void REDPFCQueue::initialize(int stage)
         queuelengthVector.setName("queuelength (bit)");
         sharedBufferVector.setName("sharedbuffer (bit)");
         count = -1;
+        WATCH(ecncount);
         packetComparatorFunction = createComparatorFunction(par("comparatorClass"));
         if (packetComparatorFunction != nullptr)
             queue.setup(packetComparatorFunction);
@@ -170,14 +171,14 @@ Packet *REDPFCQueue::pullPacket(cGate *gate)
             IpEcnCode ecn = EcnMarker::getEcn(packet);EV<<"ecn = "<<ecn<<endl;
             if (ecn != IP_ECN_NOT_ECT) {
                 // if next packet should be marked and it is not
-                if (markNext && ecn != IP_ECN_CE) {EV<<"set ECN"<<endl;
+                if (markNext && ecn != IP_ECN_CE) {EV<<"set ECN"<<endl;ecncount++;
                     EcnMarker::setEcn(packet, IP_ECN_CE);
                     markNext = false;
                 }
                 else {
                     if (ecn == IP_ECN_CE)
                         markNext = true;
-                    else{EV<<"set ECN"<<endl;
+                    else{EV<<"set ECN"<<endl;ecncount++;
                         EcnMarker::setEcn(packet, IP_ECN_CE);
                     }
 
@@ -287,6 +288,10 @@ void REDPFCQueue::handlePacketRemoved(Packet *packet)
         emit(packetRemovedSignal, packet);
         updateDisplayString();
     }
+}
+
+void REDPFCQueue::finish(){
+    recordScalar("ecnnum",ecncount);
 }
 
 bool REDPFCQueue::BufferManagement(cMessage *msg){

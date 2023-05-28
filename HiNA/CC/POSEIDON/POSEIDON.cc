@@ -23,15 +23,16 @@ void POSEIDON::initialize(int stage)
         activate = par("activate");
         linkspeed = par("linkspeed");
         max_pck_size=par("max_pck_size");
+        maxInterval = par("maxInterval");
         baseRTT = par("baseRTT");
         PARA_P = par("PARA_P");
         PARA_K = par("PARA_K");
         m = par("m");
         min_md = par("min_md");
 
-        snd_cwnd = max_cwnd = linkspeed*baseRTT.dbl()/(1538*8);EV<<"max_cwnd = "<<max_cwnd<<endl;
+        snd_cwnd = max_cwnd = linkspeed*baseRTT.dbl()/(1526*8);EV<<"max_cwnd = "<<max_cwnd<<endl;
         max_rate = currentRate = linkspeed;
-        min_rate = min_cwnd*1538*8/baseRTT.dbl();
+        min_rate = min_cwnd*1526*8/baseRTT.dbl();
 
         senddata = new TimerMsg("senddata");
         senddata->setKind(SENDDATA);
@@ -42,6 +43,7 @@ void POSEIDON::initialize(int stage)
         currentRTTVector.setName("currentRTT (s)");
         targetVector.setName("target_delay (s)");
         cwndVector.setName("cwnd (num)");
+        currateVector.setName("currate");
         WATCH(timeout_num);
     }else if (stage == INITSTAGE_TRANSPORT_LAYER) {
         registerService(Protocol::udp, gate("upperIn"), gate("upperOut"));
@@ -201,6 +203,15 @@ void POSEIDON::send_data()
     addressReq->setSrcAddress(snd_info.srcAddr);
     addressReq->setDestAddress(snd_info.destAddr);
 
+    bitlength+=(snd_info.length+58)*8;
+    //58=20(IP)+14(EthernetMac)+8(EthernetPhy)+4(EthernetFcs)+12(interframe gap,IFG)
+    if(simTime()-lasttime>=maxInterval){
+        simtime_t interval = simTime()-lasttime;
+        currentRate = bitlength/(simTime()-lasttime).dbl();
+        currateVector.recordWithTimestamp(simTime(),currentRate);
+        bitlength = 0;
+        lasttime = simTime();
+    }
     EV<<"packet length = "<<packet->getByteLength()<<", current rate = "<<currentRate<<endl;
     EV<<"packet name "<<packet->getFullName()<<", ts = "<<simTime()<<"s"<<endl;
 
@@ -362,8 +373,8 @@ void POSEIDON::receiveAck(Packet *pck)
     {
         pacing_delay = 0;
     }
-    currentRate = snd_cwnd*1538*8/currentRTT;
-    EV<<"currentRTT = "<<currentRTT<<"s, "<<"pacing_delay = "<<pacing_delay<<"s, the ACK computed rate is "<<currentRate<<endl;
+
+    EV<<"currentRTT = "<<currentRTT<<"s, "<<"pacing_delay = "<<pacing_delay<<"s"<<endl;
 
     if(SenderState==PAUSING){
         SenderState=SENDING;

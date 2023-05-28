@@ -26,6 +26,7 @@ simple SWIFT like UdpCC
         double linkspeed @unit(bps) = default (10Gbps);
         double stopTime @unit(s) = default(10s);
         int max_pck_size = default(1472);
+        double maxInterval @unit(s)= default(20us);
         double baseRTT @unit(s) = default(1s);
         double ai = default(1);
         double beta = default(0.8);

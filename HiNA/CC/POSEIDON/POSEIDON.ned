@@ -24,6 +24,7 @@ simple POSEIDON like UdpCC
         double linkspeed @unit(bps) = default (1Gbps);
         double stopTime @unit(s) = default(10s);
  		int max_pck_size = default(1470);
+ 		double maxInterval @unit(s)= default(20us);
  		double baseRTT @unit(s) = default(1us);
  		double PARA_P = default(40);
         double PARA_K = default(2);

@@ -85,6 +85,10 @@ protected:
     cOutVector currentRTTVector;
     cOutVector targetVector;
     cOutVector cwndVector;
+    cOutVector currateVector;
+    int bitlength;
+    simtime_t maxInterval;
+    simtime_t lasttime;
     int timeout_num = 0;
 
     const char *packetName = "PSDData";

@@ -202,7 +202,7 @@ void HiUdpApp::processSend()
                 simtime_t tSend = commands[commandIndex].tSend;
                 selfMsg->setKind(SEND);
                 scheduleAt(std::max(tSend, simTime()), selfMsg);
-            }else if(d<stopTime){
+            }else if(d<stopTime&&commandIndex<commands.size()){
                 EV<<"simTime() = "<<simTime()<<", next time = "<<d<<endl;
                 selfMsg->setKind(SEND);
                 scheduleAt(d, selfMsg);

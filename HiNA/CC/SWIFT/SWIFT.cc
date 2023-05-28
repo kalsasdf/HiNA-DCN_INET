@@ -23,6 +23,7 @@ void SWIFT::initialize(int stage)
         activate = par("activate");
         linkspeed = par("linkspeed");
         max_pck_size = par("max_pck_size");
+        maxInterval = par("maxInterval");
         baseRTT = par("baseRTT");
         hop_scaler = par("hop_scaler");
         hops = par("hops");
@@ -32,7 +33,7 @@ void SWIFT::initialize(int stage)
         fs_min_cwnd = par("fs_min_cwnd");
         fs_max_cwnd = par("fs_max_cwnd");
 
-        snd_cwnd = max_cwnd = linkspeed*baseRTT.dbl()/(max_pck_size*8);
+        snd_cwnd = max_cwnd = linkspeed*baseRTT.dbl()/(1526*8);
         fs_range = 4 * baseRTT.dbl();
 
         alpha = fs_range/((1.0/sqrt(fs_min_cwnd)) - (1.0/sqrt(fs_max_cwnd)));
@@ -46,6 +47,7 @@ void SWIFT::initialize(int stage)
         currentRTTVector.setName("currentRTT (s)");
         targetVector.setName("target_delay (s)");
         cwndVector.setName("cwnd (num)");
+        currateVector.setName("currate");
         WATCH(timeout_num);
     }else if (stage == INITSTAGE_TRANSPORT_LAYER) {
         registerService(Protocol::udp, gate("upperIn"), gate("upperOut"));
@@ -201,6 +203,15 @@ void SWIFT::send_data()
     packet->setKind(0);
     packet->setTimestamp(simTime());
 
+    bitlength+=(snd_info.length+58)*8;
+    //58=20(IP)+14(EthernetMac)+8(EthernetPhy)+4(EthernetFcs)+12(interframe gap,IFG)
+    if(simTime()-lasttime>=maxInterval){
+        simtime_t interval = simTime()-lasttime;
+        currentRate = bitlength/(simTime()-lasttime).dbl();
+        currateVector.recordWithTimestamp(simTime(),currentRate);
+        bitlength = 0;
+        lasttime = simTime();
+    }
     EV<<"packet length = "<<packet->getByteLength()<<endl;
 
     sendDown(packet);

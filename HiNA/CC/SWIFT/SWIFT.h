@@ -99,6 +99,11 @@ protected:
     cOutVector currentRTTVector;
     cOutVector targetVector;
     cOutVector cwndVector;
+    cOutVector currateVector;
+    int bitlength = 0;
+    simtime_t maxInterval;
+    simtime_t lasttime = 0;
+    double currentRate;
     int timeout_num = 0;
 
     const char *packetName = "SWIFTData";

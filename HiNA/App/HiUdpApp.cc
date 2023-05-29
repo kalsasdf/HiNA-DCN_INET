@@ -202,7 +202,7 @@ void HiUdpApp::processSend()
                 simtime_t tSend = commands[commandIndex].tSend;
                 selfMsg->setKind(SEND);
                 scheduleAt(std::max(tSend, simTime()), selfMsg);
-            }else if(d<stopTime&&commandIndex<commands.size()){
+            }else if(std::string(trafficMode).find("sendscript") == std::string::npos&&d<stopTime){
                 EV<<"simTime() = "<<simTime()<<", next time = "<<d<<endl;
                 selfMsg->setKind(SEND);
                 scheduleAt(d, selfMsg);
@@ -402,7 +402,7 @@ void HiUdpApp::parseScript(const char *script)
         while (isspace(*s))
             s++;
     }
-    //    delete[] buffer;
+//        delete[] buffer;
     EV << "parser finished\n";
 }
 

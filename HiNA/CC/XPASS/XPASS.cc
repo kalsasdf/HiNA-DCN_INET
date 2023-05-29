@@ -175,7 +175,7 @@ void XPASS::processLowerpck(Packet *pck)
 
 void XPASS::send_credreq(L3Address destaddr)
 {
-    sender_StateMap[destaddr] = CREQ_SENT;
+    sender_StateMap[destaddr] = CREDIT_RECEIVING;
     Packet *cred_req = new Packet("credit_req");
     cred_req->addTagIfAbsent<L3AddressReq>()->setDestAddress(destaddr);
     cred_req->addTagIfAbsent<L3AddressReq>()->setSrcAddress(srcaddr);
@@ -272,9 +272,10 @@ void XPASS::send_credit(L3Address destaddr)
     receiver_flowMap[destaddr] = rcvflow;
     if(receiver_StateMap[destaddr]==CREDIT_SENDING){
         rcvflow.sendcredit->setDestAddr(destaddr);
-        scheduleAt(simTime() + (simtime_t)((credit_size+(jitter_bytes+58)*8)/rcvflow.current_speed),rcvflow.sendcredit);
-        //58=20(IP)+14(EthernetMac)+8(EthernetPhy)+4(EthernetFcs)+12(interframe gap,IFG)
-        EV<<"currate = "<<rcvflow.current_speed<<", next time = "<<simTime() + (credit_size+jitter_bytes*8)/rcvflow.current_speed<<"s"<<endl;
+        simtime_t interval = (simtime_t)((credit_size+(jitter_bytes+46)*8)/rcvflow.current_speed+12*8/linkspeed);
+        //46=20(IP)+14(EthernetMac)+8(EthernetPhy)+4(EthernetFcs), plus 12(interframe gap,IFG)
+        scheduleAt(simTime() + interval,rcvflow.sendcredit);
+        EV<<"currate = "<<rcvflow.current_speed<<", jitter_bytes = "<<jitter_bytes<<", next time = "<<simTime() + interval<<"s"<<endl;
     }
 }
 
@@ -292,7 +293,7 @@ void XPASS::receive_credit(Packet *pck)
     }
 
     // if no flow exits to be transmitted, stop transmitting.
-    if (simTime()>=stopTime||(remainSize == 0 && sender_StateMap[l3addr->getSrcAddress()]==CREDIT_RECEIVING))
+    if (simTime()>=stopTime||remainSize == 0 )
     {
         // send stop credit to the receiver
         TimerMsg *sendstop = new TimerMsg("sendstop");
@@ -325,15 +326,16 @@ void XPASS::receive_credit(Packet *pck)
             remainSize -= max_pck_size;
             packetLength=max_pck_size;
         }
-        else{
+        else {
+            packetLength=max_pck_size;
             remainSize=0;
-            packetLength=remainSize;
         }
         const auto& payload = makeShared<ByteCountChunk>(B(packetLength));
         auto tag = payload->addTag<HiTag>();
         tag->setReverse(true);
         tag->setFlowId(flowid);
         tag->setPacketId(packetid);
+        tag->setPriority(sndflow.priority);
         tag->setCreationtime(simTime());
         if(last)
             tag->setIsLastPck(true);

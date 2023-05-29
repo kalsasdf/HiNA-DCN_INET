@@ -377,6 +377,16 @@ void HPCC::receiveAck(Packet *pck)
 
     const auto& INT_msg = pck->peekAtFront<INTHeader>();
     int size = INT_msg->getHopInfsArraySize();
+
+    if(isFirstAck){
+        for(int i = 0; i < size; i++)
+        {
+            Last[i]  = INT_msg->getHopInfs(i);
+        }
+        isFirstAck=false;
+        delete pck;
+        return;
+    }
     hopInf curINTs[size];
     for(int i = 0; i < size; i++)
     {
@@ -410,16 +420,6 @@ void HPCC::receiveAck(Packet *pck)
     U = (1-(tao.dbl()/baseRTT.dbl()))*U + (tao.dbl()/baseRTT.dbl())*u;
     emit(Usignal,U);
     EV<<"the ACK computed U is "<<U<<endl;
-
-    if(isFirstAck){
-        for(int i = 0; i < size; i++)
-        {
-            Last[i]  = INT_msg->getHopInfs(i);
-        }
-        isFirstAck=false;
-        delete pck;
-        return;
-    }
 
     EV<<"csend_window = "<<csend_window<<endl;
     //function COMPUTEWIND(U,updatewc)

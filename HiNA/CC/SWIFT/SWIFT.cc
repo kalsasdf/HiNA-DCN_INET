@@ -206,7 +206,6 @@ void SWIFT::send_data()
     bitlength+=(snd_info.length+58)*8;
     //58=20(IP)+14(EthernetMac)+8(EthernetPhy)+4(EthernetFcs)+12(interframe gap,IFG)
     if(simTime()-lasttime>=maxInterval){
-        simtime_t interval = simTime()-lasttime;
         currentRate = bitlength/(simTime()-lasttime).dbl();
         currateVector.recordWithTimestamp(simTime(),currentRate);
         bitlength = 0;

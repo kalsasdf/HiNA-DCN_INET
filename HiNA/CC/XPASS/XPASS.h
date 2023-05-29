@@ -29,7 +29,6 @@ class XPASS : public TransportProtocolBase
         Hyper_Increase
     };
     enum SenderState{
-        CREQ_SENT,
         CREDIT_RECEIVING,
         CSTOP_SENT
     };

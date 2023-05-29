@@ -1,6 +1,7 @@
-[HiNA-DCN inet项目.docx](https://github.com/kalsasdf/HiNA-DCN_INET/files/11584965/HiNA-DCN.inet.docx)
+[HiNA-DCN inet项目.docx](https://github.com/kalsasdf/HiNA-DCN_INET/files/11592762/HiNA-DCN.inet.docx)
 
-2023-5-28 POSEIDON计算实时速率功能优化；HiUdpApp读取负载条件优化 
+
+2023-5-29 POSEIDON计算实时速率功能优化；HiUdpApp读取负载条件优化 
 
 2023-5-27 修复所有TimerMsg在仿真结束后没能正确删除而弹出的警告;将非标准结构的包（如credit、ack等）的payload字段enableImplicitChunkSerailization置为true，使其可以在release模式下的仿真中点开而不需要额外的序列化文件；更正DT动态阈值计算方式
 

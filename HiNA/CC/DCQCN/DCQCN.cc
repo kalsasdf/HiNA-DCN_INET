@@ -233,7 +233,7 @@ void DCQCN::send_data()
 
 void DCQCN::processLowerpck(Packet *pck)
 {
-    if (strcmp(pck->getFullName(),"CNP")==0)
+    if (string(pck->getFullName()).find("CNP") != string::npos)
     {
         receive_cnp(pck);
     }

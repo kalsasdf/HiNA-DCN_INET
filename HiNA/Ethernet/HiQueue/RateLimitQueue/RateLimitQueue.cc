@@ -33,6 +33,7 @@ void RateLimitQueue::initialize(int stage)
             queue.setup(packetComparatorFunction);
         packetDropperFunction = createDropperFunction(par("dropperClass"));
         limrate = par("limrate");EV<<"limrate = "<<limrate<<endl;
+        linkspeed = par("linkspeed");
     }
     else if (stage == INITSTAGE_QUEUEING) {
         checkPacketOperationSupport(inputGate);
@@ -78,6 +79,17 @@ Packet *RateLimitQueue::getPacket(int index) const
     return check_and_cast<Packet *>(queue.get(index));
 }
 
+void RateLimitQueue::handleMessage(cMessage *message)
+{
+    if (message->isSelfMessage()){
+        if (collector != nullptr && getNumPackets() != 0)
+            collector->handleCanPullPacketChanged(outputGate->getPathEndGate());
+    }else{
+        auto packet = check_and_cast<Packet *>(message);
+        pushPacket(packet, packet->getArrivalGate());
+    }
+}
+
 void RateLimitQueue::pushPacket(Packet *packet, cGate *gate)
 {
     Enter_Method("pushPacket");
@@ -112,7 +124,8 @@ bool RateLimitQueue::canPullSomePacket(cGate *gate) const
     }else{
         auto packet = check_and_cast<Packet *>(queue.front());
         simtime_t interval = simTime() - lasttime;
-        auto time = packet->getBitLength()/limrate;
+        simtime_t time = simtime_t((packet->getBitLength()+8*8)/limrate)+simtime_t(12*8/linkspeed);
+        //20=8(EtherPhy)+12(interframe gap,IFG)
         EV<<"packet length = "<<packet->getBitLength()<<", interval = "<<interval<<", mintime = "<<time<<endl;
         if(simtime_t(packet->getBitLength()/limrate)>interval){
             EV<< "interval is not enough, delayed "<<endl;
@@ -136,6 +149,13 @@ Packet *RateLimitQueue::pullPacket(cGate *gate)
         queue.pop();
     auto queueingTime = simTime() - packet->getArrivalTime();
     lasttime = simTime();
+    if(!isEmpty()){
+        cancelEvent(canpull);
+        auto newpacket = check_and_cast<Packet *>(queue.front());
+        simtime_t time = simtime_t((newpacket->getBitLength()+8*8)/limrate)+simtime_t(12*8/linkspeed);
+        //20=8(EtherPhy)+12(interframe gap,IFG)
+        scheduleAt(simTime()+time,canpull);
+    }
     auto packetEvent = new PacketQueuedEvent();
     packetEvent->setQueuePacketLength(getNumPackets());
     packetEvent->setQueueDataLength(getTotalLength());

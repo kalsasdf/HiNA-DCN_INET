@@ -367,7 +367,6 @@ void XPASS::receive_credit(Packet *pck)
     delete pck;
 }
 
-// Receive the TCP segment, determine the credit loss ratio and enter the feedback control.
 void XPASS::receive_data(Packet *pck)
 {
     auto l3addr = pck->addTagIfAbsent<L3AddressInd>();

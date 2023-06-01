@@ -226,9 +226,7 @@ void HiEthernetMac::updateStats(simtime_t now, Packet *pck)
     EV<<"intvlNumbits = "<<intvlNumBits<<", intvlNumPackets = "<<intvlNumPackets<<endl;
     intvlPriBits[priority] += bits;
 
-    // packet should be counted to new interval
-    if (intvlNumPackets >= batchSize || now - intvlStartTime >= maxInterval)
-        beginNewInterval(now);
+
 }
 
 void HiEthernetMac::beginNewInterval(simtime_t now)
@@ -456,6 +454,9 @@ void HiEthernetMac::handleEndIFGPeriod()
 
     // End of IFG period, okay to transmit
     EV_DETAIL << "IFG elapsed" << endl;
+    // packet should be counted to new interval
+    if (intvlNumPackets >= batchSize || simTime() - intvlStartTime >= maxInterval)
+        beginNewInterval(simTime());
     changeTransmissionState(TX_IDLE_STATE);
 
 

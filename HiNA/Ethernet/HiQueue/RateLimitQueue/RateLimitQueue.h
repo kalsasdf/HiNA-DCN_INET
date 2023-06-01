@@ -34,10 +34,13 @@ class INET_API RateLimitQueue : public PacketQueueBase, public IPacketBuffer::IC
     IPacketComparatorFunction *packetComparatorFunction = nullptr;
 
     double limrate = NaN;
+    double linkspeed;
     simtime_t lasttime=0;
+    cMessage *canpull = new cMessage;
 
   protected:
     virtual void initialize(int stage) override;
+    virtual void handleMessage(cMessage *msg) override;
 
     virtual IPacketDropperFunction *createDropperFunction(const char *dropperClass) const;
     virtual IPacketComparatorFunction *createComparatorFunction(const char *comparatorClass) const;
@@ -45,7 +48,7 @@ class INET_API RateLimitQueue : public PacketQueueBase, public IPacketBuffer::IC
     virtual bool isOverloaded() const;
 
   public:
-    virtual ~RateLimitQueue() { delete packetDropperFunction; }
+    virtual ~RateLimitQueue() { delete packetDropperFunction; cancelEvent(canpull);delete canpull;}
 
     virtual int getMaxNumPackets() const override { return packetCapacity; }
     virtual int getNumPackets() const override;

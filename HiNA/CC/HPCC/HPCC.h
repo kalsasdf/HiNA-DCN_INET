@@ -58,7 +58,7 @@ protected:
     int lastUpdateSeq = -1;//sequence number of ACK(wanted sequence at the receiver) that triggered the last update
     int incstage = 0;//the count of Addictive Increase
 
-    double U;//the normalized total inflight bytes
+    double U=0;//the normalized total inflight bytes
     uint send_window;//parameter w
     uint csend_window;//parameter wc
     double currentRate;

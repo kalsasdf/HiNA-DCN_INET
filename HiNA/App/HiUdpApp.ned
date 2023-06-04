@@ -47,7 +47,7 @@ simple HiUdpApp like IApp
         string localAddress = default("");
         int localPort = default(100);  // local port (-1: use ephemeral port)
         int connectPort = default(100);
-        int AppPrioirty = default(0);
+        int AppPriority = default(0);
         string packetName = default("HiUdpData");
         double startTime @unit(s) = default(-1s); // application start time (start of the first packet)
         double stopTime @unit(s) = default(-1s);  // time of finishing sending, -1s means forever

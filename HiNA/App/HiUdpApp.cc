@@ -59,7 +59,7 @@ void HiUdpApp::initialize(int stage)
         startTime = par("startTime");
         stopTime = par("stopTime");
         packetName = par("packetName");
-        AppPriority = par("AppPrioirty");
+        AppPriority = par("AppPriority");
         longflow = par("longflow");
         commandIndex = 0;
         const char *script = par("sendScript");
@@ -329,20 +329,20 @@ void HiUdpApp::refreshDisplay() const
 void HiUdpApp::parseScript(const char *script)
 {
     // ------------------------------------------------------------------------
-    // ´ÓÖ¸¶¨µÄ½Å±¾ÎÄ¼ş »ò ini×Ö·û´®²ÎÊıÖĞ¶ÁÈ¡Á÷Á¿Ä£Ê½
+    // ä»æŒ‡å®šçš„è„šæœ¬æ–‡ä»¶ æˆ– iniå­—ç¬¦ä¸²å‚æ•°ä¸­è¯»å–æµé‡æ¨¡å¼
 //    char* buffer = nullptr;
 //    if(*script){
 //        std::fstream SCRIPT_FILE;
 //        int file_length;
 //        SCRIPT_FILE.open(script);
-//        if(!SCRIPT_FILE.is_open()){     // ½Å±¾ÎÄ¼ş²»´æÔÚ£¬±íÊ¾scriptÖ¸ÏòiniÎÄ¼şÅäÖÃµÄ×Ö·û´®²ÎÊı
+//        if(!SCRIPT_FILE.is_open()){     // è„šæœ¬æ–‡ä»¶ä¸å­˜åœ¨ï¼Œè¡¨ç¤ºscriptæŒ‡å‘iniæ–‡ä»¶é…ç½®çš„å­—ç¬¦ä¸²å‚æ•°
 //            EV_INFO << "Script file not found!Traffic Pattern is configured by const string." << endl;
 //            EV_INFO << script << endl;
 //        }
-//        else{                           // ½Å±¾ÎÄ¼ş´æÔÚ,È¡³öÎÄ¼şÄÚÈİ£¬¸³Öµ¸øbuffer£¬ÔÙ´«¸øscript
-//            SCRIPT_FILE.seekg(0, std::ios::end);    // ½«ÎÄ¼şÖ¸Õë¶¨Î»µ½ÎÄ¼ş½áÊøÎ»ÖÃ
-//            file_length = SCRIPT_FILE.tellg();      // ¸ù¾İÎÄ¼şÖ¸Õëµ±Ç°Î»ÖÃ£¬¼ÆËãµÃµ½ÎÄ¼ş³¤¶È
-//            SCRIPT_FILE.seekg(0, std::ios::beg);    // ½«ÎÄ¼şÖ¸Õë¶¨Î»µ½ÎÄ¼ş¿ªÊ¼Î»ÖÃ
+//        else{                           // è„šæœ¬æ–‡ä»¶å­˜åœ¨,å–å‡ºæ–‡ä»¶å†…å®¹ï¼Œèµ‹å€¼ç»™bufferï¼Œå†ä¼ ç»™script
+//            SCRIPT_FILE.seekg(0, std::ios::end);    // å°†æ–‡ä»¶æŒ‡é’ˆå®šä½åˆ°æ–‡ä»¶ç»“æŸä½ç½®
+//            file_length = SCRIPT_FILE.tellg();      // æ ¹æ®æ–‡ä»¶æŒ‡é’ˆå½“å‰ä½ç½®ï¼Œè®¡ç®—å¾—åˆ°æ–‡ä»¶é•¿åº¦
+//            SCRIPT_FILE.seekg(0, std::ios::beg);    // å°†æ–‡ä»¶æŒ‡é’ˆå®šä½åˆ°æ–‡ä»¶å¼€å§‹ä½ç½®
 //            if(file_length == 0) script = "";
 //            else{
 //                buffer = new char[file_length];
@@ -352,7 +352,7 @@ void HiUdpApp::parseScript(const char *script)
 //            SCRIPT_FILE.close();
 //        }
 //    }
-    // else{} Îª¿ÕÊ±£¬scriptÖ¸Ïò¿Õ´® ""£¬±íÊ¾¼ÈÎ´Ö¸¶¨½Å±¾ÎÄ¼şÂ·¾¶¡¢ÓÖÃ»ÓĞÖ¸¶¨ini×Ö·û´®²ÎÊı
+    // else{} ä¸ºç©ºæ—¶ï¼ŒscriptæŒ‡å‘ç©ºä¸² ""ï¼Œè¡¨ç¤ºæ—¢æœªæŒ‡å®šè„šæœ¬æ–‡ä»¶è·¯å¾„ã€åˆæ²¡æœ‰æŒ‡å®šiniå­—ç¬¦ä¸²å‚æ•°
     // ------------------------------------------------------------------------
     const char *s = script;
 

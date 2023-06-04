@@ -83,12 +83,13 @@ protected:
     int num_acked;
 
     cOutVector currentRTTVector;
+    cOutVector mpdVector;
     cOutVector targetVector;
     cOutVector cwndVector;
     cOutVector currateVector;
     int bitlength;
     simtime_t maxInterval;
-    simtime_t lasttime;
+    simtime_t lasttime = 0;
     int timeout_num = 0;
 
     const char *packetName = "PSDData";

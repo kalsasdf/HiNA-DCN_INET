@@ -41,6 +41,7 @@ void POSEIDON::initialize(int stage)
         timeout->setKind(TIMEOUT);
 
         currentRTTVector.setName("currentRTT (s)");
+        mpdVector.setName("mpd (s)");
         targetVector.setName("target_delay (s)");
         cwndVector.setName("cwnd (num)");
         currateVector.setName("currate");
@@ -225,9 +226,8 @@ void POSEIDON::send_data()
     }
     else if(snd_cwnd>=1){
         if(snd_cwnd-(nxtSendpacketid-snd_una)>0){
-            EV<<"snd_cwnd = "<<snd_cwnd<<", sended window - "<<packetid-snd_una<<endl;
-            cancelEvent(senddata);
-            scheduleAt(simTime(),senddata);
+            EV<<"snd_cwnd = "<<snd_cwnd<<", sended window = "<<packetid-snd_una<<endl;
+            send_data();
         }
         else{
             EV<<"Pausing !!!!!"<<endl;
@@ -304,6 +304,7 @@ void POSEIDON::receiveAck(Packet *pck)
         ackid = region.getTag()->getPacketId();
     }
     currentRTT = simTime()-ts;
+    currentRTTVector.recordWithTimestamp(simTime(),currentRTT);
     if((ts>t_last_decrease)){//different from SWIFT
         can_decrease = true;
     }
@@ -348,6 +349,8 @@ void POSEIDON::receiveAck(Packet *pck)
 
     ratio = math::clamp(ratio,0.4,2.5);
     EV<<"ratio = "<<ratio<<", mpd = "<<mpd<<", target = "<<target<<endl;
+    mpdVector.recordWithTimestamp(simTime(),mpd);
+    targetVector.recordWithTimestamp(simTime(),target);
     if(mpd<=target){
         snd_cwnd = snd_cwnd*(1+(ratio-1)*num_acked/snd_cwnd);
     }else if(can_decrease){

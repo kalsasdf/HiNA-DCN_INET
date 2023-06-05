@@ -1,6 +1,6 @@
+[HiNA-DCN inet项目.docx](https://github.com/kalsasdf/HiNA-DCN_INET/files/11650719/HiNA-DCN.inet.docx)
 
-
-[HiNA-DCN inet项目.docx](https://github.com/kalsasdf/HiNA-DCN_INET/files/11622753/HiNA-DCN.inet.docx)
+2023-6-5 新增TcpApp可以使用优先级
 
 2023-6-1 RateLimitQueue优化，pullPacket()中添加scheduleAt自消息，可以做到更精确的限速；测速功能优化
 

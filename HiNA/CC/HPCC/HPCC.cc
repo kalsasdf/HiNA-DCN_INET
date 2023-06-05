@@ -31,6 +31,8 @@ void HPCC::initialize(int stage)
         csend_window = wint;
         send_window = wint;
         Usignal = cComponent::registerSignal("Usignal");
+        linkrateVector.setName("hpcc_linkrate");
+        queuelengthVector.setName("hpcc_queuelength");
 
         senddata = new TimerMsg("senddata");
         senddata->setKind(SENDDATA);
@@ -412,8 +414,12 @@ void HPCC::receiveAck(Packet *pck)
         {
             u = u1;
             tao = curINTs[i].TS - Last[i].TS;
+            linkrate = Rate;
+            queuelength = curINTs[i].queueLength.get();
         }
     }
+    linkrateVector.recordWithTimestamp(simTime(),linkrate);
+    queuelengthVector.recordWithTimestamp(simTime(),queuelength);
     EV<<"total link u ="<<u<<endl;
     if (tao > baseRTT)
         tao = baseRTT;

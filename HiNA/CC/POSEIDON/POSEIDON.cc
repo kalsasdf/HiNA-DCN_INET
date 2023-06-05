@@ -45,6 +45,7 @@ void POSEIDON::initialize(int stage)
         targetVector.setName("target_delay (s)");
         cwndVector.setName("cwnd (num)");
         currateVector.setName("currate");
+        bitlengthVector.setName("PSD_bitlength");
         WATCH(timeout_num);
     }else if (stage == INITSTAGE_TRANSPORT_LAYER) {
         registerService(Protocol::udp, gate("upperIn"), gate("upperOut"));
@@ -207,6 +208,7 @@ void POSEIDON::send_data()
     bitlength+=(snd_info.length+58)*8;
     //58=20(IP)+14(EthernetMac)+8(EthernetPhy)+4(EthernetFcs)+12(interframe gap,IFG)
     if(simTime()-lasttime>=maxInterval){
+        bitlengthVector.recordWithTimestamp(simTime(),bitlength);
         currentRate = bitlength/(simTime()-lasttime).dbl();
         currateVector.recordWithTimestamp(simTime(),currentRate);
         bitlength = 0;

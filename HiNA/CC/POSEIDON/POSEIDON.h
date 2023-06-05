@@ -87,7 +87,8 @@ protected:
     cOutVector targetVector;
     cOutVector cwndVector;
     cOutVector currateVector;
-    int bitlength;
+    int bitlength = 0;
+    cOutVector bitlengthVector;
     simtime_t maxInterval;
     simtime_t lasttime = 0;
     int timeout_num = 0;

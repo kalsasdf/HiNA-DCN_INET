@@ -77,6 +77,10 @@ protected:
     std::map<L3Address, int> receiver_packetMap;
 
     simsignal_t Usignal;
+    double linkrate;
+    cOutVector linkrateVector;
+    int queuelength;
+    cOutVector queuelengthVector;
 
 protected:
     virtual void initialize(int stage) override;

@@ -240,7 +240,7 @@ void SWIFT::send_data()
     else if(snd_cwnd>=1){
         if(snd_cwnd-(nxtSendpacketid-snd_una)>0){
             EV<<"snd_cwnd = "<<snd_cwnd<<", sended window - "<<packetid-snd_una<<endl;
-            scheduleAt(simTime(),senddata);
+            send_data();
         }
         else{
             EV<<"Pausing !!!!!"<<endl;
@@ -552,6 +552,7 @@ void SWIFT::receive_ack(Packet *pck)
     EV<<"pacing_delay = "<<pacing_delay<<"s"<<endl;
     if(SenderState==PAUSING){
         SenderState=SENDING;
+        cancelEvent(senddata);
         scheduleAt(simTime(),senddata);
     }
     delete pck;
@@ -582,6 +583,7 @@ void SWIFT::time_out()
     RTO *= 2;  // 典型RTO机制，超时后时间乘2
     if(SenderState!=STOPPING){
         nxtSendpacketid=snd_una;
+        cancelEvent(senddata);
         scheduleAt(simTime(),senddata);  // 超时后，立即重发未确认的第一个报文
         cancelEvent(timeout);
         scheduleAt(simTime() + RTO, timeout);

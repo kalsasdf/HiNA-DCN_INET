@@ -56,10 +56,10 @@ class INET_API HiUdpApp : public ClockUserModuleMixin<ApplicationBase>, public U
     simtime_t stopTime=0;
     const char *packetName = nullptr;
     uint longflow=0;
-    uint32_t AppPriority=0;
+    int AppPriority;
     const char *trafficMode = nullptr;
-    double linkSpeed=0;
-    double workLoad=0;
+    double linkSpeed;
+    double workLoad;
 
     uint messageLength=0;
     // state

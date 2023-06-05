@@ -54,8 +54,9 @@ class INET_API TcpApp : public TcpAppBase
     const char *trafficMode = nullptr;
     uint longflow=0;
     double packetLength=0;
-    double linkSpeed=0;
-    double workLoad=0;
+    int AppPriority;
+    double linkSpeed;
+    double workLoad;
 
     // state
     cMessage *selfMsg = nullptr;

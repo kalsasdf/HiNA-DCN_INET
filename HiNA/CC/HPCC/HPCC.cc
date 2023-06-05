@@ -159,7 +159,7 @@ void HPCC::send_data()
     auto tag = payload->addTag<HiTag>();
     tag->setFlowId(snd_info.flowid);
     tag->setPriority(snd_info.priority);
-    tag->setCreationtime(snd_info.cretime);
+    tag->setCreationtime(simTime());
     tag->setPacketId(packetid);
     tag->setIsLastPck(snd_info.last);
 

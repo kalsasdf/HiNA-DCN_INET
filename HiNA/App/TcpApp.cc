@@ -55,6 +55,7 @@ void TcpApp::initialize(int stage)
         workLoad = par("workLoad");
         linkSpeed = par("linkSpeed");
         trafficMode = par("trafficMode");
+        AppPriority = par("AppPriority");
         longflow = par("longflow");
         commandIndex = 0;
 
@@ -153,6 +154,8 @@ Packet *TcpApp::createDataPacket(long sendBytes)
     str << packetName;
     Packet *packet = new Packet(str.str().c_str());
     auto payload = makeShared<ByteCountChunk>(B(sendBytes));
+    auto tag=payload->addTag<HiTag>();
+    tag->setPriority(AppPriority);
     packet->insertAtBack(payload);
     numSent++;
     BytesSent+=sendBytes;

@@ -153,11 +153,11 @@ void HOMA::processLowerpck(Packet *pck)
     {
         receive_busy(pck);
     }
-    else if (string(pck->getFullName()).find("homaUnscheduleData") != string::npos)
+    else if (string(pck->getFullName()).find("homaUData") != string::npos)
     {
         receive_unscheduledata(pck);
     }
-    else if (string(pck->getFullName()).find("homaScheduleData") != string::npos)
+    else if (string(pck->getFullName()).find("homaSData") != string::npos)
     {
         receive_scheduledata(pck);
     }
@@ -213,7 +213,7 @@ void HOMA::send_unschedule(uint32_t flowid)
     if (snd_info.sendRtt < snd_info.unsSize)
     {
         send_unschedule(flowid);
-        //·¢ËÍ×ÔÏûÏ¢
+        //å‘é€è‡ªæ¶ˆæ¯
 //        scheduleAt(simTime(),snd_info.sendunschedule);
     }
 
@@ -232,7 +232,7 @@ void HOMA::receive_unscheduledata(Packet* pck)
    uint flowsize;
    receiver_flowinfo rcv_info;
 
-   //ÌáÈ¡±êÇ©ĞÅÏ¢
+   //æå–æ ‡ç­¾ä¿¡æ¯
    for (auto& region : pck->peekData()->getAllTags<HiTag>())
    {
        flowid = region.getTag()->getFlowId();
@@ -293,7 +293,7 @@ void HOMA::receive_unscheduledata(Packet* pck)
        send_grant(flowid);
    }
 
-   //¼ì²âÊÇ·ñ·¢Éú¶ª°ü£¨ÔÚ³¬Ê±Ê±¼äÄÚÎ´ÊÕµ½¼´ÈÏÎª¶ª°ü£¬´ËÊ±ĞèÒª·¢ËÍRESENDÖ¸Áî
+   //æ£€æµ‹æ˜¯å¦å‘ç”Ÿä¸¢åŒ…ï¼ˆåœ¨è¶…æ—¶æ—¶é—´å†…æœªæ”¶åˆ°å³è®¤ä¸ºä¸¢åŒ…ï¼Œæ­¤æ—¶éœ€è¦å‘é€RESENDæŒ‡ä»¤
    sendUp(pck);
 }
 
@@ -323,7 +323,7 @@ void HOMA::send_grant(uint32_t flowid)
         sendDown(grant);
         EV<<"send grant "<<rcv_info.now_send_grt_seq<<", timestamp = "<<simTime()<<"s, "<< "for flow " << flowid << endl;
 
-        //¼ì²âÊÇ·ñ·¢Éú¶ª°ü£¨ÔÚ³¬Ê±Ê±¼äÄÚÎ´ÊÕµ½¼´ÈÏÎª¶ª°ü£¬´ËÊ±ĞèÒª·¢ËÍRESENDÖ¸Áî
+        //æ£€æµ‹æ˜¯å¦å‘ç”Ÿä¸¢åŒ…ï¼ˆåœ¨è¶…æ—¶æ—¶é—´å†…æœªæ”¶åˆ°å³è®¤ä¸ºä¸¢åŒ…ï¼Œæ­¤æ—¶éœ€è¦å‘é€RESENDæŒ‡ä»¤
         cancelEvent(rcv_info.timeout);
         scheduleAt(simTime() + timeout, rcv_info.timeout);
 
@@ -414,7 +414,7 @@ void HOMA::receive_scheduledata(Packet* pck)
     int flowid;
     int priority;
     int now_received_data_seq;
-    //ÌáÈ¡±êÇ©ĞÅÏ¢
+    //æå–æ ‡ç­¾ä¿¡æ¯
     for (auto& region : pck->peekData()->getAllTags<HiTag>())
     {
        last = region.getTag()->isLastPck();
@@ -423,7 +423,7 @@ void HOMA::receive_scheduledata(Packet* pck)
        priority = region.getTag()->getPriority();
     }
     receiver_flowinfo rcv_info = receiver_flowMap.find(flowid) -> second;
-    //½â³ı¸ÃÓÅÏÈ¼¶µÄÏŞÖÆ
+    //è§£é™¤è¯¥ä¼˜å…ˆçº§çš„é™åˆ¶
     rcv_info.now_received_data_seq = now_received_data_seq;
 
     rcv_info.scheduleFlowSize += length;
@@ -459,7 +459,7 @@ void HOMA::send_resend(uint32_t flowid, long seq)
     auto tag = content -> addTag<HiTag>();
     tag->setPriority(0);
     tag->setFlowId(rcv_info.flowid);
-    //´ËÊ±packetidÎªÆÚ´ıÖØ´«µÄ°ü
+    //æ­¤æ—¶packetidä¸ºæœŸå¾…é‡ä¼ çš„åŒ…
     tag->setPacketId(seq);
     resend->insertAtFront(content);
 
@@ -487,7 +487,7 @@ void HOMA::receive_resend(Packet* pck)
        flowid = region.getTag()->getFlowId();
     }
     sender_flowinfo snd_info = sender_flowMap.find(flowid) -> second;
-    //Èô´ËÊ±ÕıÔÚ´«ÊäÊı¾İ£¬·¢ËÍBUSY°ü
+    //è‹¥æ­¤æ—¶æ­£åœ¨ä¼ è¾“æ•°æ®ï¼Œå‘é€BUSYåŒ…
 //    if(snd_info.SenderState == US_SENT)
 //    {
 //        send_busy(flowid, seq);
@@ -530,7 +530,7 @@ void HOMA::send_busy(uint32_t flowid, long seq)
     auto tag = content -> addTag<HiTag>();
     tag->setPriority(7);
     tag->setFlowId(snd_info.flowid);
-    //´ËÊ±packetidÎªÆÚ´ıÖØ´«µÄ°ü
+    //æ­¤æ—¶packetidä¸ºæœŸå¾…é‡ä¼ çš„åŒ…
     tag->setPacketId(seq);
     busy->insertAtFront(content);
 

@@ -213,9 +213,9 @@ void XPASS::receive_credreq(Packet *pck)
             rcvflow.current_speed = currate;
             rcvflow.targetRate=maxrate;
             rcvflow.max_speed = maxrate;
+            rcvflow.omega =0.5;
 
             //for ECN-based rate control
-            rcvflow.omega =1/16;
             rcvflow.alpha=alpha;
             rcvflow.ByteFrSteps=0;
             rcvflow.ByteCounter=0;
@@ -305,14 +305,14 @@ void XPASS::receive_credit(Packet *pck)
     else
     {
         // none stop
-        sender_flowinfo sndflow= sender_flowMap.begin()->second;
+        sender_flowinfo snd_info= sender_flowMap.begin()->second;
         int flowid =sender_flowMap.begin()->first;
         std::ostringstream str;
         str << packetName << "-" <<flowid<<"-"<<packetid;
         Packet *packet = new Packet(str.str().c_str());
         int packetLength;
         bool last = false;
-        if (sndflow.flowsize >= max_pck_size)
+        if (snd_info.flowsize >= max_pck_size)
         {
             remainSize -=  max_pck_size;
             sender_flowMap[flowid].flowsize-=  max_pck_size;
@@ -322,7 +322,7 @@ void XPASS::receive_credit(Packet *pck)
         {
             last = true;
             sender_flowMap.erase(flowid);
-            sender_flowMap.begin()->second.flowsize-=(max_pck_size-sndflow.flowsize);
+            sender_flowMap.begin()->second.flowsize-=(max_pck_size-snd_info.flowsize);
             remainSize -= max_pck_size;
             packetLength=max_pck_size;
         }
@@ -335,8 +335,12 @@ void XPASS::receive_credit(Packet *pck)
         tag->setReverse(true);
         tag->setFlowId(flowid);
         tag->setPacketId(packetid);
-        tag->setPriority(sndflow.priority);
-        tag->setCreationtime(simTime());
+        tag->setPriority(snd_info.priority);
+        if(lastflowid!=snd_info.flowid){
+            last_creation_time = snd_info.cretime;
+            lastflowid = snd_info.flowid;
+        }
+        tag->setCreationtime(last_creation_time);
         if(last)
             tag->setIsLastPck(true);
 
@@ -349,10 +353,10 @@ void XPASS::receive_credit(Packet *pck)
         // insert udpHeader, set source and destination port
         const Protocol *l3Protocol = &Protocol::ipv4;
         auto udpHeader = makeShared<UdpHeader>();
-        udpHeader->setSourcePort(sndflow.srcPort);
-        udpHeader->setDestinationPort(sndflow.destPort);
-        udpHeader->setCrc(sndflow.crc);
-        udpHeader->setCrcMode(sndflow.crcMode);
+        udpHeader->setSourcePort(snd_info.srcPort);
+        udpHeader->setDestinationPort(snd_info.destPort);
+        udpHeader->setCrc(snd_info.crc);
+        udpHeader->setCrcMode(snd_info.crcMode);
         udpHeader->setTotalLengthField(udpHeader->getChunkLength() + packet->getTotalLength());
         insertTransportProtocolHeader(packet, Protocol::udp, udpHeader);
         packet->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(l3Protocol);

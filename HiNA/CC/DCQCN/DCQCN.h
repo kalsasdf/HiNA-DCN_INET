@@ -69,16 +69,19 @@ protected:
     simtime_t stopTime;
     double linkspeed;
     double initialrate;
+    int64_t max_pck_size;
     double gamma;
     simtime_t min_cnp_interval;
     simtime_t AlphaTimer_th;
     simtime_t RateTimer_th;
     double Rai;
     double Rhai;
-    int64_t max_pck_size;
+
+    simtime_t last_creation_time = 0;
+    int lastflowid = -1;
+
     int ByteCounter_th;
     int frSteps_th;
-
     L3Address srcAddr;
 
     const char *packetName = "DcqcnData";

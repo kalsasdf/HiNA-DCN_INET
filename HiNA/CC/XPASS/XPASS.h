@@ -107,6 +107,8 @@ class XPASS : public TransportProtocolBase
     int credit_size = 208;//(84-58)*8,58=20(IP)+14(EthernetMac)+8(EthernetPhy)+4(EthernetFcs)+12(interframe gap,IFG)
     simtime_t max_idletime = 0.00002;
     long remainSize = 0;
+    simtime_t last_creation_time = 0;
+    int lastflowid = -1;
 
     L3Address srcaddr;
 

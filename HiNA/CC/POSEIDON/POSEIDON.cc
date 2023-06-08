@@ -175,7 +175,11 @@ void POSEIDON::send_data()
     auto tag = payload->addTag<HiTag>();
     tag->setFlowId(snd_info.flowid);
     tag->setPriority(snd_info.priority);
-    tag->setCreationtime(simTime());
+    if(lastflowid!=snd_info.flowid){
+        last_creation_time = snd_info.cretime;
+        lastflowid = snd_info.flowid;
+    }
+    tag->setCreationtime(last_creation_time);
     tag->setPacketId(packetid);
     tag->setIsLastPck(snd_info.last);
 
@@ -276,7 +280,7 @@ void POSEIDON::receive_data(Packet *pck)
     std::ostringstream str;
     str <<"ACK-" <<curRcvNum;
     Packet *intinfo = new Packet(str.str().c_str());
-    const auto& payload = makeShared<ByteCountChunk>(B(1));
+    const auto& payload = makeShared<ByteCountChunk>(B(26));
     auto tag = payload->addTag<HiTag>();
     tag->setPacketId(curRcvNum);
     payload->enableImplicitChunkSerialization = true;

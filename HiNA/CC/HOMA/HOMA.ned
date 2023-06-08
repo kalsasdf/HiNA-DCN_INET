@@ -31,6 +31,7 @@ simple HOMA like UdpCC
         bool activate = default(true);
         double linkspeed @unit(bps) = default (1Gbps);
         int max_pck_size = default(1472);
+        double stopTime @unit(s) = default(10s);
         double baseRTT @unit(s) = default(4us);
         
         @display("i=block/downarrow,grey80;is=s;i2=status/down");

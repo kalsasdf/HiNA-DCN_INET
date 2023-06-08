@@ -91,6 +91,8 @@ protected:
     simtime_t pacing_delay = 0;
     double pre_snd = 0;
     bool can_decrease = true;
+    simtime_t last_creation_time = 0;
+    int lastflowid = -1;
 
     double fs_range;
     double snd_cwnd;

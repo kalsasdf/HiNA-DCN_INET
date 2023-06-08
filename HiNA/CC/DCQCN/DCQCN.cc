@@ -174,7 +174,11 @@ void DCQCN::send_data()
     auto tag = payload->addTag<HiTag>();
     tag->setFlowId(snd_info.flowid);
     tag->setPriority(snd_info.priority);
-    tag->setCreationtime(snd_info.cretime);
+    if(lastflowid!=snd_info.flowid){
+        last_creation_time = snd_info.cretime;
+        lastflowid = snd_info.flowid;
+    }
+    tag->setCreationtime(last_creation_time);
     tag->setPacketId(snd_info.pckseq);
     if(snd_info.remainLength==0)
         tag->setIsLastPck(true);

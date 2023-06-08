@@ -74,6 +74,7 @@ class HOMA : public TransportProtocolBase
 
     // configuration for .ned file
     bool activate;
+    simtime_t stopTime;
     double linkspeed;
     simtime_t baseRTT;
     int64_t max_pck_size;
@@ -81,7 +82,9 @@ class HOMA : public TransportProtocolBase
     L3Address srcAddr;
     int rttbytes = 0;
     simtime_t timeout = 0.00002;
-    bool priorityUse[8];
+    simtime_t last_creation_time = 0;
+    int lastflowid = -1;
+    bool priorityUse[8] = {0};
     uint32_t maxSchedPktDataBytes;
     std::vector<uint32_t> prioCutOffs;
     std::vector<uint32_t> eUnschedPrioCutoff;

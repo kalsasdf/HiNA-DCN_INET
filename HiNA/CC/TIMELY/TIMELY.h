@@ -63,6 +63,8 @@ protected:
     int accumlength = 0;
     int segcount = 0;
     bool isLastPck = false;
+    simtime_t last_creation_time = 0;
+    int lastflowid = -1;
 
     L3Address srcAddr;
 

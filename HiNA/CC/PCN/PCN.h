@@ -71,6 +71,9 @@ protected:
 
     L3Address srcAddr;
 
+    simtime_t last_creation_time = 0;
+    int lastflowid = -1;
+
     const char *packetName = "PCNData";
     cGate *lowerOutGate;
     cGate *lowerInGate;

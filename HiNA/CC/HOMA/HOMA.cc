@@ -21,6 +21,7 @@ void HOMA::initialize(int stage)
         downGate = gate("upperIn");
         // configuration
         activate = par("activate");
+        stopTime = par("stopTime");
         linkspeed = par("linkspeed");
         max_pck_size = par("max_pck_size");
         baseRTT = par("baseRTT");
@@ -171,7 +172,7 @@ void HOMA::send_unschedule(uint32_t flowid)
     sender_flowinfo snd_info = sender_flowMap.find(flowid)->second;
     std::ostringstream str;
 
-    str << "homaUnscheduleData" << "-" <<snd_info.flowid<< "-" <<snd_info.pckseq;
+    str << "homaUData" << "-" <<snd_info.flowid<< "-" <<snd_info.pckseq;
     Packet *packet = new Packet(str.str().c_str());
     int64_t this_pck_bytes = (snd_info.sendRtt+max_pck_size<=snd_info.unsSize)?max_pck_size:snd_info.unsSize-snd_info.sendRtt;
     snd_info.sendRtt += this_pck_bytes;
@@ -181,7 +182,11 @@ void HOMA::send_unschedule(uint32_t flowid)
     if(snd_info.sendRtt == snd_info.unsSize&&snd_info.sSize==0) tag->setIsLastPck(true);
     tag->setFlowId(snd_info.flowid);
     tag->setPacketId(snd_info.pckseq);
-    tag->setCreationtime(snd_info.cretime);
+    if(lastflowid!=snd_info.flowid){
+        last_creation_time = snd_info.cretime;
+        lastflowid = snd_info.flowid;
+    }
+    tag->setCreationtime(last_creation_time);
     tag->setPriority(0);
     tag->setFlowSize(snd_info.flowsize);
     packet->insertAtBack(payload);
@@ -248,7 +253,7 @@ void HOMA::receive_unscheduledata(Packet* pck)
       rcv_info.unscheduleFlowSize = length;
       rcv_info.flowid = flowid;
       for(int i = 0; i < 8; i ++)
-      {
+      {EV<<i<<" = "<<priorityUse[i]<<endl;
           if(!priorityUse[i])
           {
               rcv_info.SenderPriority = i;
@@ -296,25 +301,17 @@ void HOMA::send_grant(uint32_t flowid)
 {
     receiver_flowinfo rcv_info = receiver_flowMap[flowid];
 
-
-    //若所有优先级都已发送一个GRANT，此时稍作等待
-//    if(SenderPriority == -1)
-//    {
-//        cancelEvent(rcv_info.sendgrant);
-//        scheduleAt(simTime() + timeout, rcv_info.sendgrant);
-//    }
-//    else
-//    {
+    if(simTime()<stopTime){
         Packet *grant = new Packet("Grant");
 
         rcv_info.now_send_grt_seq ++;
-        const auto& content = makeShared<ByteCountChunk>(B(1));
-        auto tag = content -> addTag<HiTag>();
+        const auto& content = makeShared<ByteCountChunk>(B(26));
+        auto tag = content->addTag<HiTag>();
         tag->setPriority(0);
         tag->setFlowId(rcv_info.flowid);
         tag->setPacketId(rcv_info.now_send_grt_seq);
         tag->setSenderPriority(rcv_info.SenderPriority);
-
+        content->enableImplicitChunkSerialization=true;
         grant->insertAtBack(content);
 
         grant->addTagIfAbsent<L3AddressReq>()->setDestAddress(rcv_info.destAddr);
@@ -326,11 +323,16 @@ void HOMA::send_grant(uint32_t flowid)
         sendDown(grant);
         EV<<"send grant "<<rcv_info.now_send_grt_seq<<", timestamp = "<<simTime()<<"s, "<< "for flow " << flowid << endl;
 
+        //检测是否发生丢包（在超时时间内未收到即认为丢包，此时需要发送RESEND指令
+        cancelEvent(rcv_info.timeout);
+        scheduleAt(simTime() + timeout, rcv_info.timeout);
 
         receiver_flowMap[flowid] = rcv_info;
+    }else{
+        cancelEvent(rcv_info.timeout);
+        receiver_flowMap[flowid] = rcv_info;
+    }
 
-
-//    }
 }
 
 void HOMA::receive_grant(Packet *pck)
@@ -350,13 +352,13 @@ void HOMA::receive_grant(Packet *pck)
     }
     sender_flowinfo snd_info = sender_flowMap.find(flowid)->second;
 
-    if(snd_info.sSize > 0)
+    if(simTime()<stopTime&&snd_info.sSize>0)
     {
         snd_info.flowid = flowid;
         int64_t this_pck_bytes = 0;
         bool last = false;
         std::ostringstream str;
-        str << "homaScheduleData" << "-" << flowid << "-" << snd_info.pckseq << " - " << priority << endl;
+        str << "homaSData" << "-" << flowid << "-" << snd_info.pckseq << endl;
         Packet *packet = new Packet(str.str().c_str());
         this_pck_bytes = max_pck_size;
         if(snd_info.sSize <= this_pck_bytes)
@@ -442,9 +444,7 @@ void HOMA::receive_scheduledata(Packet* pck)
         EV << "The flow " << flowid << " unschedule data has been all received, send GRANT" << endl;
 
         send_grant(flowid);
-        //检测是否发生丢包（在超时时间内未收到即认为丢包，此时需要发送RESEND指令
-        cancelEvent(rcv_info.timeout);
-        scheduleAt(simTime() + timeout, rcv_info.timeout);
+
     }
 
     sendUp(pck);
@@ -517,6 +517,7 @@ void HOMA::receive_resend(Packet* pck)
 
         EV << "resend pckid = " << seq << endl;
         sendDown(packet);
+        delete pck;
 //    }
 }
 

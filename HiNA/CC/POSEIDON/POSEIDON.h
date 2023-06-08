@@ -55,6 +55,7 @@ protected:
     double PARA_K;
     double m;
     double min_md;
+    simtime_t maxInterval;
 
 
     uint64_t packetid = 0;
@@ -73,6 +74,11 @@ protected:
     simtime_t currentRTT = 0;
     simtime_t t_last_decrease = 0;
     simtime_t pacing_delay = 0;
+    int bitlength = 0;
+    simtime_t lasttime = 0;
+    int timeout_num = 0;
+    simtime_t last_creation_time = 0;
+    int lastflowid = -1;
 
     double snd_cwnd;
     double cwnd_prev;
@@ -82,16 +88,13 @@ protected:
     double min_rate;
     int num_acked;
 
+    cOutVector bitlengthVector;
     cOutVector currentRTTVector;
     cOutVector mpdVector;
     cOutVector targetVector;
     cOutVector cwndVector;
     cOutVector currateVector;
-    int bitlength = 0;
-    cOutVector bitlengthVector;
-    simtime_t maxInterval;
-    simtime_t lasttime = 0;
-    int timeout_num = 0;
+
 
     const char *packetName = "PSDData";
     cGate *lowerOutGate;

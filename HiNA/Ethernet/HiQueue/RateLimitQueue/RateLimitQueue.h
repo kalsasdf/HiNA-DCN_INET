@@ -34,7 +34,6 @@ class INET_API RateLimitQueue : public PacketQueueBase, public IPacketBuffer::IC
     IPacketComparatorFunction *packetComparatorFunction = nullptr;
 
     double limrate = NaN;
-    double linkspeed;
     simtime_t lasttime=0;
     cMessage *canpull = new cMessage;
 

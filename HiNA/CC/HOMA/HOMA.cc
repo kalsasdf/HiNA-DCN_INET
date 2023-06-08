@@ -213,7 +213,7 @@ void HOMA::send_unschedule(uint32_t flowid)
     if (snd_info.sendRtt < snd_info.unsSize)
     {
         send_unschedule(flowid);
-        //å‘é€è‡ªæ¶ˆæ¯
+        //·¢ËÍ×ÔÏûÏ¢
 //        scheduleAt(simTime(),snd_info.sendunschedule);
     }
 
@@ -232,7 +232,7 @@ void HOMA::receive_unscheduledata(Packet* pck)
    uint flowsize;
    receiver_flowinfo rcv_info;
 
-   //æå–æ ‡ç­¾ä¿¡æ¯
+   //ÌáÈ¡±êÇ©ÐÅÏ¢
    for (auto& region : pck->peekData()->getAllTags<HiTag>())
    {
        flowid = region.getTag()->getFlowId();
@@ -240,6 +240,7 @@ void HOMA::receive_unscheduledata(Packet* pck)
        now_received_data_seq = region.getTag()->getPacketId();
        flowsize = region.getTag()->getFlowSize();
    }
+   EV<<"The flow " << flowid << " unschedule data received"<<endl;
 
    auto it = receiver_flowMap.find(flowid);
    if(it != receiver_flowMap.end())
@@ -285,15 +286,12 @@ void HOMA::receive_unscheduledata(Packet* pck)
        rcv_info.ReceiverState = GRANT_SENDING;
        receiver_flowMap[flowid] = rcv_info;
    }
-
-   if(rcv_info.ReceiverState == GRANT_SENDING)
+   EV <<" receiver state is "<<receiver_flowMap[flowid].ReceiverState<< endl;
+   if(receiver_flowMap[flowid].ReceiverState == GRANT_SENDING)
    {
-       EV << "The flow " << flowid << " unschedule data received, send GRANT" << endl;
-
        send_grant(flowid);
    }
 
-   //æ£€æµ‹æ˜¯å¦å‘ç”Ÿä¸¢åŒ…ï¼ˆåœ¨è¶…æ—¶æ—¶é—´å†…æœªæ”¶åˆ°å³è®¤ä¸ºä¸¢åŒ…ï¼Œæ­¤æ—¶éœ€è¦å‘é€RESENDæŒ‡ä»¤
    sendUp(pck);
 }
 
@@ -323,7 +321,7 @@ void HOMA::send_grant(uint32_t flowid)
         sendDown(grant);
         EV<<"send grant "<<rcv_info.now_send_grt_seq<<", timestamp = "<<simTime()<<"s, "<< "for flow " << flowid << endl;
 
-        //æ£€æµ‹æ˜¯å¦å‘ç”Ÿä¸¢åŒ…ï¼ˆåœ¨è¶…æ—¶æ—¶é—´å†…æœªæ”¶åˆ°å³è®¤ä¸ºä¸¢åŒ…ï¼Œæ­¤æ—¶éœ€è¦å‘é€RESENDæŒ‡ä»¤
+        //¼ì²âÊÇ·ñ·¢Éú¶ª°ü£¨ÔÚ³¬Ê±Ê±¼äÄÚÎ´ÊÕµ½¼´ÈÏÎª¶ª°ü£¬´ËÊ±ÐèÒª·¢ËÍRESENDÖ¸Áî
         cancelEvent(rcv_info.timeout);
         scheduleAt(simTime() + timeout, rcv_info.timeout);
 
@@ -414,7 +412,7 @@ void HOMA::receive_scheduledata(Packet* pck)
     int flowid;
     int priority;
     int now_received_data_seq;
-    //æå–æ ‡ç­¾ä¿¡æ¯
+    //ÌáÈ¡±êÇ©ÐÅÏ¢
     for (auto& region : pck->peekData()->getAllTags<HiTag>())
     {
        last = region.getTag()->isLastPck();
@@ -423,7 +421,7 @@ void HOMA::receive_scheduledata(Packet* pck)
        priority = region.getTag()->getPriority();
     }
     receiver_flowinfo rcv_info = receiver_flowMap.find(flowid) -> second;
-    //è§£é™¤è¯¥ä¼˜å…ˆçº§çš„é™åˆ¶
+    //½â³ý¸ÃÓÅÏÈ¼¶µÄÏÞÖÆ
     rcv_info.now_received_data_seq = now_received_data_seq;
 
     rcv_info.scheduleFlowSize += length;
@@ -459,7 +457,7 @@ void HOMA::send_resend(uint32_t flowid, long seq)
     auto tag = content -> addTag<HiTag>();
     tag->setPriority(0);
     tag->setFlowId(rcv_info.flowid);
-    //æ­¤æ—¶packetidä¸ºæœŸå¾…é‡ä¼ çš„åŒ…
+    //´ËÊ±packetidÎªÆÚ´ýÖØ´«µÄ°ü
     tag->setPacketId(seq);
     resend->insertAtFront(content);
 
@@ -487,7 +485,7 @@ void HOMA::receive_resend(Packet* pck)
        flowid = region.getTag()->getFlowId();
     }
     sender_flowinfo snd_info = sender_flowMap.find(flowid) -> second;
-    //è‹¥æ­¤æ—¶æ­£åœ¨ä¼ è¾“æ•°æ®ï¼Œå‘é€BUSYåŒ…
+    //Èô´ËÊ±ÕýÔÚ´«ÊäÊý¾Ý£¬·¢ËÍBUSY°ü
 //    if(snd_info.SenderState == US_SENT)
 //    {
 //        send_busy(flowid, seq);
@@ -530,7 +528,7 @@ void HOMA::send_busy(uint32_t flowid, long seq)
     auto tag = content -> addTag<HiTag>();
     tag->setPriority(7);
     tag->setFlowId(snd_info.flowid);
-    //æ­¤æ—¶packetidä¸ºæœŸå¾…é‡ä¼ çš„åŒ…
+    //´ËÊ±packetidÎªÆÚ´ýÖØ´«µÄ°ü
     tag->setPacketId(seq);
     busy->insertAtFront(content);
 

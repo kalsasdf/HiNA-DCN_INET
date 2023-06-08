@@ -64,7 +64,6 @@ simple RateLimitQueue extends PacketQueueBase like IPacketQueue
         string bufferModule = default(""); // relative module path to the IPacketBuffer module used by this queue, implicit buffer by default
         displayStringTextFormat = default("contains %p pk (%l) pushed %u\npulled %o removed %r dropped %d");
         double limrate @unit(bps) = default(10Gbps);
-        double linkspeed @unit(bps) = default(10Gbps);
         @class(RateLimitQueue);
         @signal[packetPushStarted](type=inet::Packet);
         @signal[packetPushEnded](type=inet::Packet?);

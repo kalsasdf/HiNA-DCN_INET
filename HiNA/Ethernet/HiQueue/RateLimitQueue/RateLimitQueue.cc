@@ -32,8 +32,7 @@ void RateLimitQueue::initialize(int stage)
         if (packetComparatorFunction != nullptr)
             queue.setup(packetComparatorFunction);
         packetDropperFunction = createDropperFunction(par("dropperClass"));
-        limrate = par("limrate");EV<<"limrate = "<<limrate<<endl;
-        linkspeed = par("linkspeed");
+        limrate = par("limrate");
     }
     else if (stage == INITSTAGE_QUEUEING) {
         checkPacketOperationSupport(inputGate);
@@ -124,10 +123,10 @@ bool RateLimitQueue::canPullSomePacket(cGate *gate) const
     }else{
         auto packet = check_and_cast<Packet *>(queue.front());
         simtime_t interval = simTime() - lasttime;
-        simtime_t time = simtime_t((packet->getBitLength()+8*8)/limrate)+simtime_t(12*8/linkspeed);
+        simtime_t mintime = simtime_t((packet->getBitLength()+20*8)/limrate);
         //20=8(EtherPhy)+12(interframe gap,IFG)
-        EV<<"packet length = "<<packet->getBitLength()<<", interval = "<<interval<<", mintime = "<<time<<endl;
-        if(simtime_t(packet->getBitLength()/limrate)>interval){
+        EV<<"packet length = "<<packet->getBitLength()<<", interval = "<<interval<<", mintime = "<<mintime<<endl;
+        if(mintime>interval){
             EV<< "interval is not enough, delayed "<<endl;
             return false;
         }else{
@@ -152,9 +151,9 @@ Packet *RateLimitQueue::pullPacket(cGate *gate)
     if(!isEmpty()){
         cancelEvent(canpull);
         auto newpacket = check_and_cast<Packet *>(queue.front());
-        simtime_t time = simtime_t((newpacket->getBitLength()+8*8)/limrate)+simtime_t(12*8/linkspeed);
+        simtime_t mintime = simtime_t((newpacket->getBitLength()+20*8)/limrate);
         //20=8(EtherPhy)+12(interframe gap,IFG)
-        scheduleAt(simTime()+time,canpull);
+        scheduleAt(simTime()+mintime,canpull);
     }
     auto packetEvent = new PacketQueuedEvent();
     packetEvent->setQueuePacketLength(getNumPackets());

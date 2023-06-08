@@ -272,8 +272,8 @@ void XPASS::send_credit(L3Address destaddr)
     receiver_flowMap[destaddr] = rcvflow;
     if(receiver_StateMap[destaddr]==CREDIT_SENDING){
         rcvflow.sendcredit->setDestAddr(destaddr);
-        simtime_t interval = (simtime_t)((credit_size+(jitter_bytes+46)*8)/rcvflow.current_speed+12*8/linkspeed);
-        //46=20(IP)+14(EthernetMac)+8(EthernetPhy)+4(EthernetFcs), plus 12(interframe gap,IFG)
+        simtime_t interval = (simtime_t)((credit_size+(jitter_bytes+58)*8)/rcvflow.current_speed);
+        //58=20(IP)+14(EthernetMac)+8(EthernetPhy)+4(EthernetFcs)+12(interframe gap,IFG)
         scheduleAt(simTime() + interval,rcvflow.sendcredit);
         EV<<"currate = "<<rcvflow.current_speed<<", jitter_bytes = "<<jitter_bytes<<", next time = "<<simTime() + interval<<"s"<<endl;
     }

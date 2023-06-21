@@ -37,8 +37,8 @@ simple XPASS like UdpCC
         double tlow=default(0.001);
         double RTT_a=default(0.5);
         double minRTT=default(0.0001);
-        double gamma=default(1/256);
-        double alpha=default(1);
+        double gamma=default(1/16);
+        double alpha=default(0);
         double Rai @unit(bps) = default(40Mbps);
  		double Rhai @unit(bps) = default(400Mbps);
         

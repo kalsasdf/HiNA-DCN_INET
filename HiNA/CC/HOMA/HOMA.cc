@@ -110,9 +110,6 @@ void HOMA::processUpperpck(Packet *pck)
             snd_info.crc = udpHeader->getCrc();
             snd_info.sendRtt = 0;
             snd_info.unscheduledPrio = getMesgPrio(snd_info.unsSize);
-            snd_info.sendunschedule = new TimerMsg("sendunschedule");
-            snd_info.sendunschedule->setKind(SENDUNSCHEDULE);
-            snd_info.sendunschedule->setFlowId(snd_info.flowid);
             if(snd_info.flowsize < rttbytes)
             {
                 snd_info.unsSize = snd_info.flowsize;
@@ -126,7 +123,7 @@ void HOMA::processUpperpck(Packet *pck)
 
             sender_flowMap[flowid] = snd_info;
 
-            scheduleAt(simTime(),snd_info.sendunschedule);
+            send_unschedule(flowid);
             EV << "store new flow, id = "<<snd_info.flowid<<", size = " << snd_info.flowsize <<
                     ", creationtime = "<<snd_info.cretime<<endl;
         }
@@ -213,8 +210,6 @@ void HOMA::send_unschedule(uint32_t flowid)
     if (snd_info.sendRtt < snd_info.unsSize)
     {
         send_unschedule(flowid);
-        //发送自消息
-//        scheduleAt(simTime(),snd_info.sendunschedule);
     }
 
 }
@@ -224,7 +219,6 @@ void HOMA::receive_unscheduledata(Packet* pck)
    auto l3addr = pck->getTag<L3AddressInd>();
    srcAddr = l3addr->getDestAddress();
    L3Address destAddr = l3addr->getSrcAddress();
-   int64_t length = pck->getByteLength();
 
    int flowid;
    bool last;
@@ -246,12 +240,10 @@ void HOMA::receive_unscheduledata(Packet* pck)
    if(it != receiver_flowMap.end())
    {
       rcv_info = it->second;
-      rcv_info.unscheduleFlowSize += length;
    }
    else
    {
       rcv_info.destAddr = destAddr;
-      rcv_info.unscheduleFlowSize = length;
       rcv_info.flowid = flowid;
       for(int i = 0; i < 8; i ++)
       {EV<<i<<" = "<<priorityUse[i]<<endl;
@@ -271,7 +263,6 @@ void HOMA::receive_unscheduledata(Packet* pck)
    }
    rcv_info.now_received_data_seq = now_received_data_seq;
    rcv_info.now_send_grt_seq = -1;
-   rcv_info.scheduleFlowSize = 0;
    rcv_info.if_get[rcv_info.now_received_data_seq] = true;
    if(last) {
        rcv_info.ReceiverState = GRANT_STOP;
@@ -356,7 +347,7 @@ void HOMA::receive_grant(Packet *pck)
         int64_t this_pck_bytes = 0;
         bool last = false;
         std::ostringstream str;
-        str << "homaSData" << "-" << flowid << "-" << snd_info.pckseq << endl;
+        str << "homaSData" << "-" << flowid << "-" << snd_info.pckseq;
         Packet *packet = new Packet(str.str().c_str());
         this_pck_bytes = max_pck_size;
         if(snd_info.sSize <= this_pck_bytes)
@@ -398,7 +389,7 @@ void HOMA::receive_grant(Packet *pck)
         sender_flowMap[flowid] = snd_info;
         sendDown(packet);
     }
-    delete(pck);
+    delete pck;
 }
 
 void HOMA::receive_scheduledata(Packet* pck)
@@ -406,7 +397,6 @@ void HOMA::receive_scheduledata(Packet* pck)
     auto l3addr = pck->getTag<L3AddressInd>();
     L3Address srcAddr = l3addr->getDestAddress();
     L3Address destAddr = l3addr->getSrcAddress();
-    int64_t length = pck->getByteLength();
 
     bool last;
     int flowid;
@@ -424,7 +414,6 @@ void HOMA::receive_scheduledata(Packet* pck)
     //解除该优先级的限制
     rcv_info.now_received_data_seq = now_received_data_seq;
 
-    rcv_info.scheduleFlowSize += length;
     rcv_info.if_get[rcv_info.now_received_data_seq] = true;
     if(last){
         rcv_info.ReceiverState = GRANT_STOP;

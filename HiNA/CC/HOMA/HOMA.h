@@ -44,8 +44,6 @@ class HOMA : public TransportProtocolBase
         bool if_get[10000]; //包是否收到状态表
         int now_received_data_seq; //当前收到的包序列号
         long now_send_grt_seq; //当前发送的GRANT序列号
-        int64_t unscheduleFlowSize; //Unscheduled流大小
-        int64_t scheduleFlowSize; //Schedule流大小
         ReceiverState ReceiverState;
         int SenderPriority = -1;
         TimerMsg *sendresend;
@@ -68,7 +66,6 @@ class HOMA : public TransportProtocolBase
         int64_t unsSize; //Unscheduled总部分长度
         int64_t sSize; //schedule部分总长度
         uint16_t unscheduledPrio; //unscheduled部分使用的优先级
-        TimerMsg *sendunschedule;
     };
 
 
@@ -119,10 +116,6 @@ class HOMA : public TransportProtocolBase
             delete i->second.sendresend;
             cancelEvent(i->second.timeout);
             delete i->second.timeout;
-        }
-        for(auto i: sender_flowMap){
-            cancelEvent(i.second.sendunschedule);
-            delete i.second.sendunschedule;
         }
     }
 

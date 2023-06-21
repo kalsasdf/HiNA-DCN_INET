@@ -44,6 +44,9 @@ void XPASS::initialize(int stage)
         Rai = par("Rai");
         Rhai = par("Rhai");
 
+        lossratioVector.setName("lossratio");
+        currateVector.setName("currate");
+        ecnratioVector.setName("ecnratio");
         receiver_flowMap.clear();
         sender_flowMap.clear();
     }else if (stage == INITSTAGE_TRANSPORT_LAYER) {
@@ -383,6 +386,9 @@ void XPASS::receive_data(Packet *pck)
         if (useECN) // use ecn for rate control
         {
             receiver_flowinfo tinfo = it->second;
+            for (auto& region : pck->peekData()->getAllTags<HiTag>()){
+                tinfo.now_received_data_seq = region.getTag()->getPacketId();
+            }
             if(tinfo.ReceiverState!=Normal)
             {
                 tinfo.ByteCounter+=pck->getByteLength();
@@ -400,27 +406,19 @@ void XPASS::receive_data(Packet *pck)
             }
             EV<<"receive_data(), now the RTT = "<<tinfo.nowRTT<<"s, the time gap from last ECN-based rate control = "<< simTime()-tinfo.last_Fbtime <<"s"<<endl;
             tinfo.pck_in_rtt++;
+            if (ecn == 3)
+            {
+                tinfo.ecn_in_rtt++;
+
+            }
 
             // Calculate the credit loss ratio, and enter the feedback control.
-            if ((simTime()-tinfo.last_Fbtime) < tinfo.nowRTT )
-            {
-                if (ecn == 3)
-                {
-                    tinfo.ecn_in_rtt++;
-
-                }
-            }
-            else
+            if ((simTime()-tinfo.last_Fbtime) >= tinfo.nowRTT )
             {
                 tinfo.preRTT=tinfo.nowRTT;
                 tinfo.nowRTT = simTime() - pck->getTimestamp();
                 nowRTT=tinfo.nowRTT;
                 tinfo.sumlost = tinfo.now_received_data_seq - tinfo.last_received_data_seq - tinfo.pck_in_rtt;
-                if (ecn == 3)
-                {
-                    tinfo.ecn_in_rtt++;
-
-                }
                 EV<<"receive_data(), ecn_in_rtt = "<<tinfo.ecn_in_rtt<<", pck_in_rtt = "<<tinfo.pck_in_rtt<<endl;
                 EV<<"preRTT="<<tinfo.preRTT<<",nowRTT="<<tinfo.nowRTT<<",rtt_diff="<<tinfo.rtt_diff<<",minRTT="<<minRTT<<endl;
                 tinfo = ecnbased_control(tinfo);

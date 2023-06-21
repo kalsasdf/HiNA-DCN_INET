@@ -25,8 +25,12 @@
 #include "inet/networklayer/common/NetworkInterface.h"
 #include "inet/queueing/marker/EcnMarker.h"
 
+
+#include "inet/HiNA/Ethernet/HiEthernetMac/HiEthernetMac.h"
+
 namespace inet {
 using namespace inet::queueing;
+using namespace std;
 
 class INET_API REDPFCQueue : public PacketQueueBase, public IPacketBuffer::ICallback
 {
@@ -61,6 +65,7 @@ class INET_API REDPFCQueue : public PacketQueueBase, public IPacketBuffer::ICall
     int ecncount=0;
     enum RedResult { RANDOMLY_ABOVE_LIMIT, RANDOMLY_BELOW_LIMIT, ABOVE_MAX_LIMIT, BELOW_MIN_LIMIT };
     mutable RedResult lastResult;
+    b S_drop;
 
     cOutVector queuelengthVector;
     cOutVector sharedBufferVector;

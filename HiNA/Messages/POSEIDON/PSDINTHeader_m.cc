@@ -28,7 +28,7 @@
 #include <sstream>
 #include <memory>
 #include <type_traits>
-#include "inet\HiNA\Messages\POSEIDON\PSDINTHeader_m.h"
+#include "PSDINTHeader_m.h"
 
 namespace omnetpp {
 

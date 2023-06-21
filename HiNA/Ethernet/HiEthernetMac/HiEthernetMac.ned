@@ -136,6 +136,8 @@ simple HiEthernetMac like IEtherMac
         bool TIMELY = default(false);
         bool HPCC = default(false);
         bool PSD = default(false);
+        bool CoRe = default(false);
+        double stopTime @unit(s) = default(10s);
         @class(HiEthernetMac);
         @display("i=block/rxtx");
 

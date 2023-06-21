@@ -90,6 +90,7 @@ protected:
 
     cOutVector bitlengthVector;
     cOutVector currentRTTVector;
+    cOutVector ratioVector;
     cOutVector mpdVector;
     cOutVector targetVector;
     cOutVector cwndVector;

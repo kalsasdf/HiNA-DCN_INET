@@ -71,6 +71,12 @@ class INET_API HiEthernetMac : public EthernetMacBase
     bool PSD;
     //for PSD
 
+    //for CoRe
+    bool CoRe;
+    //for CoRe
+
+    double stopTime;
+
     // IActivePacketSink:
     virtual void handleCanPullPacketChanged(cGate *gate) override;
 

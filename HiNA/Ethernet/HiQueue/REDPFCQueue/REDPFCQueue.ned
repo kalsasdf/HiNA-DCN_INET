@@ -73,6 +73,7 @@ simple REDPFCQueue extends PacketQueueBase like IPacketQueue
         int sharedBuffer @unit(b)= default(16Mb);
         int headroom @unit(b) = default(1b);
         double alpha = default(1);
+        int S_drop @unit(b) = default(0b);
         @class(REDPFCQueue);
         @signal[packetPushStarted](type=inet::Packet);
         @signal[packetPushEnded](type=inet::Packet?);//A question mark after the class name means that the signal is allowed to emit nullptr pointers.

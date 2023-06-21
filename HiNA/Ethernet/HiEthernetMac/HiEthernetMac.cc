@@ -67,6 +67,8 @@ void HiEthernetMac::initialize(int stage)
         TIMELY=par("TIMELY");
         HPCC=par("HPCC");
         PSD=par("PSD");
+        CoRe=par("CoRe");
+        stopTime=par("stopTime");
 
         if (!par("duplexMode"))
             throw cRuntimeError("Half duplex operation is not supported by HiEthernetMac, use the EthernetCsmaMac module for that! (Please enable csmacdSupport on EthernetInterface)");
@@ -165,12 +167,28 @@ void HiEthernetMac::startFrameTransmission()
         auto& INT_hdr = frame->removeAtFront<PSDINTHeader>();//移除INT头
         if(simTime()-INT_hdr->getTS()>INT_hdr->getMPD())
             INT_hdr->setMPD(simTime()-INT_hdr->getTS());
+        EV<<"mpd = "<<INT_hdr->getMPD();
         INT_hdr->setTS(simTime());
         frame->insertAtFront(INT_hdr);//加INT头
         frame->insertAtFront(ip_hdr);//加ip头
         frame->insertAtFront(eth_hdr);//加mac头
     }
     //for PSD
+
+    //for CoRe
+    if(CoRe&&std::string(frame->getFullName()).find("CoRe") != std::string::npos){
+        auto& eth_hdr = frame->popAtFront<EthernetMacHeader>();//移除mac头
+        auto& ip_hdr = frame->popAtFront<Ipv4Header>();//移除ip头
+        auto& INT_hdr = frame->removeAtFront<PSDINTHeader>();//移除INT头
+        if(simTime()-INT_hdr->getTS()>INT_hdr->getMPD())
+            INT_hdr->setMPD(simTime()-INT_hdr->getTS());
+        EV<<"mpd = "<<INT_hdr->getMPD();
+        INT_hdr->setTS(simTime());
+        frame->insertAtFront(INT_hdr);//加INT头
+        frame->insertAtFront(ip_hdr);//加ip头
+        frame->insertAtFront(eth_hdr);//加mac头
+    }
+    //for CoRe
 
     // add preamble and SFD (Starting Frame Delimiter), then send out
     encapsulate(frame);
@@ -255,47 +273,51 @@ void HiEthernetMac::handleUpperPacket(Packet *packet)
 {
     EV_INFO << "Received " << packet << " from upper layer." << endl;
 
-    numFramesFromHL++;
-    emit(packetReceivedFromUpperSignal, packet);
-
-    auto frame = packet->peekAtFront<EthernetMacHeader>();
-    if (frame->getDest().equals(getMacAddress())) {
-        throw cRuntimeError("logic error: frame %s from higher layer has local MAC address as dest (%s)",
-                packet->getFullName(), frame->getDest().str().c_str());
-    }
-
-    if (packet->getDataLength() > MAX_ETHERNET_FRAME_BYTES) { // FIXME two MAX FRAME BYTES in specif...
-        throw cRuntimeError("packet from higher layer (%s) exceeds maximum Ethernet frame size (%s)",
-                B(packet->getByteLength()).str().c_str(), MAX_ETHERNET_FRAME_BYTES.str().c_str());
-    }
-
-    if (!connected) {
-        EV_WARN << "Interface is not connected -- dropping packet " << packet << endl;
-        PacketDropDetails details;
-        details.setReason(INTERFACE_DOWN);
-        emit(packetDroppedSignal, packet, &details);
-        numDroppedPkFromHLIfaceDown++;
+    if(simTime()>stopTime){
         delete packet;
+    }else{
+        numFramesFromHL++;
+        emit(packetReceivedFromUpperSignal, packet);
 
-        return;
+        auto frame = packet->peekAtFront<EthernetMacHeader>();
+        if (frame->getDest().equals(getMacAddress())) {
+            throw cRuntimeError("logic error: frame %s from higher layer has local MAC address as dest (%s)",
+                    packet->getFullName(), frame->getDest().str().c_str());
+        }
+
+        if (packet->getDataLength() > MAX_ETHERNET_FRAME_BYTES) { // FIXME two MAX FRAME BYTES in specif...
+            throw cRuntimeError("packet from higher layer (%s) exceeds maximum Ethernet frame size (%s)",
+                    B(packet->getByteLength()).str().c_str(), MAX_ETHERNET_FRAME_BYTES.str().c_str());
+        }
+
+        if (!connected) {
+            EV_WARN << "Interface is not connected -- dropping packet " << packet << endl;
+            PacketDropDetails details;
+            details.setReason(INTERFACE_DOWN);
+            emit(packetDroppedSignal, packet, &details);
+            numDroppedPkFromHLIfaceDown++;
+            delete packet;
+
+            return;
+        }
+
+        // fill in src address if not set
+        if (frame->getSrc().isUnspecified()) {
+            frame = nullptr; // drop shared ptr
+            auto newFrame = packet->removeAtFront<EthernetMacHeader>();
+            newFrame->setSrc(getMacAddress());
+            packet->insertAtFront(newFrame);
+            frame = newFrame;
+        }
+
+        if (transmitState != TX_IDLE_STATE)
+            throw cRuntimeError("HiEthernetMac not in TX_IDLE_STATE when packet arrived from upper layer");
+        if (currentTxFrame != nullptr)
+            throw cRuntimeError("HiEthernetMac already has a transmit packet when packet arrived from upper layer");
+        addPaddingAndSetFcs(packet, MIN_ETHERNET_FRAME_BYTES);
+        currentTxFrame = packet;
+        startFrameTransmission();
     }
-
-    // fill in src address if not set
-    if (frame->getSrc().isUnspecified()) {
-        frame = nullptr; // drop shared ptr
-        auto newFrame = packet->removeAtFront<EthernetMacHeader>();
-        newFrame->setSrc(getMacAddress());
-        packet->insertAtFront(newFrame);
-        frame = newFrame;
-    }
-
-    if (transmitState != TX_IDLE_STATE)
-        throw cRuntimeError("HiEthernetMac not in TX_IDLE_STATE when packet arrived from upper layer");
-    if (currentTxFrame != nullptr)
-        throw cRuntimeError("HiEthernetMac already has a transmit packet when packet arrived from upper layer");
-    addPaddingAndSetFcs(packet, MIN_ETHERNET_FRAME_BYTES);
-    currentTxFrame = packet;
-    startFrameTransmission();
 }
 
 void HiEthernetMac::processMsgFromNetwork(EthernetSignalBase *signal)

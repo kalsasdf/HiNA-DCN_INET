@@ -123,7 +123,7 @@ bool RateLimitQueue::canPullSomePacket(cGate *gate) const
     }else{
         auto packet = check_and_cast<Packet *>(queue.front());
         simtime_t interval = simTime() - lasttime;
-        simtime_t mintime = simtime_t((packet->getBitLength()+20*8)/limrate);
+        simtime_t mintime = simtime_t((packet->getBitLength()+8*8)/limrate+12*8/1e10);
         //20=8(EtherPhy)+12(interframe gap,IFG)
         EV<<"packet length = "<<packet->getBitLength()<<", interval = "<<interval<<", mintime = "<<mintime<<endl;
         if(mintime>interval){
@@ -151,7 +151,7 @@ Packet *RateLimitQueue::pullPacket(cGate *gate)
     if(!isEmpty()){
         cancelEvent(canpull);
         auto newpacket = check_and_cast<Packet *>(queue.front());
-        simtime_t mintime = simtime_t((newpacket->getBitLength()+20*8)/limrate);
+        simtime_t mintime = simtime_t((newpacket->getBitLength()+8*8)/limrate+12*8/1e10);
         //20=8(EtherPhy)+12(interframe gap,IFG)
         scheduleAt(simTime()+mintime,canpull);
     }

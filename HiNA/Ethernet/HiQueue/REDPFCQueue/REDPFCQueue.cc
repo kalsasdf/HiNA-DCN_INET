@@ -45,6 +45,7 @@ void REDPFCQueue::initialize(int stage)
         Pmax=par("Pmax");
         useEcn=par("useEcn");
         alpha=par("alpha");
+        S_drop=b(par("S_drop"));
         queuelengthVector.setName("queuelength (bit)");
         sharedBufferVector.setName("sharedbuffer (bit)");
         count = -1;
@@ -299,6 +300,12 @@ bool REDPFCQueue::BufferManagement(cMessage *msg){
     Packet *packet = check_and_cast<Packet*>(msg);
     int64_t queueLength = queue.getBitLength();
     queuelengthVector.recordWithTimestamp(simTime(), queueLength);
+
+    WrrScheduler *radioModule = check_and_cast<WrrScheduler*>(getParentModule() -> getSubmodule("WrrScheduler"));
+
+    if(S_drop.get()>0&&string(packet->getFullName()).find("UData") != string::npos&&radioModule->getTotalLength()>S_drop){
+        return false;
+    }
 
     if(!isOverloaded())
     {

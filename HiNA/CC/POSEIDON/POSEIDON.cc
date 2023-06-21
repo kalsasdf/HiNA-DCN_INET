@@ -43,6 +43,7 @@ void POSEIDON::initialize(int stage)
         currentRTTVector.setName("currentRTT (s)");
         mpdVector.setName("mpd (s)");
         targetVector.setName("target_delay (s)");
+        ratioVector.setName("ratio");
         cwndVector.setName("cwnd (num)");
         currateVector.setName("currate");
         bitlengthVector.setName("PSD_bitlength");
@@ -355,6 +356,7 @@ void POSEIDON::receiveAck(Packet *pck)
 
     ratio = math::clamp(ratio,0.4,2.5);
     EV<<"ratio = "<<ratio<<", mpd = "<<mpd<<", target = "<<target<<endl;
+    ratioVector.recordWithTimestamp(simTime(),ratio);
     mpdVector.recordWithTimestamp(simTime(),mpd);
     targetVector.recordWithTimestamp(simTime(),target);
     if(mpd<=target){

@@ -86,7 +86,7 @@ simple TcpApp like IApp
     parameters:
         string localAddress = default("");
         int localPort = default(100);  // local port
-        string connectAddress = default("");
+        string connectAddresses = default("");
         int connectPort = default(100);
         string packetName = default("TcpData");
         double tOpen @unit(s) = default(-1s);
@@ -100,6 +100,7 @@ simple TcpApp like IApp
         int longflow = default(10000);
         double linkSpeed @unit(bps) = default(1e9bps);
         double workLoad = default(1);
+        bool Enablepoisson = default(false);
         string sendScript = default("");//With sendScript, the format is "<time> <numBytes>;<time> <numBytes>;..."
         
         @display("i=block/app");

@@ -19,6 +19,7 @@ package inet.HiNA.HiHost;
 
 import inet.applications.contract.IApp;
 import inet.common.MessageDispatcher;
+import inet.HiNA.App.GlobalFlowId;
 
 module HiApplicationLayer extends HiTransportLayer
 {
@@ -37,7 +38,9 @@ module HiApplicationLayer extends HiTransportLayer
             parameters:
                 @display("p=749.10504,141.63751;b=1000,5,,,,1");
         }
-
+        GlobalFlowId: GlobalFlowId {
+            @display("p=893.89,64.52375;is=s");
+        }
     connections allowunconnected:
         for i=0..numApps-1 {
             app[i].socketOut --> at.in++;

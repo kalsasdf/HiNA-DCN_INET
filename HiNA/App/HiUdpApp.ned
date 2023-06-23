@@ -55,7 +55,8 @@ simple HiUdpApp like IApp
         double workLoad = default(1);
         int longflow = default(10000);
         string trafficMode = default("LongFlow");// CacheFollower, DataMining, WebServer, WebSearch.
-        string sendScript = default("");        
+        string sendScript = default("");     
+        bool Enablepoisson = default(false);   
         int timeToLive = default(-1); // if not -1, set the TTL (IPv4) or Hop Limit (IPv6) field of sent packets to this value
         int dscp = default(-1);
         int tos = default(-1); // if not -1, set the ToS (IPv4) or Traffic Class (IPv6) field of sent packets to this value

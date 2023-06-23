@@ -143,7 +143,7 @@ void XPASS::processUpperpck(Packet *pck)
         delete pck;
 
         if(sender_StateMap[destAddr]==CSTOP_SENT)
-            send_credreq(destAddr);
+            send_credreq(flowid);
     }
     else
     {
@@ -176,18 +176,23 @@ void XPASS::processLowerpck(Packet *pck)
     }
 }
 
-void XPASS::send_credreq(L3Address destaddr)
+void XPASS::send_credreq(uint32_t flowid)
 {
-    sender_StateMap[destaddr] = CREDIT_RECEIVING;
+    sender_flowinfo snd_info= sender_flowMap.find(flowid)->second;
+    sender_StateMap[snd_info.destaddr] = CREDIT_RECEIVING;
     Packet *cred_req = new Packet("credit_req");
-    cred_req->addTagIfAbsent<L3AddressReq>()->setDestAddress(destaddr);
+    const auto& content = makeShared<ByteCountChunk>(B(1));
+    auto tag = content->addTag<HiTag>();
+    tag->setFlowId(flowid);
+    cred_req->insertAtBack(content);
+    cred_req->addTagIfAbsent<L3AddressReq>()->setDestAddress(snd_info.destaddr);
     cred_req->addTagIfAbsent<L3AddressReq>()->setSrcAddress(srcaddr);
     cred_req->setTimestamp(simTime());
 
     cred_req->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(&Protocol::ipv4);
     cred_req->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::udp);
 
-    EV << "send creditreq to "<<destaddr.toIpv4()<<", dest state = "<<sender_StateMap[destaddr]<<endl;
+    EV << "send creditreq to "<<snd_info.destaddr.toIpv4()<<", dest state = "<<sender_StateMap[snd_info.destaddr]<<endl;
     sendDown(cred_req); // send down the credit_request.
 }
 

@@ -172,7 +172,7 @@ class XPASS : public TransportProtocolBase
     /**
      * Send credit and request.
      */
-    virtual void send_credreq(L3Address destaddr);
+    virtual void send_credreq(uint32_t flowid);
     virtual void send_credit(L3Address destaddr);
     /**
      * Send data and credit_stop.

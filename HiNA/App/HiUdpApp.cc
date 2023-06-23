@@ -31,7 +31,6 @@ namespace inet {
 
 Define_Module(HiUdpApp);
 
-uint32_t HiUdpApp::flowid=0;
 
 HiUdpApp::~HiUdpApp()
 {
@@ -44,6 +43,7 @@ void HiUdpApp::initialize(int stage)
 
     if (stage == INITSTAGE_LOCAL) {EV<<"HiUdpApp::initialize stage = "<<stage<<endl;
         FCT_Vector.setName("FCT");
+        shortflow_FCT_Vector.setName("shortflow_FCT");
         goodputVector.setName("goodput (bps)");
 
         WATCH(numSent);
@@ -61,6 +61,7 @@ void HiUdpApp::initialize(int stage)
         packetName = par("packetName");
         AppPriority = par("AppPriority");
         longflow = par("longflow");
+        Enablepoisson = par("Enablepoisson");
         commandIndex = 0;
         const char *script = par("sendScript");
         parseScript(script);
@@ -187,17 +188,20 @@ void HiUdpApp::processSend()
 {
     if(count==0){
         updateNextFlow(trafficMode);
+        auto module = check_and_cast<GlobalFlowId*>(getParentModule()->getSubmodule("GlobalFlowId"));
+        flowid = module->getflowid();
+        module->flowidadd();
         if(messageLength>65527){
             count = num = messageLength/65527;
-            sendPacket(65527);
+            sendPacket(65527,flowid);
             selfMsg->setKind(SEND);
             scheduleAt(simTime(), selfMsg);
         }else{
-            sendPacket(messageLength);
-            flowid++;
-            simtime_t txTime = simtime_t((messageLength+ceil(double(messageLength)/1472)*66)*8/linkSpeed);
+            sendPacket(messageLength,flowid);
+            simtime_t txTime = simtime_t((messageLength+ceil(double(messageLength)/1472)*66)*8/linkSpeed);EV<<"txTime = "<<txTime<<endl;
+            if(Enablepoisson) txTime = exponential(txTime);
             //66=8(UDP)+20(IP)+14(EthernetMac)+8(EthernetPhy)+4(EthernetFcs)+12(interframe gap,IFG)
-            simtime_t d = simTime() + txTime/workLoad;
+            simtime_t d = simTime() + txTime/workLoad;EV<<"poissontime = "<<txTime<<endl;
             if(std::string(trafficMode).find("sendscript") != std::string::npos&&++commandIndex < (int)commands.size()){
                 simtime_t tSend = commands[commandIndex].tSend;
                 selfMsg->setKind(SEND);
@@ -214,11 +218,11 @@ void HiUdpApp::processSend()
     }else{
         count--;
         if(count==0){
-            sendPacket(messageLength-num*65527);
-            flowid++;
-            simtime_t txTime = simtime_t((messageLength+ceil(double(messageLength)/1472)*66)*8/linkSpeed);
+            sendPacket(messageLength-num*65527,flowid);
+            simtime_t txTime = simtime_t((messageLength+ceil(double(messageLength)/1472)*66)*8/linkSpeed);EV<<"txTime = "<<txTime<<endl;
+            if(Enablepoisson) txTime = exponential(txTime);
             //66=8(UDP)+20(IP)+14(EthernetMac)+8(EthernetPhy)+4(EthernetFcs)+12(interframe gap,IFG)
-            simtime_t d = simTime() + txTime/workLoad;
+            simtime_t d = simTime() + txTime/workLoad;EV<<"poissontime = "<<txTime<<endl;
             if(std::string(trafficMode).find("sendscript") != std::string::npos&&++commandIndex < (int)commands.size()){
                 simtime_t tSend = commands[commandIndex].tSend;
                 selfMsg->setKind(SEND);
@@ -232,20 +236,20 @@ void HiUdpApp::processSend()
                 scheduleAt(stopTime, selfMsg);
             }
         }else{
-            sendPacket(65527);
+            sendPacket(65527,flowid);
             selfMsg->setKind(SEND);
             scheduleAt(simTime(), selfMsg);
         }
     }
 }
 
-void HiUdpApp::sendPacket(int packetlength)
+void HiUdpApp::sendPacket(int packetlength, uint64_t flowid)
 {
     srand(flowid);
     int k = rand()%connectAddresses.size();
     EV<<"dest seed k = "<<k<<endl;
     L3Address destAddr = chooseDestAddr(k);
-    EV<<"Size of DestAddresses is "<<connectAddresses.size()<<endl;
+    EV<<"destAddr is "<<destAddr<<endl;
 
     std::ostringstream str;
     str << packetName << "-" << flowid;
@@ -284,17 +288,22 @@ void HiUdpApp::processPacket(Packet *pck)
     EV_INFO << "Received packet: " << UdpSocket::getReceivedPacketInfo(pck) << endl;
 
     bool last = false;
+    uint64_t this_flow_id;
+    simtime_t this_flow_creation_time;
+    long flowsize;
     for (auto& region : pck->peekData()->getAllTags<HiTag>()){
         this_flow_id = region.getTag()->getFlowId();
         this_flow_creation_time = region.getTag()->getCreationtime();
         last = region.getTag()->isLastPck();
-        EV << "this_flow_id = "<<this_flow_id<<", this_flow_creation_time = "<<this_flow_creation_time<<"s"<<endl;
+        flowsize = region.getTag()->getFlowSize();
     }
+    EV << "this_flow_id = "<<this_flow_id<<", this_flow_creation_time = "<<this_flow_creation_time<<"s"<<", last = "<<last<<endl;
 
     if (last)
     {
         flow_completion_time[numReceived] = simTime() - this_flow_creation_time;
         FCT_Vector.record(flow_completion_time[numReceived]);
+        if(flowsize<=1e5) shortflow_FCT_Vector.record(flow_completion_time[numReceived]);
         sumFct+=flow_completion_time[numReceived];
         EV << "flow ends, this_flow_creation_time = "<<this_flow_creation_time<<"s, fct = "<<flow_completion_time[numReceived]<<"s, flowid = "<<this_flow_id<<endl;
         numReceived++;
@@ -311,7 +320,7 @@ void HiUdpApp::finish()
     recordScalar("Flows received", numReceived);
     recordScalar("BytesRcvd", BytesRcvd);
     recordScalar("BytesSent", BytesSent);
-    recordScalar("final flow id", flowid);
+//    recordScalar("final flow id", flowid);
     ApplicationBase::finish();
 }
 
@@ -409,7 +418,7 @@ void HiUdpApp::parseScript(const char *script)
 void HiUdpApp::updateNextFlow(const char* TM)
 {
     //double seed = uniform(0,1);
-    srand(flowid);
+//    srand(flowid);
     double seed = double(rand()%9999)/9999;
     //flowsize_seed += 999;
     EV<<"flow size seed = "<<seed<<endl;

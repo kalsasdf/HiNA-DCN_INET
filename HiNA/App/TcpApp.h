@@ -21,6 +21,7 @@
 #include <map>
 #include <fstream>
 
+#include "GlobalFlowId.h"
 #include "inet/common/INETDefs.h"
 #include "inet/common/lifecycle/LifecycleOperation.h"
 #include "inet/applications/tcpapp/TcpAppBase.h"
@@ -45,6 +46,8 @@ class INET_API TcpApp : public TcpAppBase
     typedef std::vector<Command> CommandVector;
     CommandVector commands;
     int commandIndex = -1;
+    std::vector<L3Address> connectAddresses;
+    std::vector<std::string> destAddressStr;
 
     // parameters
     simtime_t tOpen=0;
@@ -56,6 +59,7 @@ class INET_API TcpApp : public TcpAppBase
     double packetLength=0;
     int AppPriority;
     double linkSpeed;
+    bool Enablepoisson;
     double workLoad;
 
     // state
@@ -65,7 +69,12 @@ class INET_API TcpApp : public TcpAppBase
     // statistics
     int numSent = 0;
     int numReceived = 0;
+    std::map<long,simtime_t> flow_completion_time;
+    std::map<uint64_t,long> flowsize_Map;
+    cOutVector FCT_Vector;
+    cOutVector shortflow_FCT_Vector;
     cOutVector goodputVector;
+    simtime_t sumFct=0;
     long BytesRcvd=0;
     long BytesSent=0;
     simtime_t last_pck_time=0;
@@ -79,6 +88,8 @@ class INET_API TcpApp : public TcpAppBase
     virtual void finish() override;
     virtual void refreshDisplay() const override;
 
+    virtual void connect() override;
+    virtual L3Address chooseDestAddr(int k);
     virtual void parseScript(const char *script);
     virtual void updateNextFlow(const char* TM);
     virtual Packet *createDataPacket(long sendBytes);

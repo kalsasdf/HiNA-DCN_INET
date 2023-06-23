@@ -22,6 +22,7 @@
 #include <vector>
 #include <fstream>
 
+#include "GlobalFlowId.h"
 #include "inet/HiNA/Messages/HiTag/HiTag_m.h"
 #include "inet/networklayer/common/L3AddressTag_m.h"
 #include "inet/applications/base/ApplicationBase.h"
@@ -60,6 +61,7 @@ class INET_API HiUdpApp : public ClockUserModuleMixin<ApplicationBase>, public U
     const char *trafficMode = nullptr;
     double linkSpeed;
     double workLoad;
+    bool Enablepoisson;
 
     uint messageLength=0;
     // state
@@ -69,10 +71,12 @@ class INET_API HiUdpApp : public ClockUserModuleMixin<ApplicationBase>, public U
     // statistics
     int numSent = 0;
     int numReceived = 0;
-    static uint32_t flowid;    // counter for generating a global number for each packet
+    //static uint32_t flowid;    // counter for generating a global number for each packet
+    uint64_t flowid;
 
     std::map<long,simtime_t> flow_completion_time;
     cOutVector FCT_Vector;
+    cOutVector shortflow_FCT_Vector;
     cOutVector goodputVector;
     long BytesRcvd=0;
     long BytesSent=0;
@@ -80,9 +84,9 @@ class INET_API HiUdpApp : public ClockUserModuleMixin<ApplicationBase>, public U
     int count=0;
 
     simtime_t sumFct=0;
-    simtime_t this_flow_creation_time=0;
+//    simtime_t this_flow_creation_time=0;
     simtime_t last_pck_time = 0;
-    int this_flow_id=0;
+//    int this_flow_id=0;
 
     virtual int numInitStages() const override { return NUM_INIT_STAGES; }
     virtual void initialize(int stage) override;
@@ -92,7 +96,7 @@ class INET_API HiUdpApp : public ClockUserModuleMixin<ApplicationBase>, public U
 
     // chooses random destination address
     virtual L3Address chooseDestAddr(int k);
-    virtual void sendPacket(int packetlength);
+    virtual void sendPacket(int packetlength, uint64_t flowid);
     virtual void processPacket(Packet *msg);
 
     virtual void processStart();

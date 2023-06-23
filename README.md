@@ -1,5 +1,7 @@
-[HiNA-DCN inet项目.docx](https://github.com/kalsasdf/HiNA-DCN_INET/files/11690799/HiNA-DCN.inet.docx)
 
+[HiNA-DCN inet项目.docx](https://github.com/kalsasdf/HiNA-DCN_INET/files/11849039/HiNA-DCN.inet.docx)
+
+2023-6-23 实现TcpApp和UdpApp统一的全局流id
 
 2023-6-5 新增TcpApp可以使用优先级;POSEIDON等新增一些输出数据方便观测
 

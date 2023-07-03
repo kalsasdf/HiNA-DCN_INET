@@ -47,6 +47,7 @@ void TcpApp::initialize(int stage)
     if (stage == INITSTAGE_LOCAL) {
         FCT_Vector.setName("FCT");
         shortflow_FCT_Vector.setName("shortflow_FCT");
+        flowsize_Vector.setName("flowsize");
         goodputVector.setName("goodput (bps)");
         WATCH(numSent);
         WATCH(numReceived);
@@ -227,6 +228,7 @@ Packet *TcpApp::createDataPacket(long sendBytes)
     auto payload = makeShared<ByteCountChunk>(B(sendBytes));
     auto tag=payload->addTag<HiTag>();
     tag->setPriority(AppPriority);
+    tag->setCreationtime(simTime());
     tag->setFlowId(module->getflowid());
     tag->setFlowSize(sendBytes);
     packet->insertAtBack(payload);
@@ -257,8 +259,9 @@ void TcpApp::socketDataArrived(TcpSocket *socket, Packet *pck, bool urgent)
     if (flowsize_Map[this_flow_id]>=flowsize)
     {
         flow_completion_time[numReceived] = simTime() - this_flow_creation_time;
-        FCT_Vector.record(flow_completion_time[numReceived]);
-        if(flowsize<=1e5) shortflow_FCT_Vector.record(flow_completion_time[numReceived]);
+        FCT_Vector.recordWithTimestamp(simTime(),flow_completion_time[numReceived]);
+        flowsize_Vector.recordWithTimestamp(simTime(),flowsize);
+        if(flowsize<=1e5) shortflow_FCT_Vector.recordWithTimestamp(simTime(),flow_completion_time[numReceived]);
         sumFct+=flow_completion_time[numReceived];
         EV << "flow ends, this_flow_creation_time = "<<this_flow_creation_time<<"s, fct = "<<flow_completion_time[numReceived]<<"s, flowid = "<<this_flow_id<<endl;
         numReceived++;

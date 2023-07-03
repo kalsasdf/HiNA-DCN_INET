@@ -181,7 +181,7 @@ void XPASS::send_credreq(uint32_t flowid)
     sender_flowinfo snd_info= sender_flowMap.find(flowid)->second;
     sender_StateMap[snd_info.destaddr] = CREDIT_RECEIVING;
     Packet *cred_req = new Packet("credit_req");
-    const auto& content = makeShared<ByteCountChunk>(B(1));
+    const auto& content = makeShared<ByteCountChunk>(B(26));
     auto tag = content->addTag<HiTag>();
     tag->setFlowId(flowid);
     cred_req->insertAtBack(content);

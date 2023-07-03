@@ -77,6 +77,7 @@ class INET_API HiUdpApp : public ClockUserModuleMixin<ApplicationBase>, public U
     std::map<long,simtime_t> flow_completion_time;
     cOutVector FCT_Vector;
     cOutVector shortflow_FCT_Vector;
+    cOutVector flowsize_Vector;
     cOutVector goodputVector;
     long BytesRcvd=0;
     long BytesSent=0;

@@ -44,6 +44,7 @@ void HiUdpApp::initialize(int stage)
     if (stage == INITSTAGE_LOCAL) {EV<<"HiUdpApp::initialize stage = "<<stage<<endl;
         FCT_Vector.setName("FCT");
         shortflow_FCT_Vector.setName("shortflow_FCT");
+        flowsize_Vector.setName("flowsize");
         goodputVector.setName("goodput (bps)");
 
         WATCH(numSent);
@@ -302,8 +303,9 @@ void HiUdpApp::processPacket(Packet *pck)
     if (last)
     {
         flow_completion_time[numReceived] = simTime() - this_flow_creation_time;
-        FCT_Vector.record(flow_completion_time[numReceived]);
-        if(flowsize<=1e5) shortflow_FCT_Vector.record(flow_completion_time[numReceived]);
+        FCT_Vector.recordWithTimestamp(simTime(),flow_completion_time[numReceived]);
+        flowsize_Vector.recordWithTimestamp(simTime(),flowsize);
+        if(flowsize<=1e5) shortflow_FCT_Vector.recordWithTimestamp(simTime(),flow_completion_time[numReceived]);
         sumFct+=flow_completion_time[numReceived];
         EV << "flow ends, this_flow_creation_time = "<<this_flow_creation_time<<"s, fct = "<<flow_completion_time[numReceived]<<"s, flowid = "<<this_flow_id<<endl;
         numReceived++;

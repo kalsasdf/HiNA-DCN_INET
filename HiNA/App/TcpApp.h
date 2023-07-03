@@ -73,6 +73,7 @@ class INET_API TcpApp : public TcpAppBase
     std::map<uint64_t,long> flowsize_Map;
     cOutVector FCT_Vector;
     cOutVector shortflow_FCT_Vector;
+    cOutVector flowsize_Vector;
     cOutVector goodputVector;
     simtime_t sumFct=0;
     long BytesRcvd=0;

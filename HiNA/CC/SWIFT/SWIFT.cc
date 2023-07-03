@@ -233,15 +233,14 @@ void SWIFT::send_data()
                 nxtSendpacketid = pre_snd;
             }
         }
-    }else{
-        nxtSendpacketid = packetid+1;
     }
 
-    if(sender_packetMap.find(nxtSendpacketid)==sender_packetMap.end()){
+    if(sender_packetMap.find(nxtSendpacketid+1)==sender_packetMap.end()){
         EV<<"packet run out, stopping"<<endl;
         SenderState = STOPPING;
     }
     else if(snd_cwnd>=1){
+        nxtSendpacketid++;
         if(snd_cwnd-(nxtSendpacketid-snd_una)>0){
             EV<<"snd_cwnd = "<<snd_cwnd<<", sended window - "<<packetid-snd_una<<endl;
             send_data();
@@ -252,6 +251,7 @@ void SWIFT::send_data()
         }
     }
     else if(snd_cwnd<1){
+        nxtSendpacketid++;
         EV<<"snd_cwnd < 1, nxtSendtime = "<<simTime()+pacing_delay<<endl;
         cancelEvent(senddata);
         scheduleAt(simTime()+pacing_delay,senddata);
@@ -474,7 +474,7 @@ void SWIFT::receive_ack(Packet *pck)
         num_dupack = 0;
         num_acked = 0;
         retransmit_cnt = 0;
-        sender_packetMap.erase(ackid);EV<<"erase "<<ackid<<endl;
+//        sender_packetMap.erase(ackid);EV<<"erase "<<ackid<<endl;
     }else if(string(pck->getFullName()).find("SACK") != string::npos){
         auto SACK_msg = pck->peekAtFront<SACK>();
         uint n = SACK_msg->getSackItemArraySize();
@@ -504,7 +504,6 @@ void SWIFT::receive_ack(Packet *pck)
     RTO = RTT_S + 4 * RTT_D;
     EV<<"RTO = "<<RTO<<endl;
     cancelEvent(timeout);
-    scheduleAt(simTime() + RTO, timeout);
 
     num_acked++;
 
@@ -588,9 +587,8 @@ void SWIFT::time_out()
     if(SenderState!=STOPPING){
         nxtSendpacketid=snd_una;
         cancelEvent(senddata);
-        scheduleAt(simTime(),senddata);  // 超时后，立即重发未确认的第一个报文
         cancelEvent(timeout);
-        scheduleAt(simTime() + RTO, timeout);
+        scheduleAt(simTime(),senddata);  // 超时后，立即重发未确认的第一个报文
     }
 }
 

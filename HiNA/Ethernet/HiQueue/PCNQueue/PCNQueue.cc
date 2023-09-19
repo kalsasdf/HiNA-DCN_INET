@@ -35,6 +35,7 @@ Packet *PCNQueue::pullPacket(cGate *gate)
         sharedBuffer[switchid]+=b(queue.getBitLength()-dataCapacity.get());
     }
     queue.pop();
+    queuelengthVector.recordWithTimestamp(simTime(), queue.getBitLength());
     EV<<"after pop queuelength = "<<queue.getBitLength()<<endl;
 
     auto queueingTime = simTime() - packet->getArrivalTime();

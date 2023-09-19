@@ -119,6 +119,7 @@ void REDPFCQueue::pushPacket(Packet *packet, cGate *gate)
     emit(packetPushStartedSignal, packet, &packetPushStartedDetails);
     EV_INFO << "Pushing packet" << EV_FIELD(packet) << EV_ENDL;
     queue.insert(packet);
+    queuelengthVector.recordWithTimestamp(simTime(), queue.getBitLength());
 
     int iface = packet->addTagIfAbsent<InterfaceInd>()->getInterfaceId();
     EV<<"iface = "<<iface<<endl;
@@ -155,6 +156,7 @@ Packet *REDPFCQueue::pullPacket(cGate *gate)
         sharedBuffer[switchid]+=b(queue.getBitLength()-dataCapacity.get());
     }
     queue.pop();
+    queuelengthVector.recordWithTimestamp(simTime(), queue.getBitLength());
     EV<<"after pop queuelength = "<<queue.getBitLength()<<endl;
 
     auto queueingTime = simTime() - packet->getArrivalTime();
@@ -299,7 +301,6 @@ bool REDPFCQueue::BufferManagement(cMessage *msg){
 
     Packet *packet = check_and_cast<Packet*>(msg);
     int64_t queueLength = queue.getBitLength();
-    queuelengthVector.recordWithTimestamp(simTime(), queueLength);
 
     WrrScheduler *radioModule = check_and_cast<WrrScheduler*>(getParentModule() -> getSubmodule("WrrScheduler"));
 

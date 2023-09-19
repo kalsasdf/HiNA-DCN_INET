@@ -1,6 +1,8 @@
 
 [HiNA-DCN inet项目.docx](https://github.com/kalsasdf/HiNA-DCN_INET/files/12002592/HiNA-DCN.inet.docx)
 
+2023-9-20 优化REDPFCQueue的队列长度测量机制，记录到queuelengthVector的位置从BufferMangement()中移到了pushPacket()和pullPacket()中，不然导出数据时会出现同一个时间点存在两个队列长度数据，PCNQueue也连带修改
+
 2023-6-23 实现TcpApp和UdpApp统一的全局流id
 
 2023-6-5 新增TcpApp可以使用优先级;POSEIDON等新增一些输出数据方便观测

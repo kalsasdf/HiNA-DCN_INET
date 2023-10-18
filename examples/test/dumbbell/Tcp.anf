@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<analysis version="2">
+    <inputs>
+        <input pattern="/inet4.4/examples/HiNA/test/dumbbell/results/Tcp-*.vec"/>
+        <input pattern="/inet4.4/examples/HiNA/test/dumbbell/results/Tcp-*.sca"/>
+    </inputs>
+    <charts/>
+</analysis>

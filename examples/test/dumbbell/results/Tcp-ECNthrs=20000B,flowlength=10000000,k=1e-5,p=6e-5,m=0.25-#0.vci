@@ -1,0 +1,1513 @@
+file 81529 1695391680                                           
+version 3
+run Tcp-0-20230922-21:17:01-41488
+attr configname Tcp
+attr datetime 20230922-21:17:01
+attr datetimef 20230922-211701
+attr experiment Tcp
+attr inifile testdumbbell.ini
+attr iterationvars "$ECNthrs=20000B, $flowlength=10000000, $k=1e-5, $p=6e-5, $m=0.25"
+attr iterationvarsd ECNthrs=20000B/flowlength=10000000/k=1e-5/p=6e-5/m=0.25
+attr iterationvarsf ECNthrs=20000B,flowlength=10000000,k=1e-5,p=6e-5,m=0.25-
+attr measurement "$ECNthrs=20000B, $flowlength=10000000, $k=1e-5, $p=6e-5, $m=0.25"
+attr network testdumbbell
+attr processid 41488
+attr repetition 0
+attr replication #0
+attr resultdir results/
+attr runnumber 0
+attr seedset 0
+itervar ECNthrs 20000B
+itervar flowlength 10000000
+itervar k 1e-5
+itervar m 0.25
+itervar p 6e-5
+config image-path ../../../../images
+config network testdumbbell
+config warnings true
+config sim-time-limit 10s
+config **.*.vector-recording true
+config **.arp.typename GlobalArp
+config **.arp.retryTimeout 1s
+config **.arp.retryCount 3
+config **.arp.cacheTimeout 100s
+config **.Router*.eth[*].Hiqueue.*.sharedBuffer 9MB
+config **.Router*.eth[*].Hiqueue.*.alpha 1
+config **.Router*.eth[*].Hiqueue.*.useEcn true
+config **.Router*.eth[*].Hiqueue.beQueue.Kmax 20000B
+config **.Router*.eth[*].Hiqueue.beQueue.Kmin 2000B
+config **.Router*.eth[*].Hiqueue.beQueue.Pmax 0
+config **.Router*.eth[*].Hiqueue.*.Kmax 20000B
+config **.Router*.eth[*].Hiqueue.*.Kmin 5000B
+config **.Router*.eth[*].Hiqueue.*.Pmax 0
+config **.Router*.eth[*].Hiqueue.Priority_*.usePfc true
+config **.Router*.eth[*].Hiqueue.*.XOFF 300000B
+config **.Router*.eth[*].Hiqueue.*.XON 297000B
+config **.Router*.eth[*].Hiqueue.*.headroom 21520b
+config **.Router*.eth[*].Hiqueue.creditQueue.limrate 0.5Gbps
+config **.*.mac.maxInterval 100us
+config **.*.mac.batchSize 5000
+config **.Host*.numApps 2
+config **.Hostr2.app[0].typename HiUdpApp
+config **.Hosts2.app[0].typename HiUdpApp
+config **.Hosts3.app[0].typename HiUdpApp
+config **.Hostr3.app[0].typename HiUdpApp
+config **.Host*.app[0].typename TcpApp
+config **.Host*.app[1].typename TcpApp
+config **.Host*.app[0].longflow 10000000
+config **.Host*.app[0].trafficMode "\"LongFlow\""
+config **.Host*.app[0].AppPriority 0
+config **.Host*.app[0].workLoad 1
+config **.Host*.app[0].linkSpeed 10Gbps
+config **.Hosts1.app[0].localAddress "\"Hosts1\""
+config **.Hosts2.app[0].localAddress "\"Hosts2\""
+config **.Hosts3.app[0].localAddress "\"Hosts3\""
+config **.Hosts2.app[1].localAddress "\"Hosts2\""
+config **.Hosts3.app[1].localAddress "\"Hosts3\""
+config **.Hosts4.app[0].localAddress "\"Hosts4\""
+config **.Hosts5.app[0].localAddress "\"Hosts5\""
+config **.Hosts6.app[0].localAddress "\"Hosts6\""
+config **.Hosts7.app[0].localAddress "\"Hosts7\""
+config **.Hosts8.app[0].localAddress "\"Hosts8\""
+config **.Hosts9.app[0].localAddress "\"Hosts9\""
+config **.Hosts10.app[0].localAddress "\"Hosts10\""
+config **.Hostr1.app[0].localAddress "\"Hostr1\""
+config **.Hostr2.app[0].localAddress "\"Hostr2\""
+config **.Hostr3.app[0].localAddress "\"Hostr3\""
+config **.Hostr2.app[1].localAddress "\"Hostr2\""
+config **.Hostr3.app[1].localAddress "\"Hostr3\""
+config **.Hostr4.app[0].localAddress "\"Hostr4\""
+config **.Hostr5.app[0].localAddress "\"Hostr5\""
+config **.Hostr6.app[0].localAddress "\"Hostr6\""
+config **.Hostr7.app[0].localAddress "\"Hostr7\""
+config **.Hostr8.app[0].localAddress "\"Hostr8\""
+config **.Hostr9.app[0].localAddress "\"Hostr9\""
+config **.Hostr10.app[0].localAddress "\"Hostr10\""
+config **.Hosts1.app[0].connectAddresses "\"Hostr1\""
+config **.Hosts1.app[0].tOpen -1s
+config **.Hosts1.app[0].tSend 0s
+config **.Hosts1.app[0].tClose 10.006s
+config **.Hosts1.eth[*].mac.stopTime 10.015s
+config **.Hosts2.app[0].connectAddresses "\"Hostr2\""
+config **.Hosts2.app[0].startTime 0s
+config **.Hosts2.app[0].stopTime 0.015s
+config **.Hosts2.UdpCC.stopTime 0.015s
+config **.Hostr2.UdpCC.stopTime 0.015s
+config **.Hosts2.app[1].connectAddresses "\"Hostr2\""
+config **.Hosts2.app[1].tOpen 0s
+config **.Hosts2.app[1].tSend 0s
+config **.Hosts2.app[1].tClose 10.7s
+config **.Hosts3.app[0].connectAddresses "\"Hostr3\""
+config **.Hosts3.app[0].startTime -1s
+config **.Hosts3.app[0].stopTime 0.1s
+config **.Hosts3.UdpCC.stopTime 0.1s
+config **.Hosts3.app[1].connectAddresses "\"Hostr3\""
+config **.Hosts3.app[1].tOpen -1s
+config **.Hosts3.app[1].tSend 0s
+config **.Hosts3.app[1].tClose 10.7s
+config **.Hosts4.app[0].connectAddresses "\"Hostr1\""
+config **.Hosts4.app[0].tOpen -10s
+config **.Hosts4.app[0].tSend 0.005s
+config **.Hosts4.app[0].tClose 0.02s
+config **.Hosts4.eth[*].mac.stopTime 0.015s
+config **.Hosts5.app[0].connectAddresses "\"Hostr1\""
+config **.Hosts5.app[0].tOpen -10s
+config **.Hosts5.app[0].tSend 0s
+config **.Hosts5.app[0].tClose 10.7s
+config **.Hosts6.app[0].connectAddresses "\"Hostr6\""
+config **.Hosts6.app[0].tOpen 10s
+config **.Hosts6.app[0].tSend 0s
+config **.Hosts6.app[0].tClose 10.7s
+config **.Hosts7.app[0].connectAddresses "\"Hostr7\""
+config **.Hosts7.app[0].tOpen 10s
+config **.Hosts7.app[0].tSend 0s
+config **.Hosts7.app[0].tClose 10.7s
+config **.Hosts8.app[0].connectAddresses "\"Hostr8\""
+config **.Hosts8.app[0].tOpen 10s
+config **.Hosts8.app[0].tSend 0s
+config **.Hosts8.app[0].tClose 10.7s
+config **.Hosts9.app[0].connectAddresses "\"Hostr9\""
+config **.Hosts9.app[0].tOpen 10s
+config **.Hosts9.app[0].tSend 0s
+config **.Hosts9.app[0].tClose 10.7s
+config **.Hosts10.app[0].connectAddresses "\"Hostr10\""
+config **.Hosts10.app[0].tOpen 10s
+config **.Hosts10.app[0].tSend 0s
+config **.Hosts10.app[0].tClose 10.7s
+config **.Hosts2.UdpCC.typename XPASS
+config **.Hostr2.UdpCC.typename XPASS
+config **.Hosts3.UdpCC.typename SWIFT
+config **.Hostr3.UdpCC.typename SWIFT
+config **.Hosts*.UdpCC.linkspeed 10Gbps
+config **.Hosts*.UdpCC.initialrate 1
+config **.Hosts*.UdpCC.min_cnp_interval 55us
+config **.Hosts*.UdpCC.AlphaTimer_th 25us
+config **.Hosts*.UdpCC.RateTimer_th 55us
+config **.Hosts*.UdpCC.ByteCounter_th 10MiB
+config **.Hosts*.UdpCC.gamma 1/256
+config **.Hosts*.UdpCC.Rai 40Mbps
+config **.Hosts*.UdpCC.Rhai 100Mbps
+config **.Hostr*.UdpCC.linkspeed 10Gbps
+config **.Host*.UdpCC.useECN true
+config **.Hostr*.UdpCC.initialrate 1
+config **.Hostr*.UdpCC.wmax 0.02
+config **.Hostr*.UdpCC.wmin 0.01
+config **.Hostr*.UdpCC.targetratio 0.1
+config **.Hosts*.UdpCC.baseRTT 4.1us
+config **.Hosts*.UdpCC.expectedFlows 2
+config **.Router*.eth[*].mac.HPCC true
+config **.Hosts*.UdpCC.ai 1
+config **.Hosts*.UdpCC.beta 0.8
+config **.Hosts*.UdpCC.max_mdf 0.5
+config **.Hosts*.UdpCC.hop_scaler 500ns
+config **.Hosts*.UdpCC.hops 6
+config **.Hosts*.UdpCC.fs_min_cwnd 0.1
+config **.Hosts*.UdpCC.fs_max_cwnd 100
+config **.Hosts*.UdpCC.PARA_K 0.000011
+config **.Hosts*.UdpCC.PARA_P 0.00004
+config **.Hosts*.UdpCC.m 0.25
+config **.Host*.UdpCC.maxInterval 100us
+config **.Router*.eth[*].mac.PSD true
+config **.Hostr*.UdpCC.PARA_K 1e-5
+config **.Hostr*.UdpCC.PARA_P 6e-5
+config **.Hostr*.UdpCC.m 0.25
+config **.Router*.eth[*].mac.CoRe true
+config **.Router*.eth[*].*.*.S_drop 8kB
+config **.Host*.tcp.tcpAlgorithmClass "\"DcTcp\""
+config **.Host*.tcp.mss 1460
+config **.Host*.tcp.ecnWillingness true
+config **.Host*.tcp.delayedAcksEnabled false
+config **.Host*.tcp.nagleEnabled false
+config **.Host*.tcp.limitedTransmitEnabled false
+config **.Host*.tcp.increasedIWEnabled false
+config **.Host*.tcp.sackSupport false
+config **.Host*.tcp.timestampSupport false
+config **.Host*.tcp.advertisedWindow 65535
+config result-dir results/
+
+vector 0 testdumbbell.Hostr1.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 1 testdumbbell.Hostr1.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 2 testdumbbell.Hostr1.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 3 testdumbbell.Hosts1.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 4 testdumbbell.Hosts1.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 5 testdumbbell.Hosts1.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 6 testdumbbell.Hosts2.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 7 testdumbbell.Hosts2.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 8 testdumbbell.Hosts2.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 9 testdumbbell.Hosts3.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 10 testdumbbell.Hosts3.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 11 testdumbbell.Hosts3.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 12 testdumbbell.Hosts4.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 13 testdumbbell.Hosts4.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 14 testdumbbell.Hosts4.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 15 testdumbbell.Hosts5.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 16 testdumbbell.Hosts5.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 17 testdumbbell.Hosts5.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 18 testdumbbell.Hostr2.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 19 testdumbbell.Hostr2.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 20 testdumbbell.Hostr2.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 21 testdumbbell.Hostr3.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 22 testdumbbell.Hostr3.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 23 testdumbbell.Hostr3.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 24 testdumbbell.Hostr4.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 25 testdumbbell.Hostr4.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 26 testdumbbell.Hostr4.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 27 testdumbbell.Hostr5.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 28 testdumbbell.Hostr5.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 29 testdumbbell.Hostr5.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 30 testdumbbell.Hosts6.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 31 testdumbbell.Hosts6.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 32 testdumbbell.Hosts6.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 33 testdumbbell.Hosts7.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 34 testdumbbell.Hosts7.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 35 testdumbbell.Hosts7.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 36 testdumbbell.Hosts8.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 37 testdumbbell.Hosts8.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 38 testdumbbell.Hosts8.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 39 testdumbbell.Hosts9.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 40 testdumbbell.Hosts9.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 41 testdumbbell.Hosts9.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 42 testdumbbell.Hosts10.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 43 testdumbbell.Hosts10.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 44 testdumbbell.Hosts10.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 45 testdumbbell.Hostr6.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 46 testdumbbell.Hostr6.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 47 testdumbbell.Hostr6.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 48 testdumbbell.Hostr7.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 49 testdumbbell.Hostr7.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 50 testdumbbell.Hostr7.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 51 testdumbbell.Hostr8.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 52 testdumbbell.Hostr8.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 53 testdumbbell.Hostr8.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 54 testdumbbell.Hostr9.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 55 testdumbbell.Hostr9.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 56 testdumbbell.Hostr9.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 57 testdumbbell.Hostr10.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 58 testdumbbell.Hostr10.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 59 testdumbbell.Hostr10.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 60 testdumbbell.Hosts2.app[0] packetSent:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetSent
+attr title "packets sent, packetBytes"
+vector 61 testdumbbell.Hosts2.tcp.conn-40 tcpRcvQueueBytes:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+vector 62 testdumbbell.Hosts2.tcp.conn-40 rcvAdv:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+vector 63 testdumbbell.Hosts2.tcp.conn-40 rcvWnd:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+vector 64 testdumbbell.Hosts2.tcp.conn-40 sndAck:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+vector 65 testdumbbell.Hosts2.udp packetSent:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetSent
+attr title "packets sent, packetBytes"
+vector 66 testdumbbell.Hosts2.ethernet encapPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source encapPk
+attr title "packets encapsulated, packetBytes"
+vector 67 testdumbbell.Hosts2.eth[0].Hostqueue incomingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPushStarted)
+attr title "incoming packet lengths"
+attr unit b
+vector 68 testdumbbell.Hosts2.eth[0].Hostqueue queueingTime:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source queueingTime(packetPulled)
+attr title "queueing times"
+attr unit s
+vector 69 testdumbbell.Hosts2.eth[0].Hostqueue outgoingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "outgoing packet lengths"
+attr unit b
+vector 70 testdumbbell.Hosts2.eth[0].mac packetReceivedFromUpper:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetReceivedFromUpper
+attr title "packet bytes from higher layer, packetBytes"
+vector 71 testdumbbell.Hosts2.eth[0].Hostqueue queueLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + count(packetPushStarted) - count(packetPulled) - count(packetRemoved) - count(packetDropped)))"
+attr title "queue length"
+attr unit pk
+vector 72 testdumbbell.Hosts2.eth[0].Hostqueue queueBitLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + sum(packetLength(packetPushStarted)) - sum(packetLength(packetPulled)) - sum(packetLength(packetRemoved)) - sum(packetLength(packetDropped))))"
+attr title "queue bit length"
+attr unit b
+vector 73 testdumbbell.Hosts2.eth[0].mac txPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetSentToLower
+attr title "packets transmitted, packetBytes"
+vector 74 testdumbbell.Router1.eth[1].mac rxPkOk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source rxPkOk
+attr title "packets received OK, packetBytes"
+vector 75 testdumbbell.Router1.eth[1].mac passedUpPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetSentToUpper
+attr title "packets passed to higher layer, packetBytes"
+vector 76 testdumbbell.Router1.ethernet decapPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source decapPk
+attr title "packets decapsulated, packetBytes"
+vector 77 testdumbbell.Router1.ethernet encapPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source encapPk
+attr title "packets encapsulated, packetBytes"
+vector 78 testdumbbell.Router1.eth[10].Hiqueue.beQueue incomingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPushStarted)
+attr title "incoming packet lengths"
+attr unit b
+vector 79 testdumbbell.Router1.eth[10].Hiqueue.beQueue "queuelength (bit)" ETV
+vector 80 testdumbbell.Router1.eth[10].Hiqueue.beQueue queueingTime:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source queueingTime(packetPulled)
+attr title "queueing times"
+attr unit s
+vector 81 testdumbbell.Router1.eth[10].Hiqueue.beQueue outgoingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "outgoing packet lengths"
+attr unit b
+vector 82 testdumbbell.Router1.eth[10].Hiqueue.WrrScheduler "bufferOccupancy (byte)" ETV
+vector 83 testdumbbell.Router1.eth[10].Hiqueue.WrrScheduler packetLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "packet lengths"
+attr unit b
+vector 84 testdumbbell.Router1.eth[10].Switchqueue incomingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPushStarted)
+attr title "incoming packet lengths"
+attr unit b
+vector 85 testdumbbell.Router1.eth[10].Switchqueue queueLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + count(packetPushStarted) - count(packetPulled) - count(packetRemoved) - count(packetDropped)))"
+attr title "queue length"
+attr unit pk
+vector 86 testdumbbell.Router1.eth[10].Switchqueue queueBitLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + sum(packetLength(packetPushStarted)) - sum(packetLength(packetPulled)) - sum(packetLength(packetRemoved)) - sum(packetLength(packetDropped))))"
+attr title "queue bit length"
+attr unit b
+vector 87 testdumbbell.Router1.eth[10].Switchqueue queueingTime:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source queueingTime(packetPulled)
+attr title "queueing times"
+attr unit s
+vector 88 testdumbbell.Router1.eth[10].Switchqueue outgoingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "outgoing packet lengths"
+attr unit b
+vector 89 testdumbbell.Router1.eth[10].mac packetReceivedFromUpper:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetReceivedFromUpper
+attr title "packet bytes from higher layer, packetBytes"
+vector 90 testdumbbell.Router1.eth[10].mac txPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetSentToLower
+attr title "packets transmitted, packetBytes"
+vector 91 testdumbbell.Router2.eth[10].mac rxPkOk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source rxPkOk
+attr title "packets received OK, packetBytes"
+vector 92 testdumbbell.Router2.eth[10].mac passedUpPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetSentToUpper
+attr title "packets passed to higher layer, packetBytes"
+vector 93 testdumbbell.Router2.ethernet decapPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source decapPk
+attr title "packets decapsulated, packetBytes"
+vector 94 testdumbbell.Router2.ethernet encapPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source encapPk
+attr title "packets encapsulated, packetBytes"
+vector 95 testdumbbell.Router2.eth[1].Hiqueue.beQueue incomingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPushStarted)
+attr title "incoming packet lengths"
+attr unit b
+vector 96 testdumbbell.Router2.eth[1].Hiqueue.beQueue "queuelength (bit)" ETV
+vector 97 testdumbbell.Router2.eth[1].Hiqueue.beQueue queueingTime:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source queueingTime(packetPulled)
+attr title "queueing times"
+attr unit s
+vector 98 testdumbbell.Router2.eth[1].Hiqueue.beQueue outgoingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "outgoing packet lengths"
+attr unit b
+vector 99 testdumbbell.Router2.eth[1].Hiqueue.WrrScheduler "bufferOccupancy (byte)" ETV
+vector 100 testdumbbell.Router2.eth[1].Hiqueue.WrrScheduler packetLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "packet lengths"
+attr unit b
+vector 101 testdumbbell.Router2.eth[1].Switchqueue incomingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPushStarted)
+attr title "incoming packet lengths"
+attr unit b
+vector 102 testdumbbell.Router2.eth[1].Switchqueue queueLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + count(packetPushStarted) - count(packetPulled) - count(packetRemoved) - count(packetDropped)))"
+attr title "queue length"
+attr unit pk
+vector 103 testdumbbell.Router2.eth[1].Switchqueue queueBitLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + sum(packetLength(packetPushStarted)) - sum(packetLength(packetPulled)) - sum(packetLength(packetRemoved)) - sum(packetLength(packetDropped))))"
+attr title "queue bit length"
+attr unit b
+vector 104 testdumbbell.Router2.eth[1].Switchqueue queueingTime:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source queueingTime(packetPulled)
+attr title "queueing times"
+attr unit s
+vector 105 testdumbbell.Router2.eth[1].Switchqueue outgoingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "outgoing packet lengths"
+attr unit b
+vector 106 testdumbbell.Router2.eth[1].mac packetReceivedFromUpper:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetReceivedFromUpper
+attr title "packet bytes from higher layer, packetBytes"
+vector 107 testdumbbell.Router2.eth[1].mac txPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetSentToLower
+attr title "packets transmitted, packetBytes"
+vector 108 testdumbbell.Hostr2.eth[0].mac rxPkOk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source rxPkOk
+attr title "packets received OK, packetBytes"
+vector 109 testdumbbell.Hostr2.eth[0].mac passedUpPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetSentToUpper
+attr title "packets passed to higher layer, packetBytes"
+vector 110 testdumbbell.Hostr2.ethernet decapPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source decapPk
+attr title "packets decapsulated, packetBytes"
+vector 111 testdumbbell.Hostr2.tcp.conn-13 rcvSeq:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+vector 112 testdumbbell.Hostr2.tcp.conn-13 rcvAck:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+vector 113 testdumbbell.Hostr2.tcp.conn-13 tcpRcvPayloadBytes:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+vector 114 testdumbbell.Hostr2.tcp.conn-41 rcvAdv:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+vector 115 testdumbbell.Hostr2.tcp.conn-41 sndWnd:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+vector 116 testdumbbell.Hostr2.tcp.conn-41 tcpRcvQueueBytes:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+vector 117 testdumbbell.Hostr2.tcp.conn-41 rcvWnd:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+vector 118 testdumbbell.Hostr2.tcp.conn-41 sndAck:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+vector 119 testdumbbell.Hostr2.ethernet encapPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source encapPk
+attr title "packets encapsulated, packetBytes"
+vector 120 testdumbbell.Hostr2.eth[0].Hostqueue incomingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPushStarted)
+attr title "incoming packet lengths"
+attr unit b
+vector 121 testdumbbell.Hostr2.eth[0].Hostqueue queueingTime:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source queueingTime(packetPulled)
+attr title "queueing times"
+attr unit s
+vector 122 testdumbbell.Hostr2.eth[0].Hostqueue outgoingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "outgoing packet lengths"
+attr unit b
+vector 123 testdumbbell.Hostr2.eth[0].mac packetReceivedFromUpper:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetReceivedFromUpper
+attr title "packet bytes from higher layer, packetBytes"
+vector 124 testdumbbell.Hostr2.eth[0].Hostqueue queueLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + count(packetPushStarted) - count(packetPulled) - count(packetRemoved) - count(packetDropped)))"
+attr title "queue length"
+attr unit pk
+vector 125 testdumbbell.Hostr2.eth[0].Hostqueue queueBitLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + sum(packetLength(packetPushStarted)) - sum(packetLength(packetPulled)) - sum(packetLength(packetRemoved)) - sum(packetLength(packetDropped))))"
+attr title "queue bit length"
+attr unit b
+vector 126 testdumbbell.Hostr2.eth[0].mac txPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetSentToLower
+attr title "packets transmitted, packetBytes"
+vector 127 testdumbbell.Router2.eth[1].mac rxPkOk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source rxPkOk
+attr title "packets received OK, packetBytes"
+vector 128 testdumbbell.Router2.eth[1].mac passedUpPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetSentToUpper
+attr title "packets passed to higher layer, packetBytes"
+vector 129 testdumbbell.Router2.eth[10].Hiqueue.beQueue incomingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPushStarted)
+attr title "incoming packet lengths"
+attr unit b
+vector 130 testdumbbell.Router2.eth[10].Hiqueue.beQueue "queuelength (bit)" ETV
+vector 131 testdumbbell.Router2.eth[10].Hiqueue.beQueue queueingTime:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source queueingTime(packetPulled)
+attr title "queueing times"
+attr unit s
+vector 132 testdumbbell.Router2.eth[10].Hiqueue.beQueue outgoingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "outgoing packet lengths"
+attr unit b
+vector 133 testdumbbell.Router2.eth[10].Hiqueue.WrrScheduler "bufferOccupancy (byte)" ETV
+vector 134 testdumbbell.Router2.eth[10].Hiqueue.WrrScheduler packetLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "packet lengths"
+attr unit b
+vector 135 testdumbbell.Router2.eth[10].Switchqueue incomingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPushStarted)
+attr title "incoming packet lengths"
+attr unit b
+vector 136 testdumbbell.Router2.eth[10].Switchqueue queueLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + count(packetPushStarted) - count(packetPulled) - count(packetRemoved) - count(packetDropped)))"
+attr title "queue length"
+attr unit pk
+vector 137 testdumbbell.Router2.eth[10].Switchqueue queueBitLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + sum(packetLength(packetPushStarted)) - sum(packetLength(packetPulled)) - sum(packetLength(packetRemoved)) - sum(packetLength(packetDropped))))"
+attr title "queue bit length"
+attr unit b
+vector 138 testdumbbell.Router2.eth[10].Switchqueue queueingTime:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source queueingTime(packetPulled)
+attr title "queueing times"
+attr unit s
+vector 139 testdumbbell.Router2.eth[10].Switchqueue outgoingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "outgoing packet lengths"
+attr unit b
+vector 140 testdumbbell.Router2.eth[10].mac packetReceivedFromUpper:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetReceivedFromUpper
+attr title "packet bytes from higher layer, packetBytes"
+vector 141 testdumbbell.Router2.eth[10].mac txPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetSentToLower
+attr title "packets transmitted, packetBytes"
+vector 142 testdumbbell.Router2.eth[10].Hiqueue.creditQueue incomingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPushStarted)
+attr title "incoming packet lengths"
+attr unit b
+vector 143 testdumbbell.Router2.eth[10].Hiqueue.creditQueue queueLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + count(packetPushStarted) - count(packetPulled) - count(packetRemoved) - count(packetDropped)))"
+attr title "queue length"
+attr unit pk
+vector 144 testdumbbell.Router2.eth[10].Hiqueue.creditQueue queueBitLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + sum(packetLength(packetPushStarted)) - sum(packetLength(packetPulled)) - sum(packetLength(packetRemoved)) - sum(packetLength(packetDropped))))"
+attr title "queue bit length"
+attr unit b
+vector 145 testdumbbell.Router1.eth[10].mac rxPkOk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source rxPkOk
+attr title "packets received OK, packetBytes"
+vector 146 testdumbbell.Router1.eth[10].mac passedUpPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetSentToUpper
+attr title "packets passed to higher layer, packetBytes"
+vector 147 testdumbbell.Router1.eth[1].Hiqueue.beQueue incomingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPushStarted)
+attr title "incoming packet lengths"
+attr unit b
+vector 148 testdumbbell.Router1.eth[1].Hiqueue.beQueue "queuelength (bit)" ETV
+vector 149 testdumbbell.Router1.eth[1].Hiqueue.beQueue queueingTime:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source queueingTime(packetPulled)
+attr title "queueing times"
+attr unit s
+vector 150 testdumbbell.Router1.eth[1].Hiqueue.beQueue outgoingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "outgoing packet lengths"
+attr unit b
+vector 151 testdumbbell.Router1.eth[1].Hiqueue.WrrScheduler "bufferOccupancy (byte)" ETV
+vector 152 testdumbbell.Router1.eth[1].Hiqueue.WrrScheduler packetLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "packet lengths"
+attr unit b
+vector 153 testdumbbell.Router1.eth[1].Switchqueue incomingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPushStarted)
+attr title "incoming packet lengths"
+attr unit b
+vector 154 testdumbbell.Router1.eth[1].Switchqueue queueLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + count(packetPushStarted) - count(packetPulled) - count(packetRemoved) - count(packetDropped)))"
+attr title "queue length"
+attr unit pk
+vector 155 testdumbbell.Router1.eth[1].Switchqueue queueBitLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + sum(packetLength(packetPushStarted)) - sum(packetLength(packetPulled)) - sum(packetLength(packetRemoved)) - sum(packetLength(packetDropped))))"
+attr title "queue bit length"
+attr unit b
+vector 156 testdumbbell.Router1.eth[1].Switchqueue queueingTime:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source queueingTime(packetPulled)
+attr title "queueing times"
+attr unit s
+vector 157 testdumbbell.Router1.eth[1].Switchqueue outgoingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "outgoing packet lengths"
+attr unit b
+vector 158 testdumbbell.Router1.eth[1].mac packetReceivedFromUpper:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetReceivedFromUpper
+attr title "packet bytes from higher layer, packetBytes"
+vector 159 testdumbbell.Router1.eth[1].mac txPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetSentToLower
+attr title "packets transmitted, packetBytes"
+vector 160 testdumbbell.Hosts2.eth[0].mac rxPkOk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source rxPkOk
+attr title "packets received OK, packetBytes"
+vector 161 testdumbbell.Hosts2.eth[0].mac passedUpPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetSentToUpper
+attr title "packets passed to higher layer, packetBytes"
+vector 162 testdumbbell.Hosts2.ethernet decapPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source decapPk
+attr title "packets decapsulated, packetBytes"
+vector 163 testdumbbell.Hosts2.tcp.conn-40 rcvSeq:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+vector 164 testdumbbell.Hosts2.tcp.conn-40 rcvAck:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+vector 165 testdumbbell.Hosts2.tcp.conn-40 tcpRcvPayloadBytes:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+vector 166 testdumbbell.Hosts2.tcp.conn-40 sndWnd:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+vector 167 testdumbbell.Hosts2.app[1] packetSent:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetSent
+attr title "packets sent, packetBytes"
+vector 168 testdumbbell.Hosts2.tcp.conn-40 sndNxt:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+vector 169 testdumbbell.Hosts2.tcp.conn-40 unacked:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+vector 170 testdumbbell.Hostr2.tcp.conn-41 rcvSeq:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+vector 171 testdumbbell.Hostr2.tcp.conn-41 rcvAck:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+vector 172 testdumbbell.Hostr2.tcp.conn-41 tcpRcvPayloadBytes:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+vector 173 testdumbbell.Hostr2.tcp.conn-41 unacked:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+vector 174 testdumbbell.Router2.eth[10].Hiqueue.creditQueue queueingTime:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source queueingTime(packetPulled)
+attr title "queueing times"
+attr unit s
+vector 175 testdumbbell.Router2.eth[10].Hiqueue.creditQueue outgoingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "outgoing packet lengths"
+attr unit b
+vector 176 testdumbbell.Router1.eth[10].Hiqueue.Priority_0 incomingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPushStarted)
+attr title "incoming packet lengths"
+attr unit b
+vector 177 testdumbbell.Router1.eth[10].Hiqueue.Priority_0 "queuelength (bit)" ETV
+vector 178 testdumbbell.Router1.eth[10].Hiqueue.Priority_0 queueingTime:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source queueingTime(packetPulled)
+attr title "queueing times"
+attr unit s
+vector 179 testdumbbell.Router1.eth[10].Hiqueue.Priority_0 outgoingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "outgoing packet lengths"
+attr unit b
+vector 180 testdumbbell.Router1.eth[10].Hiqueue.PriorityScheduler packetLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "packet lengths"
+attr unit b
+vector 181 testdumbbell.Router1.eth[1].Hiqueue.creditQueue incomingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPushStarted)
+attr title "incoming packet lengths"
+attr unit b
+vector 182 testdumbbell.Router1.eth[1].Hiqueue.creditQueue queueingTime:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source queueingTime(packetPulled)
+attr title "queueing times"
+attr unit s
+vector 183 testdumbbell.Router1.eth[1].Hiqueue.creditQueue outgoingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "outgoing packet lengths"
+attr unit b
+vector 184 testdumbbell.Router1.eth[1].Hiqueue.creditQueue queueLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + count(packetPushStarted) - count(packetPulled) - count(packetRemoved) - count(packetDropped)))"
+attr title "queue length"
+attr unit pk
+vector 185 testdumbbell.Router1.eth[1].Hiqueue.creditQueue queueBitLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + sum(packetLength(packetPushStarted)) - sum(packetLength(packetPulled)) - sum(packetLength(packetRemoved)) - sum(packetLength(packetDropped))))"
+attr title "queue bit length"
+attr unit b
+vector 186 testdumbbell.Router2.eth[1].Hiqueue.Priority_0 incomingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPushStarted)
+attr title "incoming packet lengths"
+attr unit b
+vector 187 testdumbbell.Router2.eth[1].Hiqueue.Priority_0 "queuelength (bit)" ETV
+vector 188 testdumbbell.Router2.eth[1].Hiqueue.Priority_0 queueingTime:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source queueingTime(packetPulled)
+attr title "queueing times"
+attr unit s
+vector 189 testdumbbell.Router2.eth[1].Hiqueue.Priority_0 outgoingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "outgoing packet lengths"
+attr unit b
+vector 190 testdumbbell.Router2.eth[1].Hiqueue.PriorityScheduler packetLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "packet lengths"
+attr unit b
+vector 191 testdumbbell.Hostr2.tcp.conn-41 dupAcks:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+vector 192 testdumbbell.Hostr2.app[1] "goodput (bps)" ETV
+vector 193 testdumbbell.Hostr2.app[1] packetReceived:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetReceived
+attr title "packets received, packetBytes"
+0	50681 9 0 0 0 0 1 0 0 0 0
+1	50690 9 0 0 0 0 1 0 0 0 0
+2	50699 9 0 0 0 0 1 0 0 0 0
+3	50708 9 0 0 0 0 1 0 0 0 0
+4	50717 9 0 0 0 0 1 0 0 0 0
+5	50726 9 0 0 0 0 1 0 0 0 0
+6	50735 9 0 0 0 0 1 0 0 0 0
+7	50744 9 0 0 0 0 1 0 0 0 0
+8	50753 9 0 0 0 0 1 0 0 0 0
+9	50762 9 0 0 0 0 1 0 0 0 0
+10	50771 10 0 0 0 0 1 0 0 0 0
+11	50781 10 0 0 0 0 1 0 0 0 0
+12	50791 10 0 0 0 0 1 0 0 0 0
+13	50801 10 0 0 0 0 1 0 0 0 0
+14	50811 10 0 0 0 0 1 0 0 0 0
+15	50821 10 0 0 0 0 1 0 0 0 0
+16	50831 10 0 0 0 0 1 0 0 0 0
+17	50841 10 0 0 0 0 1 0 0 0 0
+18	50851 10 0 0 0 0 1 0 0 0 0
+19	50861 10 0 0 0 0 1 0 0 0 0
+20	50871 10 0 0 0 0 1 0 0 0 0
+21	50881 10 0 0 0 0 1 0 0 0 0
+22	50891 10 0 0 0 0 1 0 0 0 0
+23	50901 10 0 0 0 0 1 0 0 0 0
+24	50911 10 0 0 0 0 1 0 0 0 0
+25	50921 10 0 0 0 0 1 0 0 0 0
+26	50931 10 0 0 0 0 1 0 0 0 0
+27	50941 10 0 0 0 0 1 0 0 0 0
+28	50951 10 0 0 0 0 1 0 0 0 0
+29	50961 10 0 0 0 0 1 0 0 0 0
+30	50971 10 0 0 0 0 1 0 0 0 0
+31	50981 10 0 0 0 0 1 0 0 0 0
+32	50991 10 0 0 0 0 1 0 0 0 0
+33	51001 10 0 0 0 0 1 0 0 0 0
+34	51011 10 0 0 0 0 1 0 0 0 0
+35	51021 10 0 0 0 0 1 0 0 0 0
+36	51031 10 0 0 0 0 1 0 0 0 0
+37	51041 10 0 0 0 0 1 0 0 0 0
+38	51051 10 0 0 0 0 1 0 0 0 0
+39	51061 10 0 0 0 0 1 0 0 0 0
+40	51071 10 0 0 0 0 1 0 0 0 0
+41	51081 10 0 0 0 0 1 0 0 0 0
+42	51091 10 0 0 0 0 1 0 0 0 0
+43	51101 10 0 0 0 0 1 0 0 0 0
+44	51111 10 0 0 0 0 1 0 0 0 0
+45	51121 10 0 0 0 0 1 0 0 0 0
+46	51131 10 0 0 0 0 1 0 0 0 0
+47	51141 10 0 0 0 0 1 0 0 0 0
+48	51151 10 0 0 0 0 1 0 0 0 0
+49	51161 10 0 0 0 0 1 0 0 0 0
+50	51171 10 0 0 0 0 1 0 0 0 0
+51	51181 10 0 0 0 0 1 0 0 0 0
+52	51191 10 0 0 0 0 1 0 0 0 0
+53	51201 10 0 0 0 0 1 0 0 0 0
+54	51211 10 0 0 0 0 1 0 0 0 0
+55	51221 10 0 0 0 0 1 0 0 0 0
+56	51231 10 0 0 0 0 1 0 0 0 0
+57	51241 10 0 0 0 0 1 0 0 0 0
+58	51251 10 0 0 0 0 1 0 0 0 0
+59	51261 10 0 0 0 0 1 0 0 0 0
+60	51271 2429 37 499 0 0 153 39896 65527 10000000 654247425624
+61	53700 57 38 589 0 0.0000006456 3 0 0 0 0
+62	53757 96 38 589 0 0.0000006456 4 65535 65536 262143 17179738113
+63	53853 69 38 589 0 0.0000006456 3 65535 65535 196605 12884508675
+64	53922 57 38 589 0 0.0000006456 3 0 1 2 2
+65	53979 2429 39 501 0 0 153 39904 65535 10001224 654407435416
+66	56408 126 45 699 0 0.0000034456 6 40 1500 4630 6755652
+67	56534 132 50 700 0 0.0000034456 6 464 12144 37904 443153664
+68	56666 140 50 700 0 0.0000034456 6 0 6.72e-08 1.344e-07 9.03168e-15
+69	56806 144 50 700 0 0.0000034456 6 464 12144 37904 443153664
+70	56950 138 50 700 0 0.0000034456 6 58 1518 4738 6924276
+71	57088 160 50 700 0 0.0000034456 8 0 1 2 2
+72	57248 166 50 700 0 0.0000034456 8 0 12144 12656 147738880
+73	57414 149 503 721 0.0000000576 0.0000046664 6 64 1518 4746 6925260
+74	57563 123 505 688 0.0000001076 0.000003422 5 64 1518 3228 4620936
+75	57686 123 505 688 0.0000001076 0.000003422 5 64 1518 3228 4620936
+76	57809 194 506 689 0.0000001076 0.000003422 8 46 1500 3289 4513981
+77	58003 194 508 691 0.0000001076 0.000003422 8 40 1500 3279 4513105
+78	58197 75 510 600 0.0000001076 0.0000007532 3 464 512 1472 723456
+79	58272 144 510 600 0.0000001076 0.0000007532 6 0 512 1472 723456
+80	58416 69 510 600 0.0000001076 0.0000007532 3 0 0 0 0
+81	58485 75 510 600 0.0000001076 0.0000007532 3 464 512 1472 723456
+82	58560 114 510 693 0.0000001076 0.000003422 5 0 0 0 0
+83	58674 128 510 693 0.0000001076 0.000003422 5 464 12144 25760 295676928
+84	58802 128 510 693 0.0000001076 0.000003422 5 464 12144 25760 295676928
+85	58930 228 510 693 0.0000001076 0.000003422 10 0 1 5 5
+86	59158 242 510 693 0.0000001076 0.000003422 10 0 12144 25760 295676928
+87	59400 114 510 693 0.0000001076 0.000003422 5 0 0 0 0
+88	59514 128 510 693 0.0000001076 0.000003422 5 464 12144 25760 295676928
+89	59642 123 510 693 0.0000001076 0.000003422 5 58 1518 3220 4619952
+90	59765 124 513 719 0.0000001652 0.0000046428 5 64 1518 3228 4620936
+91	59889 124 521 724 0.0000002152 0.0000046928 5 64 1518 3228 4620936
+92	60013 124 521 724 0.0000002152 0.0000046928 5 64 1518 3228 4620936
+93	60137 243 522 725 0.0000002152 0.0000046928 10 46 1500 3387 4518801
+94	60380 243 524 727 0.0000002152 0.0000046928 10 40 1500 3371 4517409
+95	60623 75 526 608 0.0000002152 0.0000008608 3 464 512 1472 723456
+96	60698 144 526 608 0.0000002152 0.0000008608 6 0 512 1472 723456
+97	60842 69 526 608 0.0000002152 0.0000008608 3 0 0 0 0
+98	60911 75 526 608 0.0000002152 0.0000008608 3 464 512 1472 723456
+99	60986 115 526 729 0.0000002152 0.0000046928 5 0 0 0 0
+100	61101 134 526 729 0.0000002152 0.0000046928 5 464 12144 25760 295676928
+101	61235 134 526 729 0.0000002152 0.0000046928 5 464 12144 25760 295676928
+102	61369 240 526 729 0.0000002152 0.0000046928 10 0 1 5 5
+103	61609 254 526 729 0.0000002152 0.0000046928 10 0 12144 25760 295676928
+104	61863 120 526 729 0.0000002152 0.0000046928 5 0 0 0 0
+105	61983 134 526 729 0.0000002152 0.0000046928 5 464 12144 25760 295676928
+106	62117 129 526 729 0.0000002152 0.0000046928 5 58 1518 3220 4619952
+107	62246 100 529 701 0.0000002728 0.0000044752 4 64 1518 1710 2316612
+108	62346 100 537 703 0.0000003228 0.0000045252 4 64 1518 1710 2316612
+109	62446 100 537 703 0.0000003228 0.0000045252 4 64 1518 1710 2316612
+110	62546 100 538 704 0.0000003228 0.0000045252 4 46 1500 1638 2256348
+111	62646 24 540 540 0.0000003228 0.0000003228 1 0 0 0 0
+112	62670 24 540 540 0.0000003228 0.0000003228 1 0 0 0 0
+113	62694 24 540 540 0.0000003228 0.0000003228 1 0 0 0 0
+114	62718 84 540 706 0.0000003228 0.0000045252 3 65536 66996 198068 13078398608
+115	62802 56 540 614 0.0000003228 0.0000009684 2 65535 65535 131070 8589672450
+116	62858 72 540 706 0.0000003228 0.0000045252 3 0 0 0 0
+117	62930 56 540 706 0.0000003228 0.0000045252 2 65535 65535 131070 8589672450
+118	62986 51 540 706 0.0000003228 0.0000045252 2 1 1461 1462 2134522
+119	63037 121 542 709 0.0000003228 0.0000045252 5 40 54 241 11757
+120	63158 126 543 710 0.0000003228 0.0000045252 5 464 576 2648 1411392
+121	63284 116 543 710 0.0000003228 0.0000045252 5 0 0 0 0
+122	63400 126 543 710 0.0000003228 0.0000045252 5 464 576 2648 1411392
+123	63526 121 543 710 0.0000003228 0.0000045252 5 58 72 331 22053
+124	63647 116 543 710 0.0000003228 0.0000045252 5 0 0 0 0
+125	63763 116 543 710 0.0000003228 0.0000045252 5 0 0 0 0
+126	63879 124 546 711 0.0000003804 0.0000045828 5 64 72 339 23037
+127	64003 124 556 713 0.0000004304 0.0000046328 5 64 72 339 23037
+128	64127 124 556 713 0.0000004304 0.0000046328 5 64 72 339 23037
+129	64251 52 561 718 0.0000004304 0.0000046328 2 464 496 960 461312
+130	64303 100 561 718 0.0000004304 0.0000046328 4 0 496 960 461312
+131	64403 48 561 718 0.0000004304 0.0000046328 2 0 0 0 0
+132	64451 52 561 718 0.0000004304 0.0000046328 2 464 496 960 461312
+133	64503 118 561 730 0.0000004304 0.0000047 5 0 72 142 10084
+134	64621 126 561 730 0.0000004304 0.0000047 5 464 576 2648 1411392
+135	64747 126 561 730 0.0000004304 0.0000047 5 464 576 2648 1411392
+136	64873 232 561 730 0.0000004304 0.0000047 10 0 1 5 5
+137	65105 242 561 730 0.0000004304 0.0000047 10 0 576 2648 1411392
+138	65347 116 561 730 0.0000004304 0.0000047 5 0 0 0 0
+139	65463 126 561 730 0.0000004304 0.0000047 5 464 576 2648 1411392
+140	65589 121 561 730 0.0000004304 0.0000047 5 58 72 331 22053
+141	65710 99 564 723 0.000000488 0.0000046904 4 64 72 269 18137
+142	65809 77 571 686 0.0000005016 0.0000033984 3 552 576 1688 950080
+143	65886 116 571 730 0.0000005016 0.0000047 5 0 1 3 3
+144	66002 122 571 730 0.0000005016 0.0000047 5 0 576 1688 950080
+145	66124 74 572 670 0.000000538 0.0000033316 3 64 72 205 14041
+146	66198 74 572 670 0.000000538 0.0000033316 3 64 72 205 14041
+147	66272 25 577 577 0.000000538 0.000000538 1 496 496 496 246016
+148	66297 48 577 577 0.000000538 0.000000538 2 0 496 496 246016
+149	66345 23 577 577 0.000000538 0.000000538 1 0 0 0 0
+150	66368 25 577 577 0.000000538 0.000000538 1 496 496 496 246016
+151	66393 71 577 675 0.000000538 0.0000033316 3 0 0 0 0
+152	66464 77 577 675 0.000000538 0.0000033316 3 496 576 1624 882496
+153	66541 77 577 675 0.000000538 0.0000033316 3 496 576 1624 882496
+154	66618 142 577 675 0.000000538 0.0000033316 6 0 1 3 3
+155	66760 148 577 675 0.000000538 0.0000033316 6 0 576 1624 882496
+156	66908 71 577 675 0.000000538 0.0000033316 3 0 0 0 0
+157	66979 77 577 675 0.000000538 0.0000033316 3 496 576 1624 882496
+158	67056 74 577 675 0.000000538 0.0000033316 3 62 72 203 13789
+159	67130 75 578 680 0.0000005956 0.0000033956 3 64 72 205 14041
+160	67205 75 580 694 0.0000006456 0.0000034456 3 64 72 205 14041
+161	67280 75 580 694 0.0000006456 0.0000034456 3 64 72 205 14041
+162	67355 75 581 695 0.0000006456 0.0000034456 3 46 54 151 7633
+163	67430 24 583 583 0.0000006456 0.0000006456 1 0 0 0 0
+164	67454 24 583 583 0.0000006456 0.0000006456 1 1 1 1 1
+165	67478 24 583 583 0.0000006456 0.0000006456 1 0 0 0 0
+166	67502 28 583 583 0.0000006456 0.0000006456 1 65535 65535 65535 4294836225
+167	67530 28 587 587 0.0000006456 0.0000006456 1 10000 10000 10000 100000000
+168	67558 24 589 589 0.0000006456 0.0000006456 1 1 1 1 1
+169	67582 27 589 589 0.0000006456 0.0000006456 1 1460 1460 1460 2131600
+170	67609 48 614 706 0.0000009684 0.0000045252 2 1 1 2 2
+171	67657 48 614 706 0.0000009684 0.0000045252 2 1 1 2 2
+172	67705 51 614 706 0.0000009684 0.0000045252 2 0 1460 1460 2131600
+173	67756 24 614 614 0.0000009684 0.0000009684 1 0 0 0 0
+174	67780 95 629 730 0.000001928 0.0000047 3 1.2896e-06 1.4264e-06 4.0176e-06 5.39184768e-12
+175	67875 74 629 730 0.000001928 0.0000047 3 552 576 1688 950080
+176	67949 55 637 693 0.0000019836 0.000003422 2 12144 12144 24288 294953472
+177	68004 102 637 693 0.0000019836 0.000003422 4 0 12144 24288 294953472
+178	68106 47 637 693 0.0000019836 0.000003422 2 0 0 0 0
+179	68153 55 637 693 0.0000019836 0.000003422 2 12144 12144 24288 294953472
+180	68208 55 637 693 0.0000019836 0.000003422 2 12144 12144 24288 294953472
+181	68263 52 645 675 0.0000020396 0.0000033316 2 552 576 1128 636480
+182	68315 48 645 675 0.0000020396 0.0000033316 2 0 0 0 0
+183	68363 52 645 675 0.0000020396 0.0000033316 2 552 576 1128 636480
+184	68415 48 645 675 0.0000020396 0.0000033316 2 0 0 0 0
+185	68463 48 645 675 0.0000020396 0.0000033316 2 0 0 0 0
+186	68511 56 663 729 0.0000032544 0.0000046928 2 12144 12144 24288 294953472
+187	68567 104 663 729 0.0000032544 0.0000046928 4 0 12144 24288 294953472
+188	68671 48 663 729 0.0000032544 0.0000046928 2 0 0 0 0
+189	68719 56 663 729 0.0000032544 0.0000046928 2 12144 12144 24288 294953472
+190	68775 56 663 729 0.0000032544 0.0000046928 2 12144 12144 24288 294953472
+191	68831 24 706 706 0.0000045252 0.0000045252 1 0 0 0 0
+192	68855 26 707 707 0 0 1 2581101387.784 2581101387.784 2581101387.784 6.6620843740203e+18
+193	68881 27 707 707 0.0000045252 0.0000045252 1 1460 1460 1460 2131600
+vector 194 testdumbbell.Hosts2.tcp.conn-40 rtt:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+vector 195 testdumbbell.Hosts2.tcp.conn-40 srtt:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+vector 196 testdumbbell.Hosts2.tcp.conn-40 rttvar:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+vector 197 testdumbbell.Hosts2.tcp.conn-40 rto:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+vector 198 testdumbbell.Hosts2.tcp.conn-40 markingProb:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+vector 199 testdumbbell.Hosts2.tcp.conn-40 load:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+vector 200 testdumbbell.Hosts2.tcp.conn-40 calcLoad:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+vector 201 testdumbbell.Hosts2.tcp.conn-40 cwnd:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+vector 202 testdumbbell.Hosts2.tcp.conn-40 ssthresh:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+vector 203 testdumbbell.Hosts2.tcp.conn-40 dupAcks:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+vector 204 testdumbbell.Hostr2.UdpCC ecnratio ETV
+vector 205 testdumbbell.Hostr2.UdpCC currate ETV
+vector 206 testdumbbell.Hostr2.udp packetReceived:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetReceived
+attr title "packets received, packetBytes"
+vector 207 testdumbbell.Hostr2.app[0] "goodput (bps)" ETV
+18	70532 45 792 843 0.0000059636 0.000007258 2 1 2 3 5
+61	70577 44 768 768 0.000004848 0.000004848 2 0 0 0 0
+62	70621 52 768 768 0.000004848 0.000004848 2 65536 65536 131072 8589934592
+63	70673 52 768 768 0.000004848 0.000004848 2 65535 65535 131070 8589672450
+64	70725 44 768 768 0.000004848 0.000004848 2 1 1 2 2
+66	70769 127 771 889 0.000004848 0.000007644 5 1500 1500 7500 11250000
+67	70896 132 773 890 0.000004848 0.000007644 5 12144 12144 60720 737383680
+68	71028 117 773 892 0.000004848 0.0000085392 4 0 2.384e-06 5.74e-06 1.171551552e-11
+69	71145 107 773 892 0.000004848 0.0000085392 4 12144 12144 48576 589906944
+70	71252 103 773 892 0.000004848 0.0000085392 4 1518 1518 6072 9217296
+71	71355 181 773 892 0.000004848 0.0000085392 8 0 2 10 16
+72	71536 209 773 892 0.000004848 0.0000085392 8 0 24288 121440 2359627776
+73	71745 78 800 891 0.0000060688 0.0000085296 3 1518 1518 4554 6912972
+74	71823 104 731 894 0.0000047164 0.0000085796 4 1518 1518 6072 9217296
+75	71927 104 731 894 0.0000047164 0.0000085796 4 1518 1518 6072 9217296
+76	72031 200 732 896 0.0000047164 0.0000085796 8 46 1500 6195 9009529
+77	72231 200 734 898 0.0000047164 0.0000085796 8 40 1500 6189 9009013
+82	72431 92 736 900 0.0000047164 0.0000085796 4 0 0 0 0
+83	72523 108 736 900 0.0000047164 0.0000085796 4 12144 12144 48576 589906944
+84	72631 108 736 900 0.0000047164 0.0000085796 4 12144 12144 48576 589906944
+85	72739 184 736 900 0.0000047164 0.0000085796 8 0 1 4 4
+86	72923 200 736 900 0.0000047164 0.0000085796 8 0 12144 48576 589906944
+87	73123 92 736 900 0.0000047164 0.0000085796 4 0 0 0 0
+88	73215 108 736 900 0.0000047164 0.0000085796 4 12144 12144 48576 589906944
+89	73323 104 736 900 0.0000047164 0.0000085796 4 1518 1518 6072 9217296
+90	73427 76 786 893 0.0000059372 0.00000857 3 1518 1518 4554 6912972
+91	73503 76 794 902 0.0000059872 0.00000862 3 1518 1518 4554 6912972
+92	73579 76 794 902 0.0000059872 0.00000862 3 1518 1518 4554 6912972
+93	73655 171 760 920 0.0000048344 0.000008768 7 46 1500 4693 6759325
+94	73826 171 762 922 0.0000048344 0.000008768 7 40 1500 4687 6758809
+99	73997 67 799 908 0.0000059872 0.00000862 3 0 0 0 0
+100	74064 82 799 908 0.0000059872 0.00000862 3 12144 12144 36432 442430208
+101	74146 82 799 908 0.0000059872 0.00000862 3 12144 12144 36432 442430208
+102	74228 140 799 908 0.0000059872 0.00000862 6 0 1 3 3
+103	74368 152 799 908 0.0000059872 0.00000862 6 0 12144 36432 442430208
+104	74520 70 799 908 0.0000059872 0.00000862 3 0 0 0 0
+105	74590 82 799 908 0.0000059872 0.00000862 3 12144 12144 36432 442430208
+106	74672 79 799 908 0.0000059872 0.00000862 3 1518 1518 4554 6912972
+107	74751 80 784 901 0.0000059136 0.0000086104 3 1518 1518 4554 6912972
+108	74831 80 788 909 0.0000059636 0.0000086604 3 1518 1518 4554 6912972
+109	74911 80 788 909 0.0000059636 0.0000086604 3 1518 1518 4554 6912972
+110	74991 80 789 910 0.0000059636 0.0000086604 3 1500 1500 4500 6750000
+114	75071 28 912 912 0.0000086604 0.0000086604 1 68456 68456 68456 4686223936
+116	75099 48 912 912 0.0000086604 0.0000086604 2 0 0 0 0
+117	75147 28 912 912 0.0000086604 0.0000086604 1 65535 65535 65535 4294836225
+118	75175 27 912 912 0.0000086604 0.0000086604 1 2921 2921 2921 8532241
+119	75202 97 739 915 0.000004726 0.0000086604 4 40 50 187 8809
+120	75299 101 740 916 0.000004726 0.0000086604 4 464 544 2072 1077568
+121	75400 93 740 916 0.000004726 0.0000086604 4 0 0 0 0
+122	75493 101 740 916 0.000004726 0.0000086604 4 464 544 2072 1077568
+123	75594 97 740 916 0.000004726 0.0000086604 4 58 68 259 16837
+124	75691 93 740 916 0.000004726 0.0000086604 4 0 0 0 0
+125	75784 93 740 916 0.000004726 0.0000086604 4 0 0 0 0
+126	75877 99 749 917 0.0000047844 0.000008718 4 64 68 265 17569
+127	75976 99 759 919 0.0000048344 0.000008768 4 64 68 265 17569
+128	76075 99 759 919 0.0000048344 0.000008768 4 64 68 265 17569
+129	76174 25 924 924 0.000008768 0.000008768 1 464 464 464 215296
+130	76199 48 924 924 0.000008768 0.000008768 2 0 464 464 215296
+131	76247 23 924 924 0.000008768 0.000008768 1 0 0 0 0
+132	76270 25 924 924 0.000008768 0.000008768 1 464 464 464 215296
+133	76295 73 819 924 0.0000061968 0.000008768 3 0 68 136 9248
+134	76368 77 819 924 0.0000061968 0.000008768 3 464 544 1528 781632
+135	76445 77 819 924 0.0000061968 0.000008768 3 464 544 1528 781632
+136	76522 142 819 924 0.0000061968 0.000008768 6 0 1 3 3
+137	76664 148 819 924 0.0000061968 0.000008768 6 0 544 1528 781632
+138	76812 71 819 924 0.0000061968 0.000008768 3 0 0 0 0
+139	76883 77 819 924 0.0000061968 0.000008768 3 464 544 1528 781632
+140	76960 74 819 924 0.0000061968 0.000008768 3 58 68 191 12213
+141	77034 75 747 862 0.0000047624 0.0000074832 3 65 70 203 13749
+142	77109 78 764 883 0.0000048344 0.0000076048 3 520 544 1608 862272
+143	77187 96 764 883 0.0000048344 0.0000076048 4 0 1 3 3
+144	77283 102 764 883 0.0000048344 0.0000076048 4 0 544 1608 862272
+145	77385 100 741 868 0.0000047404 0.0000075332 4 64 70 267 17845
+146	77485 100 741 868 0.0000047404 0.0000075332 4 64 70 267 17845
+147	77585 26 746 746 0.0000047404 0.0000047404 1 464 464 464 215296
+148	77611 50 746 746 0.0000047404 0.0000047404 2 0 464 464 215296
+149	77661 24 746 746 0.0000047404 0.0000047404 1 0 0 0 0
+150	77685 26 746 746 0.0000047404 0.0000047404 1 464 464 464 215296
+151	77711 96 746 873 0.0000047404 0.0000075332 4 0 0 0 0
+152	77807 104 746 873 0.0000047404 0.0000075332 4 464 560 2088 1095232
+153	77911 104 746 873 0.0000047404 0.0000075332 4 464 560 2088 1095232
+154	78015 192 746 873 0.0000047404 0.0000075332 8 0 1 4 4
+155	78207 200 746 873 0.0000047404 0.0000075332 8 0 560 2088 1095232
+156	78407 96 746 873 0.0000047404 0.0000075332 4 0 0 0 0
+157	78503 104 746 873 0.0000047404 0.0000075332 4 464 560 2088 1095232
+158	78607 100 746 873 0.0000047404 0.0000075332 4 58 70 261 17113
+159	78707 98 751 876 0.000004798 0.000007594 4 64 70 267 17845
+160	78805 98 765 884 0.000004848 0.000007644 4 64 70 267 17845
+161	78903 98 765 884 0.000004848 0.000007644 4 64 70 267 17845
+162	79001 98 766 885 0.000004848 0.000007644 4 46 52 195 9529
+163	79099 23 768 768 0.000004848 0.000004848 1 1 1 1 1
+164	79122 26 768 768 0.000004848 0.000004848 1 1461 1461 1461 2134521
+165	79148 23 768 768 0.000004848 0.000004848 1 0 0 0 0
+166	79171 27 768 768 0.000004848 0.000004848 1 65535 65535 65535 4294836225
+168	79198 52 768 768 0.000004848 0.000004848 2 1461 2921 4382 10666762
+169	79250 49 768 768 0.000004848 0.000004848 2 0 2920 2920 8526400
+170	79299 27 912 912 0.0000086604 0.0000086604 1 1461 1461 1461 2134521
+171	79326 24 912 912 0.0000086604 0.0000086604 1 1 1 1 1
+172	79350 27 912 912 0.0000086604 0.0000086604 1 1460 1460 1460 2131600
+174	79377 66 819 861 0.0000061968 0.0000074224 2 1.2256e-06 1.3624e-06 2.588e-06 3.35822912e-12
+175	79443 52 819 861 0.0000061968 0.0000074224 2 520 544 1064 566336
+176	79495 112 736 900 0.0000047164 0.0000085796 4 12144 12144 48576 589906944
+177	79607 208 736 900 0.0000047164 0.0000085796 8 0 12144 48576 589906944
+178	79815 96 736 900 0.0000047164 0.0000085796 4 0 0 0 0
+179	79911 112 736 900 0.0000047164 0.0000085796 4 12144 12144 48576 589906944
+180	80023 112 736 900 0.0000047164 0.0000085796 4 12144 12144 48576 589906944
+181	80135 78 758 873 0.0000048124 0.0000075332 3 520 560 1624 879936
+182	80213 72 758 873 0.0000048124 0.0000075332 3 0 0 0 0
+183	80285 78 758 873 0.0000048124 0.0000075332 3 520 560 1624 879936
+184	80363 72 758 873 0.0000048124 0.0000075332 3 0 0 0 0
+185	80435 72 758 873 0.0000048124 0.0000075332 3 0 0 0 0
+186	80507 82 799 908 0.0000059872 0.00000862 3 12144 12144 36432 442430208
+187	80589 152 799 908 0.0000059872 0.00000862 6 0 12144 36432 442430208
+188	80741 70 799 908 0.0000059872 0.00000862 3 0 0 0 0
+189	80811 82 799 908 0.0000059872 0.00000862 3 12144 12144 36432 442430208
+190	80893 82 799 908 0.0000059872 0.00000862 3 12144 12144 36432 442430208
+191	80975 24 912 912 0.0000086604 0.0000086604 1 0 0 0 0
+192	80999 38 913 913 0.0000045252 0.0000045252 1 2824530857.0323 2824530857.0323 2824530857.0323 7.9779745623277e+18
+193	81037 27 913 913 0.0000086604 0.0000086604 1 1460 1460 1460 2131600
+194	81064 32 768 768 0.000004848 0.000004848 1 4.2024e-06 4.2024e-06 4.2024e-06 1.766016576e-11
+195	81096 31 768 768 0.000004848 0.000004848 1 5.253e-07 5.253e-07 5.253e-07 2.7594009e-13
+196	81127 34 768 768 0.000004848 0.000004848 1 0.6562505253 0.6562505253 0.6562505253 0.43066475195653
+197	81161 34 768 768 0.000004848 0.000004848 1 2.6250026265 2.6250026265 2.6250026265 6.8906387891319
+198	81195 23 768 768 0.000004848 0.000004848 1 0 0 0 0
+199	81218 23 768 768 0.000004848 0.000004848 1 0 0 0 0
+200	81241 23 768 768 0.000004848 0.000004848 1 0 0 0 0
+201	81264 26 768 768 0.000004848 0.000004848 1 2920 2920 2920 8526400
+202	81290 32 768 768 0.000004848 0.000004848 1 4294967295 4294967295 4294967295 1.844674406512e+19
+203	81322 23 768 768 0.000004848 0.000004848 1 0 0 0 0
+204	81345 24 791 791 0.0000059636 0.0000059636 1 0 0 0 0
+205	81369 32 791 791 0.0000059636 0.0000059636 1 500000000 500000000 500000000 2.5e+17
+206	81401 53 792 843 0.0000059636 0.000007258 2 1480 1480 2960 4380800
+207	81454 73 793 844 0.0000059636 0.000007258 2 1974646186.867 9097651421.508 11072297608.375 8.6666488950575e+19
+

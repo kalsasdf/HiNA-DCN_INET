@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OSPFASConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="OSPF.xsd">
+
+<!-- Areas -->
+<Area id="0.0.0.0"><!-- not IP address -->
+<AddressRange address="Host1" mask="Host1" status="Advertise" />
+<AddressRange address="Host2" mask="Host2" status="Advertise" />
+<AddressRange address="Host3" mask="Host3" status="Advertise" />
+<AddressRange address="Host4" mask="Host4" status="Advertise" />
+<AddressRange address="Host5" mask="Host5" status="Advertise" />
+<AddressRange address="Host6" mask="Host6" status="Advertise" />
+<AddressRange address="Host7" mask="Host7" status="Advertise" />
+<AddressRange address="Host8" mask="Host8" status="Advertise" />
+<AddressRange address="Host9" mask="Host9" status="Advertise" />
+<AddressRange address="Host10" mask="Host10" status="Advertise" />
+<AddressRange address="Host11" mask="Host11" status="Advertise" />
+<AddressRange address="Host12" mask="Host12" status="Advertise" />
+<AddressRange address="Host13" mask="Host13" status="Advertise" />
+<AddressRange address="Host14" mask="Host14" status="Advertise" />
+<AddressRange address="Host15" mask="Host15" status="Advertise" />
+<AddressRange address="Host16" mask="Host16" status="Advertise" />
+<AddressRange address="Core1" mask="Core1" status="Advertise" />
+<AddressRange address="Core2" mask="Core2" status="Advertise" />
+<AddressRange address="Core3" mask="Core3" status="Advertise" />
+<AddressRange address="Core4" mask="Core4" status="Advertise" />
+<AddressRange address="Agre1" mask="Agre1" status="Advertise" />
+<AddressRange address="Agre2" mask="Agre2" status="Advertise" />
+<AddressRange address="Agre3" mask="Agre3" status="Advertise" />
+<AddressRange address="Agre4" mask="Agre4" status="Advertise" />
+<AddressRange address="Edge1" mask="Edge1" status="Advertise" />
+<AddressRange address="Edge2" mask="Edge2" status="Advertise" />
+<AddressRange address="Edge3" mask="Edge3" status="Advertise" />
+<AddressRange address="Edge4" mask="Edge4" status="Advertise" />
+</Area>
+
+<!-- Routers -->
+<Router name="Core*" RFC1583Compatible="true">
+<PointToPointInterface ifName="eth0" areaID="0.0.0.0"  />
+<PointToPointInterface ifName="eth1" areaID="0.0.0.0"  />
+<PointToPointInterface ifName="eth2" areaID="0.0.0.0"  />
+<PointToPointInterface ifName="eth3" areaID="0.0.0.0"  />
+</Router>
+
+<Router name="Agre*" RFC1583Compatible="true">
+<PointToPointInterface ifName="eth0" areaID="0.0.0.0"  />
+<PointToPointInterface ifName="eth1" areaID="0.0.0.0"  />
+<BroadcastInterface ifName="eth2" areaID="0.0.0.0" interfaceOutputCost="1" /><!-- cost的配置需要等价路径之间的值相等，非等价路径之间不等  -->
+<BroadcastInterface ifName="eth3" areaID="0.0.0.0" interfaceOutputCost="1" /><!-- 等价路径需要设置为BroadcastInterface  -->
+</Router>
+
+<Router name="Edge*" RFC1583Compatible="true">
+<PointToPointInterface ifName="eth0" areaID="0.0.0.0"  />
+<PointToPointInterface ifName="eth1" areaID="0.0.0.0"  />
+<BroadcastInterface ifName="eth2" areaID="0.0.0.0" interfaceOutputCost="1" />
+<BroadcastInterface ifName="eth3" areaID="0.0.0.0" interfaceOutputCost="1" />
+</Router>
+</OSPFASConfig>

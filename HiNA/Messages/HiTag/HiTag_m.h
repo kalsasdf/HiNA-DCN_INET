@@ -2,8 +2,8 @@
 // Generated file, do not edit! Created by opp_msgtool 6.0 from inet/HiNA/Messages/HiTag/HiTag.msg.
 //
 
-#ifndef __INET_HITAG_M_H
-#define __INET_HITAG_M_H
+#ifndef __INET_INET_HINA_MESSAGES_HITAG_HITAG_M_H
+#define __INET_INET_HINA_MESSAGES_HITAG_HITAG_M_H
 
 #if defined(__clang__)
 #  pragma clang diagnostic ignored "-Wreserved-id-macro"
@@ -40,11 +40,13 @@ class HiTag;
 
 #include "inet/common/Units_m.h" // import inet.common.Units
 
+#include "inet/networklayer/common/L3Address_m.h" // import inet.networklayer.common.L3Address
+
 
 namespace inet {
 
 /**
- * Class generated from <tt>inet/HiNA/Messages/HiTag/HiTag.msg:13</tt> by opp_msgtool.
+ * Class generated from <tt>inet\HiNA\Messages\HiTag\HiTag.msg:14</tt> by opp_msgtool.
  * <pre>
  * class HiTag extends TagBase
  * {
@@ -62,6 +64,20 @@ namespace inet {
  *     //for PFC
  *     int16_t op;
  *     int16_t interfaceId;
+ * 
+ *     //for BCN 
+ *     bool isDeceleration;
+ *     bool isSpeedup;
+ *     inet::L3Address destAddr;
+ *     inet::L3Address srcAddr;
+ *     int16_t local_interfaceId; //记录本地mac端口
+ *     int bfccnpECN;//用于判断发送的cnp包是否处于拥塞交换机处
+ * 
+ *     //for BFC
+ *     uint32_t queueID; //定向在app，flowid % queueNum 写死。
+ *     uint32_t upstreamQueueID;
+ *     bool ispausePck;
+ * 
  * }
  * </pre>
  */
@@ -80,6 +96,15 @@ class INET_API HiTag : public ::inet::TagBase
     uint32_t senderPriority = -1;
     int16_t op = 0;
     int16_t interfaceId = 0;
+    bool isDeceleration_ = false;
+    bool isSpeedup_ = false;
+    L3Address destAddr;
+    L3Address srcAddr;
+    int16_t local_interfaceId = 0;
+    int bfccnpECN = 0;
+    uint32_t queueID = 0;
+    uint32_t upstreamQueueID = 0;
+    bool ispausePck = false;
 
   private:
     void copy(const HiTag& other);
@@ -131,6 +156,35 @@ class INET_API HiTag : public ::inet::TagBase
 
     virtual int16_t getInterfaceId() const;
     virtual void setInterfaceId(int16_t interfaceId);
+
+    virtual bool isDeceleration() const;
+    virtual void setIsDeceleration(bool isDeceleration);
+
+    virtual bool isSpeedup() const;
+    virtual void setIsSpeedup(bool isSpeedup);
+
+    virtual const L3Address& getDestAddr() const;
+    virtual L3Address& getDestAddrForUpdate() { return const_cast<L3Address&>(const_cast<HiTag*>(this)->getDestAddr());}
+    virtual void setDestAddr(const L3Address& destAddr);
+
+    virtual const L3Address& getSrcAddr() const;
+    virtual L3Address& getSrcAddrForUpdate() { return const_cast<L3Address&>(const_cast<HiTag*>(this)->getSrcAddr());}
+    virtual void setSrcAddr(const L3Address& srcAddr);
+
+    virtual int16_t getLocal_interfaceId() const;
+    virtual void setLocal_interfaceId(int16_t local_interfaceId);
+
+    virtual int getBfccnpECN() const;
+    virtual void setBfccnpECN(int bfccnpECN);
+
+    virtual uint32_t getQueueID() const;
+    virtual void setQueueID(uint32_t queueID);
+
+    virtual uint32_t getUpstreamQueueID() const;
+    virtual void setUpstreamQueueID(uint32_t upstreamQueueID);
+
+    virtual bool getIspausePck() const;
+    virtual void setIspausePck(bool ispausePck);
 };
 
 inline void doParsimPacking(omnetpp::cCommBuffer *b, const HiTag& obj) {obj.parsimPack(b);}
@@ -146,5 +200,5 @@ template<> inline inet::HiTag *fromAnyPtr(any_ptr ptr) { return check_and_cast<i
 
 }  // namespace omnetpp
 
-#endif // ifndef __INET_HITAG_M_H
+#endif // ifndef __INET_INET_HINA_MESSAGES_HITAG_HITAG_M_H
 

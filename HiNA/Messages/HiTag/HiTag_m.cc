@@ -28,7 +28,7 @@
 #include <sstream>
 #include <memory>
 #include <type_traits>
-#include "HiTag_m.h"
+#include "inet\HiNA\Messages\HiTag\HiTag_m.h"
 
 namespace omnetpp {
 
@@ -189,6 +189,15 @@ void HiTag::copy(const HiTag& other)
     this->senderPriority = other.senderPriority;
     this->op = other.op;
     this->interfaceId = other.interfaceId;
+    this->isDeceleration_ = other.isDeceleration_;
+    this->isSpeedup_ = other.isSpeedup_;
+    this->destAddr = other.destAddr;
+    this->srcAddr = other.srcAddr;
+    this->local_interfaceId = other.local_interfaceId;
+    this->bfccnpECN = other.bfccnpECN;
+    this->queueID = other.queueID;
+    this->upstreamQueueID = other.upstreamQueueID;
+    this->ispausePck = other.ispausePck;
 }
 
 void HiTag::parsimPack(omnetpp::cCommBuffer *b) const
@@ -206,6 +215,15 @@ void HiTag::parsimPack(omnetpp::cCommBuffer *b) const
     doParsimPacking(b,this->senderPriority);
     doParsimPacking(b,this->op);
     doParsimPacking(b,this->interfaceId);
+    doParsimPacking(b,this->isDeceleration_);
+    doParsimPacking(b,this->isSpeedup_);
+    doParsimPacking(b,this->destAddr);
+    doParsimPacking(b,this->srcAddr);
+    doParsimPacking(b,this->local_interfaceId);
+    doParsimPacking(b,this->bfccnpECN);
+    doParsimPacking(b,this->queueID);
+    doParsimPacking(b,this->upstreamQueueID);
+    doParsimPacking(b,this->ispausePck);
 }
 
 void HiTag::parsimUnpack(omnetpp::cCommBuffer *b)
@@ -223,6 +241,15 @@ void HiTag::parsimUnpack(omnetpp::cCommBuffer *b)
     doParsimUnpacking(b,this->senderPriority);
     doParsimUnpacking(b,this->op);
     doParsimUnpacking(b,this->interfaceId);
+    doParsimUnpacking(b,this->isDeceleration_);
+    doParsimUnpacking(b,this->isSpeedup_);
+    doParsimUnpacking(b,this->destAddr);
+    doParsimUnpacking(b,this->srcAddr);
+    doParsimUnpacking(b,this->local_interfaceId);
+    doParsimUnpacking(b,this->bfccnpECN);
+    doParsimUnpacking(b,this->queueID);
+    doParsimUnpacking(b,this->upstreamQueueID);
+    doParsimUnpacking(b,this->ispausePck);
 }
 
 uint32_t HiTag::getPriority() const
@@ -345,6 +372,96 @@ void HiTag::setInterfaceId(int16_t interfaceId)
     this->interfaceId = interfaceId;
 }
 
+bool HiTag::isDeceleration() const
+{
+    return this->isDeceleration_;
+}
+
+void HiTag::setIsDeceleration(bool isDeceleration)
+{
+    this->isDeceleration_ = isDeceleration;
+}
+
+bool HiTag::isSpeedup() const
+{
+    return this->isSpeedup_;
+}
+
+void HiTag::setIsSpeedup(bool isSpeedup)
+{
+    this->isSpeedup_ = isSpeedup;
+}
+
+const L3Address& HiTag::getDestAddr() const
+{
+    return this->destAddr;
+}
+
+void HiTag::setDestAddr(const L3Address& destAddr)
+{
+    this->destAddr = destAddr;
+}
+
+const L3Address& HiTag::getSrcAddr() const
+{
+    return this->srcAddr;
+}
+
+void HiTag::setSrcAddr(const L3Address& srcAddr)
+{
+    this->srcAddr = srcAddr;
+}
+
+int16_t HiTag::getLocal_interfaceId() const
+{
+    return this->local_interfaceId;
+}
+
+void HiTag::setLocal_interfaceId(int16_t local_interfaceId)
+{
+    this->local_interfaceId = local_interfaceId;
+}
+
+int HiTag::getBfccnpECN() const
+{
+    return this->bfccnpECN;
+}
+
+void HiTag::setBfccnpECN(int bfccnpECN)
+{
+    this->bfccnpECN = bfccnpECN;
+}
+
+uint32_t HiTag::getQueueID() const
+{
+    return this->queueID;
+}
+
+void HiTag::setQueueID(uint32_t queueID)
+{
+    this->queueID = queueID;
+}
+
+uint32_t HiTag::getUpstreamQueueID() const
+{
+    return this->upstreamQueueID;
+}
+
+void HiTag::setUpstreamQueueID(uint32_t upstreamQueueID)
+{
+    this->upstreamQueueID = upstreamQueueID;
+}
+
+bool HiTag::getIspausePck() const
+{
+    return this->ispausePck;
+}
+
+void HiTag::setIspausePck(bool ispausePck)
+{
+    this->ispausePck = ispausePck;
+}
+
 class HiTagDescriptor : public omnetpp::cClassDescriptor
 {
   private:
@@ -362,6 +479,15 @@ class HiTagDescriptor : public omnetpp::cClassDescriptor
         FIELD_senderPriority,
         FIELD_op,
         FIELD_interfaceId,
+        FIELD_isDeceleration,
+        FIELD_isSpeedup,
+        FIELD_destAddr,
+        FIELD_srcAddr,
+        FIELD_local_interfaceId,
+        FIELD_bfccnpECN,
+        FIELD_queueID,
+        FIELD_upstreamQueueID,
+        FIELD_ispausePck,
     };
   public:
     HiTagDescriptor();
@@ -428,7 +554,7 @@ const char *HiTagDescriptor::getProperty(const char *propertyName) const
 int HiTagDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
-    return base ? 12+base->getFieldCount() : 12;
+    return base ? 21+base->getFieldCount() : 21;
 }
 
 unsigned int HiTagDescriptor::getFieldTypeFlags(int field) const
@@ -452,8 +578,17 @@ unsigned int HiTagDescriptor::getFieldTypeFlags(int field) const
         FD_ISEDITABLE,    // FIELD_senderPriority
         FD_ISEDITABLE,    // FIELD_op
         FD_ISEDITABLE,    // FIELD_interfaceId
+        FD_ISEDITABLE,    // FIELD_isDeceleration
+        FD_ISEDITABLE,    // FIELD_isSpeedup
+        0,    // FIELD_destAddr
+        0,    // FIELD_srcAddr
+        FD_ISEDITABLE,    // FIELD_local_interfaceId
+        FD_ISEDITABLE,    // FIELD_bfccnpECN
+        FD_ISEDITABLE,    // FIELD_queueID
+        FD_ISEDITABLE,    // FIELD_upstreamQueueID
+        FD_ISEDITABLE,    // FIELD_ispausePck
     };
-    return (field >= 0 && field < 12) ? fieldTypeFlags[field] : 0;
+    return (field >= 0 && field < 21) ? fieldTypeFlags[field] : 0;
 }
 
 const char *HiTagDescriptor::getFieldName(int field) const
@@ -477,8 +612,17 @@ const char *HiTagDescriptor::getFieldName(int field) const
         "senderPriority",
         "op",
         "interfaceId",
+        "isDeceleration",
+        "isSpeedup",
+        "destAddr",
+        "srcAddr",
+        "local_interfaceId",
+        "bfccnpECN",
+        "queueID",
+        "upstreamQueueID",
+        "ispausePck",
     };
-    return (field >= 0 && field < 12) ? fieldNames[field] : nullptr;
+    return (field >= 0 && field < 21) ? fieldNames[field] : nullptr;
 }
 
 int HiTagDescriptor::findField(const char *fieldName) const
@@ -497,6 +641,15 @@ int HiTagDescriptor::findField(const char *fieldName) const
     if (strcmp(fieldName, "senderPriority") == 0) return baseIndex + 9;
     if (strcmp(fieldName, "op") == 0) return baseIndex + 10;
     if (strcmp(fieldName, "interfaceId") == 0) return baseIndex + 11;
+    if (strcmp(fieldName, "isDeceleration") == 0) return baseIndex + 12;
+    if (strcmp(fieldName, "isSpeedup") == 0) return baseIndex + 13;
+    if (strcmp(fieldName, "destAddr") == 0) return baseIndex + 14;
+    if (strcmp(fieldName, "srcAddr") == 0) return baseIndex + 15;
+    if (strcmp(fieldName, "local_interfaceId") == 0) return baseIndex + 16;
+    if (strcmp(fieldName, "bfccnpECN") == 0) return baseIndex + 17;
+    if (strcmp(fieldName, "queueID") == 0) return baseIndex + 18;
+    if (strcmp(fieldName, "upstreamQueueID") == 0) return baseIndex + 19;
+    if (strcmp(fieldName, "ispausePck") == 0) return baseIndex + 20;
     return base ? base->findField(fieldName) : -1;
 }
 
@@ -521,8 +674,17 @@ const char *HiTagDescriptor::getFieldTypeString(int field) const
         "uint32_t",    // FIELD_senderPriority
         "int16_t",    // FIELD_op
         "int16_t",    // FIELD_interfaceId
+        "bool",    // FIELD_isDeceleration
+        "bool",    // FIELD_isSpeedup
+        "inet::L3Address",    // FIELD_destAddr
+        "inet::L3Address",    // FIELD_srcAddr
+        "int16_t",    // FIELD_local_interfaceId
+        "int",    // FIELD_bfccnpECN
+        "uint32_t",    // FIELD_queueID
+        "uint32_t",    // FIELD_upstreamQueueID
+        "bool",    // FIELD_ispausePck
     };
-    return (field >= 0 && field < 12) ? fieldTypeStrings[field] : nullptr;
+    return (field >= 0 && field < 21) ? fieldTypeStrings[field] : nullptr;
 }
 
 const char **HiTagDescriptor::getFieldPropertyNames(int field) const
@@ -617,6 +779,15 @@ std::string HiTagDescriptor::getFieldValueAsString(omnetpp::any_ptr object, int 
         case FIELD_senderPriority: return ulong2string(pp->getSenderPriority());
         case FIELD_op: return long2string(pp->getOp());
         case FIELD_interfaceId: return long2string(pp->getInterfaceId());
+        case FIELD_isDeceleration: return bool2string(pp->isDeceleration());
+        case FIELD_isSpeedup: return bool2string(pp->isSpeedup());
+        case FIELD_destAddr: return pp->getDestAddr().str();
+        case FIELD_srcAddr: return pp->getSrcAddr().str();
+        case FIELD_local_interfaceId: return long2string(pp->getLocal_interfaceId());
+        case FIELD_bfccnpECN: return long2string(pp->getBfccnpECN());
+        case FIELD_queueID: return ulong2string(pp->getQueueID());
+        case FIELD_upstreamQueueID: return ulong2string(pp->getUpstreamQueueID());
+        case FIELD_ispausePck: return bool2string(pp->getIspausePck());
         default: return "";
     }
 }
@@ -645,6 +816,13 @@ void HiTagDescriptor::setFieldValueAsString(omnetpp::any_ptr object, int field, 
         case FIELD_senderPriority: pp->setSenderPriority(string2ulong(value)); break;
         case FIELD_op: pp->setOp(string2long(value)); break;
         case FIELD_interfaceId: pp->setInterfaceId(string2long(value)); break;
+        case FIELD_isDeceleration: pp->setIsDeceleration(string2bool(value)); break;
+        case FIELD_isSpeedup: pp->setIsSpeedup(string2bool(value)); break;
+        case FIELD_local_interfaceId: pp->setLocal_interfaceId(string2long(value)); break;
+        case FIELD_bfccnpECN: pp->setBfccnpECN(string2long(value)); break;
+        case FIELD_queueID: pp->setQueueID(string2ulong(value)); break;
+        case FIELD_upstreamQueueID: pp->setUpstreamQueueID(string2ulong(value)); break;
+        case FIELD_ispausePck: pp->setIspausePck(string2bool(value)); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'HiTag'", field);
     }
 }
@@ -671,6 +849,15 @@ omnetpp::cValue HiTagDescriptor::getFieldValue(omnetpp::any_ptr object, int fiel
         case FIELD_senderPriority: return (omnetpp::intval_t)(pp->getSenderPriority());
         case FIELD_op: return pp->getOp();
         case FIELD_interfaceId: return pp->getInterfaceId();
+        case FIELD_isDeceleration: return pp->isDeceleration();
+        case FIELD_isSpeedup: return pp->isSpeedup();
+        case FIELD_destAddr: return omnetpp::toAnyPtr(&pp->getDestAddr()); break;
+        case FIELD_srcAddr: return omnetpp::toAnyPtr(&pp->getSrcAddr()); break;
+        case FIELD_local_interfaceId: return pp->getLocal_interfaceId();
+        case FIELD_bfccnpECN: return pp->getBfccnpECN();
+        case FIELD_queueID: return (omnetpp::intval_t)(pp->getQueueID());
+        case FIELD_upstreamQueueID: return (omnetpp::intval_t)(pp->getUpstreamQueueID());
+        case FIELD_ispausePck: return pp->getIspausePck();
         default: throw omnetpp::cRuntimeError("Cannot return field %d of class 'HiTag' as cValue -- field index out of range?", field);
     }
 }
@@ -699,6 +886,13 @@ void HiTagDescriptor::setFieldValue(omnetpp::any_ptr object, int field, int i, c
         case FIELD_senderPriority: pp->setSenderPriority(omnetpp::checked_int_cast<uint32_t>(value.intValue())); break;
         case FIELD_op: pp->setOp(omnetpp::checked_int_cast<int16_t>(value.intValue())); break;
         case FIELD_interfaceId: pp->setInterfaceId(omnetpp::checked_int_cast<int16_t>(value.intValue())); break;
+        case FIELD_isDeceleration: pp->setIsDeceleration(value.boolValue()); break;
+        case FIELD_isSpeedup: pp->setIsSpeedup(value.boolValue()); break;
+        case FIELD_local_interfaceId: pp->setLocal_interfaceId(omnetpp::checked_int_cast<int16_t>(value.intValue())); break;
+        case FIELD_bfccnpECN: pp->setBfccnpECN(omnetpp::checked_int_cast<int>(value.intValue())); break;
+        case FIELD_queueID: pp->setQueueID(omnetpp::checked_int_cast<uint32_t>(value.intValue())); break;
+        case FIELD_upstreamQueueID: pp->setUpstreamQueueID(omnetpp::checked_int_cast<uint32_t>(value.intValue())); break;
+        case FIELD_ispausePck: pp->setIspausePck(value.boolValue()); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'HiTag'", field);
     }
 }
@@ -726,6 +920,8 @@ omnetpp::any_ptr HiTagDescriptor::getFieldStructValuePointer(omnetpp::any_ptr ob
     }
     HiTag *pp = omnetpp::fromAnyPtr<HiTag>(object); (void)pp;
     switch (field) {
+        case FIELD_destAddr: return omnetpp::toAnyPtr(&pp->getDestAddr()); break;
+        case FIELD_srcAddr: return omnetpp::toAnyPtr(&pp->getSrcAddr()); break;
         default: return omnetpp::any_ptr(nullptr);
     }
 }

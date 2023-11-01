@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by opp_msgtool 6.0 from inet/common/INETDefs.msg.
+// Generated file, do not edit! Created by opp_msgtool 6.0 from ./inet/common/INETDefs.msg.
 //
 
 #ifndef __INETDEFS_M_H

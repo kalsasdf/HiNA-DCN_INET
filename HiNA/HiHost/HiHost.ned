@@ -38,7 +38,7 @@ import inet.node.base.ApplicationLayerNodeBase;
 module HiHost extends HiApplicationLayer
 {
     parameters:
-        @display("i=device/pc2");
+        @display("i=device/pc2;bgb=1254.2788,1213.3613");
         @figure[submodules];
         forwarding = default(false);  // disable routing by default, difference between host and router
         ipv4.arp.proxyARPInterfaces = default("");

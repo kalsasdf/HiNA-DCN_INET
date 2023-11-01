@@ -5,6 +5,7 @@
 import inet.common.INETDefs;
 import inet.common.TagBase;
 import inet.common.Units;
+import inet.networklayer.common.L3Address;
 
 namespace inet;
 
@@ -25,4 +26,18 @@ class HiTag extends TagBase
     //for PFC
     int16_t op;
     int16_t interfaceId;
+    
+    //for BCN 
+    bool isDeceleration;
+    bool isSpeedup;
+    inet::L3Address destAddr;
+    inet::L3Address srcAddr;
+    int16_t local_interfaceId; //记录本地mac端口
+    int bfccnpECN;//用于判断发送的cnp包是否处于拥塞交换机处
+    
+    //for BFC
+    uint32_t queueID; //定向在app，flowid % queueNum 写死。
+    uint32_t upstreamQueueID ;
+    bool ispausePck;
+    
 }

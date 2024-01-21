@@ -1712,7 +1712,7 @@ unsigned int EthernetFcsDescriptor::getFieldTypeFlags(int field) const
     }
     static unsigned int fieldTypeFlags[] = {
         FD_ISEDITABLE,    // FIELD_fcs
-        0,    // FIELD_fcsMode
+        FD_ISEDITABLE,    // FIELD_fcsMode
     };
     return (field >= 0 && field < 2) ? fieldTypeFlags[field] : 0;
 }
@@ -1862,6 +1862,7 @@ void EthernetFcsDescriptor::setFieldValueAsString(omnetpp::any_ptr object, int f
     EthernetFcs *pp = omnetpp::fromAnyPtr<EthernetFcs>(object); (void)pp;
     switch (field) {
         case FIELD_fcs: pp->setFcs(string2ulong(value)); break;
+        case FIELD_fcsMode: pp->setFcsMode((inet::FcsMode)string2enum(value, "inet::FcsMode")); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'EthernetFcs'", field);
     }
 }
@@ -1895,6 +1896,7 @@ void EthernetFcsDescriptor::setFieldValue(omnetpp::any_ptr object, int field, in
     EthernetFcs *pp = omnetpp::fromAnyPtr<EthernetFcs>(object); (void)pp;
     switch (field) {
         case FIELD_fcs: pp->setFcs(omnetpp::checked_int_cast<uint32_t>(value.intValue())); break;
+        case FIELD_fcsMode: pp->setFcsMode(static_cast<inet::FcsMode>(value.intValue())); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'EthernetFcs'", field);
     }
 }

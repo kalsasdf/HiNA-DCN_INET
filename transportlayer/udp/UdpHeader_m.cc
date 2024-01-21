@@ -353,7 +353,7 @@ unsigned int UdpHeaderDescriptor::getFieldTypeFlags(int field) const
         FD_ISEDITABLE,    // FIELD_destPort
         FD_ISEDITABLE,    // FIELD_totalLengthField
         FD_ISEDITABLE,    // FIELD_crc
-        0,    // FIELD_crcMode
+        FD_ISEDITABLE,    // FIELD_crcMode
     };
     return (field >= 0 && field < 5) ? fieldTypeFlags[field] : 0;
 }
@@ -526,6 +526,7 @@ void UdpHeaderDescriptor::setFieldValueAsString(omnetpp::any_ptr object, int fie
         case FIELD_destPort: pp->setDestPort(string2ulong(value)); break;
         case FIELD_totalLengthField: pp->setTotalLengthField(B(string2long(value))); break;
         case FIELD_crc: pp->setCrc(utils::uhex(value)); break;
+        case FIELD_crcMode: pp->setCrcMode((inet::CrcMode)string2enum(value, "inet::CrcMode")); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'UdpHeader'", field);
     }
 }
@@ -565,6 +566,7 @@ void UdpHeaderDescriptor::setFieldValue(omnetpp::any_ptr object, int field, int 
         case FIELD_destPort: pp->setDestPort(omnetpp::checked_int_cast<unsigned short>(value.intValue())); break;
         case FIELD_totalLengthField: pp->setTotalLengthField(B(value.intValueInUnit("B"))); break;
         case FIELD_crc: pp->setCrc(omnetpp::checked_int_cast<uint16_t>(value.intValue())); break;
+        case FIELD_crcMode: pp->setCrcMode(static_cast<inet::CrcMode>(value.intValue())); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'UdpHeader'", field);
     }
 }

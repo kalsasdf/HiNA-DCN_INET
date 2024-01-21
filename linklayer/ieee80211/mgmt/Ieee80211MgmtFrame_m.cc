@@ -1714,7 +1714,7 @@ unsigned int Ieee80211AuthenticationFrameDescriptor::getFieldTypeFlags(int field
     }
     static unsigned int fieldTypeFlags[] = {
         FD_ISEDITABLE,    // FIELD_sequenceNumber
-        0,    // FIELD_statusCode
+        FD_ISEDITABLE,    // FIELD_statusCode
         FD_ISEDITABLE,    // FIELD_isLast
     };
     return (field >= 0 && field < 3) ? fieldTypeFlags[field] : 0;
@@ -1869,6 +1869,7 @@ void Ieee80211AuthenticationFrameDescriptor::setFieldValueAsString(omnetpp::any_
     Ieee80211AuthenticationFrame *pp = omnetpp::fromAnyPtr<Ieee80211AuthenticationFrame>(object); (void)pp;
     switch (field) {
         case FIELD_sequenceNumber: pp->setSequenceNumber(string2ulong(value)); break;
+        case FIELD_statusCode: pp->setStatusCode((inet::ieee80211::Ieee80211StatusCode)string2enum(value, "inet::ieee80211::Ieee80211StatusCode")); break;
         case FIELD_isLast: pp->setIsLast(string2bool(value)); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'Ieee80211AuthenticationFrame'", field);
     }
@@ -1904,6 +1905,7 @@ void Ieee80211AuthenticationFrameDescriptor::setFieldValue(omnetpp::any_ptr obje
     Ieee80211AuthenticationFrame *pp = omnetpp::fromAnyPtr<Ieee80211AuthenticationFrame>(object); (void)pp;
     switch (field) {
         case FIELD_sequenceNumber: pp->setSequenceNumber(omnetpp::checked_int_cast<unsigned short>(value.intValue())); break;
+        case FIELD_statusCode: pp->setStatusCode(static_cast<inet::ieee80211::Ieee80211StatusCode>(value.intValue())); break;
         case FIELD_isLast: pp->setIsLast(value.boolValue()); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'Ieee80211AuthenticationFrame'", field);
     }
@@ -2089,7 +2091,7 @@ unsigned int Ieee80211DeauthenticationFrameDescriptor::getFieldTypeFlags(int fie
         field -= base->getFieldCount();
     }
     static unsigned int fieldTypeFlags[] = {
-        0,    // FIELD_reasonCode
+        FD_ISEDITABLE,    // FIELD_reasonCode
     };
     return (field >= 0 && field < 1) ? fieldTypeFlags[field] : 0;
 }
@@ -2234,6 +2236,7 @@ void Ieee80211DeauthenticationFrameDescriptor::setFieldValueAsString(omnetpp::an
     }
     Ieee80211DeauthenticationFrame *pp = omnetpp::fromAnyPtr<Ieee80211DeauthenticationFrame>(object); (void)pp;
     switch (field) {
+        case FIELD_reasonCode: pp->setReasonCode((inet::ieee80211::Ieee80211ReasonCode)string2enum(value, "inet::ieee80211::Ieee80211ReasonCode")); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'Ieee80211DeauthenticationFrame'", field);
     }
 }
@@ -2265,6 +2268,7 @@ void Ieee80211DeauthenticationFrameDescriptor::setFieldValue(omnetpp::any_ptr ob
     }
     Ieee80211DeauthenticationFrame *pp = omnetpp::fromAnyPtr<Ieee80211DeauthenticationFrame>(object); (void)pp;
     switch (field) {
+        case FIELD_reasonCode: pp->setReasonCode(static_cast<inet::ieee80211::Ieee80211ReasonCode>(value.intValue())); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'Ieee80211DeauthenticationFrame'", field);
     }
 }
@@ -2449,7 +2453,7 @@ unsigned int Ieee80211DisassociationFrameDescriptor::getFieldTypeFlags(int field
         field -= base->getFieldCount();
     }
     static unsigned int fieldTypeFlags[] = {
-        0,    // FIELD_reasonCode
+        FD_ISEDITABLE,    // FIELD_reasonCode
     };
     return (field >= 0 && field < 1) ? fieldTypeFlags[field] : 0;
 }
@@ -2594,6 +2598,7 @@ void Ieee80211DisassociationFrameDescriptor::setFieldValueAsString(omnetpp::any_
     }
     Ieee80211DisassociationFrame *pp = omnetpp::fromAnyPtr<Ieee80211DisassociationFrame>(object); (void)pp;
     switch (field) {
+        case FIELD_reasonCode: pp->setReasonCode((inet::ieee80211::Ieee80211ReasonCode)string2enum(value, "inet::ieee80211::Ieee80211ReasonCode")); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'Ieee80211DisassociationFrame'", field);
     }
 }
@@ -2625,6 +2630,7 @@ void Ieee80211DisassociationFrameDescriptor::setFieldValue(omnetpp::any_ptr obje
     }
     Ieee80211DisassociationFrame *pp = omnetpp::fromAnyPtr<Ieee80211DisassociationFrame>(object); (void)pp;
     switch (field) {
+        case FIELD_reasonCode: pp->setReasonCode(static_cast<inet::ieee80211::Ieee80211ReasonCode>(value.intValue())); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'Ieee80211DisassociationFrame'", field);
     }
 }
@@ -3941,7 +3947,7 @@ unsigned int Ieee80211AssociationResponseFrameDescriptor::getFieldTypeFlags(int 
         field -= base->getFieldCount();
     }
     static unsigned int fieldTypeFlags[] = {
-        0,    // FIELD_statusCode
+        FD_ISEDITABLE,    // FIELD_statusCode
         FD_ISEDITABLE,    // FIELD_aid
         FD_ISCOMPOUND,    // FIELD_supportedRates
     };
@@ -4096,6 +4102,7 @@ void Ieee80211AssociationResponseFrameDescriptor::setFieldValueAsString(omnetpp:
     }
     Ieee80211AssociationResponseFrame *pp = omnetpp::fromAnyPtr<Ieee80211AssociationResponseFrame>(object); (void)pp;
     switch (field) {
+        case FIELD_statusCode: pp->setStatusCode((inet::ieee80211::Ieee80211StatusCode)string2enum(value, "inet::ieee80211::Ieee80211StatusCode")); break;
         case FIELD_aid: pp->setAid(string2long(value)); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'Ieee80211AssociationResponseFrame'", field);
     }
@@ -4130,6 +4137,7 @@ void Ieee80211AssociationResponseFrameDescriptor::setFieldValue(omnetpp::any_ptr
     }
     Ieee80211AssociationResponseFrame *pp = omnetpp::fromAnyPtr<Ieee80211AssociationResponseFrame>(object); (void)pp;
     switch (field) {
+        case FIELD_statusCode: pp->setStatusCode(static_cast<inet::ieee80211::Ieee80211StatusCode>(value.intValue())); break;
         case FIELD_aid: pp->setAid(omnetpp::checked_int_cast<short>(value.intValue())); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'Ieee80211AssociationResponseFrame'", field);
     }

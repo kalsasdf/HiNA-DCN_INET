@@ -385,7 +385,7 @@ unsigned int Ipv6NdOptionDescriptor::getFieldTypeFlags(int field) const
         field -= base->getFieldCount();
     }
     static unsigned int fieldTypeFlags[] = {
-        FD_ISEDITABLE,    // FIELD_type
+        0,    // FIELD_type
         FD_ISEDITABLE,    // FIELD_optionLength
         FD_ISARRAY | FD_ISEDITABLE | FD_ISRESIZABLE,    // FIELD_paddingBytes
     };
@@ -542,7 +542,6 @@ void Ipv6NdOptionDescriptor::setFieldValueAsString(omnetpp::any_ptr object, int 
     }
     Ipv6NdOption *pp = omnetpp::fromAnyPtr<Ipv6NdOption>(object); (void)pp;
     switch (field) {
-        case FIELD_type: pp->setType((inet::Ipv6NdOptionTypes)string2enum(value, "inet::Ipv6NdOptionTypes")); break;
         case FIELD_optionLength: pp->setOptionLength(string2long(value)); break;
         case FIELD_paddingBytes: pp->setPaddingBytes(i,string2long(value)); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'Ipv6NdOption'", field);
@@ -578,7 +577,6 @@ void Ipv6NdOptionDescriptor::setFieldValue(omnetpp::any_ptr object, int field, i
     }
     Ipv6NdOption *pp = omnetpp::fromAnyPtr<Ipv6NdOption>(object); (void)pp;
     switch (field) {
-        case FIELD_type: pp->setType(static_cast<inet::Ipv6NdOptionTypes>(value.intValue())); break;
         case FIELD_optionLength: pp->setOptionLength(omnetpp::checked_int_cast<short>(value.intValue())); break;
         case FIELD_paddingBytes: pp->setPaddingBytes(i,omnetpp::checked_int_cast<char>(value.intValue())); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'Ipv6NdOption'", field);

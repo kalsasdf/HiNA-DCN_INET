@@ -366,7 +366,7 @@ unsigned int NextHopForwardingHeaderDescriptor::getFieldTypeFlags(int field) con
     static unsigned int fieldTypeFlags[] = {
         0,    // FIELD_srcAddr
         0,    // FIELD_destAddr
-        FD_ISEDITABLE,    // FIELD_protocolId
+        0,    // FIELD_protocolId
         FD_ISEDITABLE,    // FIELD_hopLimit
         FD_ISEDITABLE,    // FIELD_payloadLengthField
         FD_ISCOMPOUND | FD_ISCOBJECT,    // FIELD_tlvOptions
@@ -534,7 +534,6 @@ void NextHopForwardingHeaderDescriptor::setFieldValueAsString(omnetpp::any_ptr o
     }
     NextHopForwardingHeader *pp = omnetpp::fromAnyPtr<NextHopForwardingHeader>(object); (void)pp;
     switch (field) {
-        case FIELD_protocolId: pp->setProtocolId((inet::IpProtocolId)string2enum(value, "inet::IpProtocolId")); break;
         case FIELD_hopLimit: pp->setHopLimit(string2long(value)); break;
         case FIELD_payloadLengthField: pp->setPayloadLengthField(B(string2long(value))); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'NextHopForwardingHeader'", field);
@@ -573,7 +572,6 @@ void NextHopForwardingHeaderDescriptor::setFieldValue(omnetpp::any_ptr object, i
     }
     NextHopForwardingHeader *pp = omnetpp::fromAnyPtr<NextHopForwardingHeader>(object); (void)pp;
     switch (field) {
-        case FIELD_protocolId: pp->setProtocolId(static_cast<inet::IpProtocolId>(value.intValue())); break;
         case FIELD_hopLimit: pp->setHopLimit(omnetpp::checked_int_cast<short>(value.intValue())); break;
         case FIELD_payloadLengthField: pp->setPayloadLengthField(B(value.intValueInUnit("B"))); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'NextHopForwardingHeader'", field);

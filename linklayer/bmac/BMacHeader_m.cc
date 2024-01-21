@@ -321,7 +321,7 @@ unsigned int BMacHeaderBaseDescriptor::getFieldTypeFlags(int field) const
     static unsigned int fieldTypeFlags[] = {
         0,    // FIELD_srcAddr
         0,    // FIELD_destAddr
-        0,    // FIELD_type
+        FD_ISEDITABLE,    // FIELD_type
     };
     return (field >= 0 && field < 3) ? fieldTypeFlags[field] : 0;
 }
@@ -474,6 +474,7 @@ void BMacHeaderBaseDescriptor::setFieldValueAsString(omnetpp::any_ptr object, in
     }
     BMacHeaderBase *pp = omnetpp::fromAnyPtr<BMacHeaderBase>(object); (void)pp;
     switch (field) {
+        case FIELD_type: pp->setType((inet::BMacType)string2enum(value, "inet::BMacType")); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'BMacHeaderBase'", field);
     }
 }
@@ -507,6 +508,7 @@ void BMacHeaderBaseDescriptor::setFieldValue(omnetpp::any_ptr object, int field,
     }
     BMacHeaderBase *pp = omnetpp::fromAnyPtr<BMacHeaderBase>(object); (void)pp;
     switch (field) {
+        case FIELD_type: pp->setType(static_cast<inet::BMacType>(value.intValue())); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'BMacHeaderBase'", field);
     }
 }

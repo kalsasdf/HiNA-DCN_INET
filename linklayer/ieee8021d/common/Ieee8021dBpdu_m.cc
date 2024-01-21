@@ -323,9 +323,9 @@ unsigned int BpduBaseDescriptor::getFieldTypeFlags(int field) const
         field -= base->getFieldCount();
     }
     static unsigned int fieldTypeFlags[] = {
-        FD_ISEDITABLE,    // FIELD_protocolIdentifier
-        FD_ISEDITABLE,    // FIELD_protocolVersionIdentifier
-        FD_ISEDITABLE,    // FIELD_bpduType
+        0,    // FIELD_protocolIdentifier
+        0,    // FIELD_protocolVersionIdentifier
+        0,    // FIELD_bpduType
     };
     return (field >= 0 && field < 3) ? fieldTypeFlags[field] : 0;
 }
@@ -492,9 +492,6 @@ void BpduBaseDescriptor::setFieldValueAsString(omnetpp::any_ptr object, int fiel
     }
     BpduBase *pp = omnetpp::fromAnyPtr<BpduBase>(object); (void)pp;
     switch (field) {
-        case FIELD_protocolIdentifier: pp->setProtocolIdentifier((inet::BpduProtocolIdentifier)string2enum(value, "inet::BpduProtocolIdentifier")); break;
-        case FIELD_protocolVersionIdentifier: pp->setProtocolVersionIdentifier((inet::BpduProtocolVersionIdentifier)string2enum(value, "inet::BpduProtocolVersionIdentifier")); break;
-        case FIELD_bpduType: pp->setBpduType((inet::BpduType)string2enum(value, "inet::BpduType")); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'BpduBase'", field);
     }
 }
@@ -528,9 +525,6 @@ void BpduBaseDescriptor::setFieldValue(omnetpp::any_ptr object, int field, int i
     }
     BpduBase *pp = omnetpp::fromAnyPtr<BpduBase>(object); (void)pp;
     switch (field) {
-        case FIELD_protocolIdentifier: pp->setProtocolIdentifier(static_cast<inet::BpduProtocolIdentifier>(value.intValue())); break;
-        case FIELD_protocolVersionIdentifier: pp->setProtocolVersionIdentifier(static_cast<inet::BpduProtocolVersionIdentifier>(value.intValue())); break;
-        case FIELD_bpduType: pp->setBpduType(static_cast<inet::BpduType>(value.intValue())); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'BpduBase'", field);
     }
 }

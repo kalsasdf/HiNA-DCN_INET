@@ -552,14 +552,14 @@ void Ipv4::routeUnicastPacket(Packet *packet)
     else {
         // use Ipv4 routing (lookup in routing table)
         //added by HiNA
-        const Ipv4Route *re;
+        const Ipv4Route *re;EV<<"line 555"<<endl;
         if(useEcmp)
-        {
+        {EV<<"line 557"<<endl;
             IF_in = getSourceInterface(packet)->getInterfaceId();
             EV<<"routeUnicastPacket(), the IF_in = "<<getSourceInterface(packet)->getInterfaceFullPath()<<endl;
             re = rt->findecmpRoute(IF_in,srcAddr,destAddr,packet);
         }
-        else{
+        else{EV<<"line 562"<<endl;
             re = rt->findBestMatchingRoute(destAddr);
         }
         //added by HiNA
@@ -569,7 +569,7 @@ void Ipv4::routeUnicastPacket(Packet *packet)
             packet->addTagIfAbsent<InterfaceReq>()->setInterfaceId(destIE->getInterfaceId());
             packet->addTagIfAbsent<NextHopAddressReq>()->setNextHopAddress(re->getGateway());
         }
-    }
+    }EV<<"line 572"<<endl;
 
     if (!destIE) { // no route found
         EV_WARN << "unroutable, sending ICMP_DESTINATION_UNREACHABLE, dropping packet\n";

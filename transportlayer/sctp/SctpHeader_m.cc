@@ -385,7 +385,7 @@ unsigned int SctpHeaderDescriptor::getFieldTypeFlags(int field) const
         FD_ISEDITABLE,    // FIELD_vTag
         FD_ISEDITABLE,    // FIELD_checksumOk
         FD_ISEDITABLE,    // FIELD_crc
-        0,    // FIELD_crcMode
+        FD_ISEDITABLE,    // FIELD_crcMode
         FD_ISEDITABLE,    // FIELD_headerLength
         FD_ISARRAY | FD_ISCOMPOUND | FD_ISPOINTER | FD_ISCOBJECT | FD_ISCOWNEDOBJECT | FD_ISREPLACEABLE | FD_ISRESIZABLE,    // FIELD_sctpChunks
     };
@@ -568,6 +568,7 @@ void SctpHeaderDescriptor::setFieldValueAsString(omnetpp::any_ptr object, int fi
         case FIELD_vTag: pp->setVTag(string2ulong(value)); break;
         case FIELD_checksumOk: pp->setChecksumOk(string2bool(value)); break;
         case FIELD_crc: pp->setCrc(string2ulong(value)); break;
+        case FIELD_crcMode: pp->setCrcMode((inet::CrcMode)string2enum(value, "inet::CrcMode")); break;
         case FIELD_headerLength: pp->setHeaderLength(string2ulong(value)); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'SctpHeader_Base'", field);
     }
@@ -612,6 +613,7 @@ void SctpHeaderDescriptor::setFieldValue(omnetpp::any_ptr object, int field, int
         case FIELD_vTag: pp->setVTag(omnetpp::checked_int_cast<uint32_t>(value.intValue())); break;
         case FIELD_checksumOk: pp->setChecksumOk(value.boolValue()); break;
         case FIELD_crc: pp->setCrc(omnetpp::checked_int_cast<uint32_t>(value.intValue())); break;
+        case FIELD_crcMode: pp->setCrcMode(static_cast<inet::CrcMode>(value.intValue())); break;
         case FIELD_headerLength: pp->setHeaderLength(omnetpp::checked_int_cast<unsigned short>(value.intValue())); break;
         case FIELD_sctpChunks: pp->setSctpChunks(i,omnetpp::fromAnyPtr<SctpChunk>(value.pointerValue())); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'SctpHeader_Base'", field);

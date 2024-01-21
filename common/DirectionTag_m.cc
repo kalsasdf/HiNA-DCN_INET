@@ -288,7 +288,7 @@ unsigned int DirectionTagDescriptor::getFieldTypeFlags(int field) const
         field -= base->getFieldCount();
     }
     static unsigned int fieldTypeFlags[] = {
-        FD_ISEDITABLE,    // FIELD_direction
+        0,    // FIELD_direction
     };
     return (field >= 0 && field < 1) ? fieldTypeFlags[field] : 0;
 }
@@ -433,7 +433,6 @@ void DirectionTagDescriptor::setFieldValueAsString(omnetpp::any_ptr object, int 
     }
     DirectionTag *pp = omnetpp::fromAnyPtr<DirectionTag>(object); (void)pp;
     switch (field) {
-        case FIELD_direction: pp->setDirection((inet::Direction)string2enum(value, "inet::Direction")); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'DirectionTag'", field);
     }
 }
@@ -465,7 +464,6 @@ void DirectionTagDescriptor::setFieldValue(omnetpp::any_ptr object, int field, i
     }
     DirectionTag *pp = omnetpp::fromAnyPtr<DirectionTag>(object); (void)pp;
     switch (field) {
-        case FIELD_direction: pp->setDirection(static_cast<inet::Direction>(value.intValue())); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'DirectionTag'", field);
     }
 }

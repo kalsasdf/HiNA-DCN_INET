@@ -289,7 +289,7 @@ unsigned int MobilityHeaderDescriptor::getFieldTypeFlags(int field) const
         field -= base->getFieldCount();
     }
     static unsigned int fieldTypeFlags[] = {
-        0,    // FIELD_mobilityHeaderType
+        FD_ISEDITABLE,    // FIELD_mobilityHeaderType
     };
     return (field >= 0 && field < 1) ? fieldTypeFlags[field] : 0;
 }
@@ -434,6 +434,7 @@ void MobilityHeaderDescriptor::setFieldValueAsString(omnetpp::any_ptr object, in
     }
     MobilityHeader *pp = omnetpp::fromAnyPtr<MobilityHeader>(object); (void)pp;
     switch (field) {
+        case FIELD_mobilityHeaderType: pp->setMobilityHeaderType((inet::MobilityHeaderType)string2enum(value, "inet::MobilityHeaderType")); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'MobilityHeader'", field);
     }
 }
@@ -465,6 +466,7 @@ void MobilityHeaderDescriptor::setFieldValue(omnetpp::any_ptr object, int field,
     }
     MobilityHeader *pp = omnetpp::fromAnyPtr<MobilityHeader>(object); (void)pp;
     switch (field) {
+        case FIELD_mobilityHeaderType: pp->setMobilityHeaderType(static_cast<inet::MobilityHeaderType>(value.intValue())); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'MobilityHeader'", field);
     }
 }
@@ -1222,7 +1224,7 @@ unsigned int BindingAcknowledgementDescriptor::getFieldTypeFlags(int field) cons
         field -= base->getFieldCount();
     }
     static unsigned int fieldTypeFlags[] = {
-        0,    // FIELD_status
+        FD_ISEDITABLE,    // FIELD_status
         FD_ISEDITABLE,    // FIELD_sequenceNumber
         FD_ISEDITABLE,    // FIELD_lifetime
         FD_ISEDITABLE,    // FIELD_keyManagementFlag
@@ -1387,6 +1389,7 @@ void BindingAcknowledgementDescriptor::setFieldValueAsString(omnetpp::any_ptr ob
     }
     BindingAcknowledgement *pp = omnetpp::fromAnyPtr<BindingAcknowledgement>(object); (void)pp;
     switch (field) {
+        case FIELD_status: pp->setStatus((inet::BaStatus)string2enum(value, "inet::BaStatus")); break;
         case FIELD_sequenceNumber: pp->setSequenceNumber(string2ulong(value)); break;
         case FIELD_lifetime: pp->setLifetime(string2ulong(value)); break;
         case FIELD_keyManagementFlag: pp->setKeyManagementFlag(string2bool(value)); break;
@@ -1426,6 +1429,7 @@ void BindingAcknowledgementDescriptor::setFieldValue(omnetpp::any_ptr object, in
     }
     BindingAcknowledgement *pp = omnetpp::fromAnyPtr<BindingAcknowledgement>(object); (void)pp;
     switch (field) {
+        case FIELD_status: pp->setStatus(static_cast<inet::BaStatus>(value.intValue())); break;
         case FIELD_sequenceNumber: pp->setSequenceNumber(omnetpp::checked_int_cast<unsigned int>(value.intValue())); break;
         case FIELD_lifetime: pp->setLifetime(omnetpp::checked_int_cast<unsigned int>(value.intValue())); break;
         case FIELD_keyManagementFlag: pp->setKeyManagementFlag(value.boolValue()); break;
@@ -1629,7 +1633,7 @@ unsigned int BindingErrorDescriptor::getFieldTypeFlags(int field) const
         field -= base->getFieldCount();
     }
     static unsigned int fieldTypeFlags[] = {
-        0,    // FIELD_status
+        FD_ISEDITABLE,    // FIELD_status
         0,    // FIELD_homeAddress
     };
     return (field >= 0 && field < 2) ? fieldTypeFlags[field] : 0;
@@ -1779,6 +1783,7 @@ void BindingErrorDescriptor::setFieldValueAsString(omnetpp::any_ptr object, int 
     }
     BindingError *pp = omnetpp::fromAnyPtr<BindingError>(object); (void)pp;
     switch (field) {
+        case FIELD_status: pp->setStatus((inet::BeStatus)string2enum(value, "inet::BeStatus")); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'BindingError'", field);
     }
 }
@@ -1811,6 +1816,7 @@ void BindingErrorDescriptor::setFieldValue(omnetpp::any_ptr object, int field, i
     }
     BindingError *pp = omnetpp::fromAnyPtr<BindingError>(object); (void)pp;
     switch (field) {
+        case FIELD_status: pp->setStatus(static_cast<inet::BeStatus>(value.intValue())); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'BindingError'", field);
     }
 }

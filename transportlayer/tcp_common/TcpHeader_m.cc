@@ -998,7 +998,7 @@ unsigned int TcpOptionDescriptor::getFieldTypeFlags(int field) const
         field -= base->getFieldCount();
     }
     static unsigned int fieldTypeFlags[] = {
-        0,    // FIELD_kind
+        FD_ISEDITABLE,    // FIELD_kind
         FD_ISEDITABLE,    // FIELD_length
     };
     return (field >= 0 && field < 2) ? fieldTypeFlags[field] : 0;
@@ -1148,6 +1148,7 @@ void TcpOptionDescriptor::setFieldValueAsString(omnetpp::any_ptr object, int fie
     }
     TcpOption *pp = omnetpp::fromAnyPtr<TcpOption>(object); (void)pp;
     switch (field) {
+        case FIELD_kind: pp->setKind((inet::tcp::TcpOptionNumbers)string2enum(value, "inet::tcp::TcpOptionNumbers")); break;
         case FIELD_length: pp->setLength(string2ulong(value)); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'TcpOption'", field);
     }
@@ -1181,6 +1182,7 @@ void TcpOptionDescriptor::setFieldValue(omnetpp::any_ptr object, int field, int 
     }
     TcpOption *pp = omnetpp::fromAnyPtr<TcpOption>(object); (void)pp;
     switch (field) {
+        case FIELD_kind: pp->setKind(static_cast<inet::tcp::TcpOptionNumbers>(value.intValue())); break;
         case FIELD_length: pp->setLength(omnetpp::checked_int_cast<unsigned short>(value.intValue())); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'TcpOption'", field);
     }
@@ -4640,7 +4642,7 @@ unsigned int TcpHeaderDescriptor::getFieldTypeFlags(int field) const
         FD_ISEDITABLE,    // FIELD_window
         FD_ISEDITABLE,    // FIELD_urgentPointer
         FD_ISEDITABLE,    // FIELD_crc
-        FD_ISEDITABLE,    // FIELD_crcMode
+        0,    // FIELD_crcMode
         FD_ISARRAY | FD_ISCOMPOUND | FD_ISPOINTER | FD_ISCOBJECT | FD_ISREPLACEABLE | FD_ISRESIZABLE,    // FIELD_headerOption
     };
     return (field >= 0 && field < 18) ? fieldTypeFlags[field] : 0;
@@ -4880,7 +4882,6 @@ void TcpHeaderDescriptor::setFieldValueAsString(omnetpp::any_ptr object, int fie
         case FIELD_window: pp->setWindow(string2ulong(value)); break;
         case FIELD_urgentPointer: pp->setUrgentPointer(string2ulong(value)); break;
         case FIELD_crc: pp->setCrc(string2ulong(value)); break;
-        case FIELD_crcMode: pp->setCrcMode((inet::CrcMode)string2enum(value, "inet::CrcMode")); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'TcpHeader'", field);
     }
 }
@@ -4945,7 +4946,6 @@ void TcpHeaderDescriptor::setFieldValue(omnetpp::any_ptr object, int field, int 
         case FIELD_window: pp->setWindow(omnetpp::checked_int_cast<uint16_t>(value.intValue())); break;
         case FIELD_urgentPointer: pp->setUrgentPointer(omnetpp::checked_int_cast<uint16_t>(value.intValue())); break;
         case FIELD_crc: pp->setCrc(omnetpp::checked_int_cast<uint16_t>(value.intValue())); break;
-        case FIELD_crcMode: pp->setCrcMode(static_cast<inet::CrcMode>(value.intValue())); break;
         case FIELD_headerOption: pp->setHeaderOption(i,omnetpp::fromAnyPtr<TcpOption>(value.pointerValue())); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'TcpHeader'", field);
     }

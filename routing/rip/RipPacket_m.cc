@@ -270,7 +270,7 @@ unsigned int RipEntryDescriptor::getFieldTypeFlags(int field) const
         field -= base->getFieldCount();
     }
     static unsigned int fieldTypeFlags[] = {
-        0,    // FIELD_addressFamilyId
+        FD_ISEDITABLE,    // FIELD_addressFamilyId
         FD_ISEDITABLE,    // FIELD_routeTag
         0,    // FIELD_address
         FD_ISEDITABLE,    // FIELD_prefixLength
@@ -440,6 +440,7 @@ void RipEntryDescriptor::setFieldValueAsString(omnetpp::any_ptr object, int fiel
     }
     RipEntry *pp = omnetpp::fromAnyPtr<RipEntry>(object); (void)pp;
     switch (field) {
+        case FIELD_addressFamilyId: pp->addressFamilyId = (inet::RipAf)string2enum(value, "inet::RipAf"); break;
         case FIELD_routeTag: pp->routeTag = string2ulong(value); break;
         case FIELD_prefixLength: pp->prefixLength = string2long(value); break;
         case FIELD_metric: pp->metric = string2ulong(value); break;
@@ -479,6 +480,7 @@ void RipEntryDescriptor::setFieldValue(omnetpp::any_ptr object, int field, int i
     }
     RipEntry *pp = omnetpp::fromAnyPtr<RipEntry>(object); (void)pp;
     switch (field) {
+        case FIELD_addressFamilyId: pp->addressFamilyId = static_cast<inet::RipAf>(value.intValue()); break;
         case FIELD_routeTag: pp->routeTag = omnetpp::checked_int_cast<unsigned short>(value.intValue()); break;
         case FIELD_prefixLength: pp->prefixLength = omnetpp::checked_int_cast<int>(value.intValue()); break;
         case FIELD_metric: pp->metric = omnetpp::checked_int_cast<unsigned int>(value.intValue()); break;
@@ -752,7 +754,7 @@ unsigned int RipPacketDescriptor::getFieldTypeFlags(int field) const
         field -= base->getFieldCount();
     }
     static unsigned int fieldTypeFlags[] = {
-        0,    // FIELD_command
+        FD_ISEDITABLE,    // FIELD_command
         FD_ISARRAY | FD_ISCOMPOUND | FD_ISRESIZABLE,    // FIELD_entry
     };
     return (field >= 0 && field < 2) ? fieldTypeFlags[field] : 0;
@@ -904,6 +906,7 @@ void RipPacketDescriptor::setFieldValueAsString(omnetpp::any_ptr object, int fie
     }
     RipPacket *pp = omnetpp::fromAnyPtr<RipPacket>(object); (void)pp;
     switch (field) {
+        case FIELD_command: pp->setCommand((inet::RipCommand)string2enum(value, "inet::RipCommand")); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'RipPacket'", field);
     }
 }
@@ -936,6 +939,7 @@ void RipPacketDescriptor::setFieldValue(omnetpp::any_ptr object, int field, int 
     }
     RipPacket *pp = omnetpp::fromAnyPtr<RipPacket>(object); (void)pp;
     switch (field) {
+        case FIELD_command: pp->setCommand(static_cast<inet::RipCommand>(value.intValue())); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'RipPacket'", field);
     }
 }

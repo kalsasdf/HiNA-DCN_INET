@@ -263,7 +263,7 @@ class XPASS : public TransportProtocolBase
 
             ECN_a=(1-g)*ECN_a+g*ecnratio;
             nowrate=nowrate*(1-(targetecnratio+ECN_a)/2);
-            MODEFLAG=0;
+//            MODEFLAG=0;
             EV<<"after ecn decreasing,new ECN_a="<<ECN_a<<",new speed="<<nowrate<<endl;
 
 //            ECN_a=(1-g)*ECN_a+g*ecnratio;
@@ -330,14 +330,14 @@ class XPASS : public TransportProtocolBase
     EV<<"xpass functioning.old lossratio="<<lossratio<<",old speed="<<nowrate<<endl;
     if(lossratio<=targetratio)
     {
-        EV<<"xpass increasing phase.oldspeed="<<nowrate<<",w="<<w<<endl;
-        if(tinfo.previousincrease)
-        {
-            w = (w+wmax)/2;
-        }
-        nowrate = (1-w)*nowrate + w*maxrate*(1+targetratio);
-        tinfo.previousincrease = true;
-        EV<<"now w="<<w<<endl;
+//        EV<<"xpass increasing phase.oldspeed="<<nowrate<<",w="<<w<<endl;
+//        if(tinfo.previousincrease)
+//        {
+//            w = (w+wmax)/2;
+//        }
+//        nowrate = (1-w)*nowrate + w*maxrate*(1+targetratio);
+//        tinfo.previousincrease = true;
+//        EV<<"now w="<<w<<endl;
     }
     else
     {

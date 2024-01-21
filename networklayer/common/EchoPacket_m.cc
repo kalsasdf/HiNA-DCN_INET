@@ -321,7 +321,7 @@ unsigned int EchoPacketDescriptor::getFieldTypeFlags(int field) const
         field -= base->getFieldCount();
     }
     static unsigned int fieldTypeFlags[] = {
-        0,    // FIELD_type
+        FD_ISEDITABLE,    // FIELD_type
         FD_ISEDITABLE,    // FIELD_identifier
         FD_ISEDITABLE,    // FIELD_seqNumber
     };
@@ -476,6 +476,7 @@ void EchoPacketDescriptor::setFieldValueAsString(omnetpp::any_ptr object, int fi
     }
     EchoPacket *pp = omnetpp::fromAnyPtr<EchoPacket>(object); (void)pp;
     switch (field) {
+        case FIELD_type: pp->setType((inet::EchoProtocolType)string2enum(value, "inet::EchoProtocolType")); break;
         case FIELD_identifier: pp->setIdentifier(string2long(value)); break;
         case FIELD_seqNumber: pp->setSeqNumber(string2long(value)); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'EchoPacket'", field);
@@ -511,6 +512,7 @@ void EchoPacketDescriptor::setFieldValue(omnetpp::any_ptr object, int field, int
     }
     EchoPacket *pp = omnetpp::fromAnyPtr<EchoPacket>(object); (void)pp;
     switch (field) {
+        case FIELD_type: pp->setType(static_cast<inet::EchoProtocolType>(value.intValue())); break;
         case FIELD_identifier: pp->setIdentifier(omnetpp::checked_int_cast<int>(value.intValue())); break;
         case FIELD_seqNumber: pp->setSeqNumber(omnetpp::checked_int_cast<int>(value.intValue())); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'EchoPacket'", field);

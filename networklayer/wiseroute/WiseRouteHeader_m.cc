@@ -429,7 +429,7 @@ unsigned int WiseRouteHeaderDescriptor::getFieldTypeFlags(int field) const
         FD_ISEDITABLE,    // FIELD_seqNum
         FD_ISEDITABLE,    // FIELD_isFlood
         FD_ISEDITABLE,    // FIELD_nbHops
-        0,    // FIELD_headerKind
+        FD_ISEDITABLE,    // FIELD_headerKind
         0,    // FIELD_protocolId
         0,    // FIELD_finalDestAddr
         0,    // FIELD_initialSrcAddr
@@ -624,6 +624,7 @@ void WiseRouteHeaderDescriptor::setFieldValueAsString(omnetpp::any_ptr object, i
         case FIELD_seqNum: pp->setSeqNum(string2ulong(value)); break;
         case FIELD_isFlood: pp->setIsFlood(string2long(value)); break;
         case FIELD_nbHops: pp->setNbHops(string2long(value)); break;
+        case FIELD_headerKind: pp->setHeaderKind((inet::WiseRouteMsgType)string2enum(value, "inet::WiseRouteMsgType")); break;
         case FIELD_payloadLengthField: pp->setPayloadLengthField(B(string2long(value))); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'WiseRouteHeader'", field);
     }
@@ -668,6 +669,7 @@ void WiseRouteHeaderDescriptor::setFieldValue(omnetpp::any_ptr object, int field
         case FIELD_seqNum: pp->setSeqNum(omnetpp::checked_int_cast<unsigned long>(value.intValue())); break;
         case FIELD_isFlood: pp->setIsFlood(omnetpp::checked_int_cast<int>(value.intValue())); break;
         case FIELD_nbHops: pp->setNbHops(omnetpp::checked_int_cast<int>(value.intValue())); break;
+        case FIELD_headerKind: pp->setHeaderKind(static_cast<inet::WiseRouteMsgType>(value.intValue())); break;
         case FIELD_payloadLengthField: pp->setPayloadLengthField(B(value.intValueInUnit("B"))); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'WiseRouteHeader'", field);
     }

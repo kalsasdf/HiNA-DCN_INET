@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by opp_msgtool 6.0 from ./inet/common/TagBase.msg.
+// Generated file, do not edit! Created by opp_msgtool 6.0 from inet/common/TagBase.msg.
 //
 
 #ifndef __INET_TAGBASE_M_H

@@ -476,7 +476,7 @@ void SWIFT::receive_ack(Packet *pck)
             for(uint i=0; i<n;i++){
                 for(uint i2=ackid;i2<SACK_msg->getSackItem(i).getPacketid();i2++){
                     if(std::find(sacks_array_snd.begin(),sacks_array_snd.end(),i2)==sacks_array_snd.end())
-                        sacks_array_snd.push_back(i2);
+                        sacks_array_snd.push_front(i2);
                 }
             }
         }

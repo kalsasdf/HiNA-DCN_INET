@@ -1334,7 +1334,7 @@ unsigned int Ieee80211FhssPhyHeaderDescriptor::getFieldTypeFlags(int field) cons
         FD_ISEDITABLE,    // FIELD_plw
         FD_ISEDITABLE,    // FIELD_psf
         FD_ISEDITABLE,    // FIELD_crc
-        0,    // FIELD_crcMode
+        FD_ISEDITABLE,    // FIELD_crcMode
     };
     return (field >= 0 && field < 4) ? fieldTypeFlags[field] : 0;
 }
@@ -1494,6 +1494,7 @@ void Ieee80211FhssPhyHeaderDescriptor::setFieldValueAsString(omnetpp::any_ptr ob
         case FIELD_plw: pp->setPlw(string2ulong(value)); break;
         case FIELD_psf: pp->setPsf(string2ulong(value)); break;
         case FIELD_crc: pp->setCrc(string2ulong(value)); break;
+        case FIELD_crcMode: pp->setCrcMode((inet::CrcMode)string2enum(value, "inet::CrcMode")); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'Ieee80211FhssPhyHeader'", field);
     }
 }
@@ -1531,6 +1532,7 @@ void Ieee80211FhssPhyHeaderDescriptor::setFieldValue(omnetpp::any_ptr object, in
         case FIELD_plw: pp->setPlw(omnetpp::checked_int_cast<uint16_t>(value.intValue())); break;
         case FIELD_psf: pp->setPsf(omnetpp::checked_int_cast<uint8_t>(value.intValue())); break;
         case FIELD_crc: pp->setCrc(omnetpp::checked_int_cast<uint16_t>(value.intValue())); break;
+        case FIELD_crcMode: pp->setCrcMode(static_cast<inet::CrcMode>(value.intValue())); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'Ieee80211FhssPhyHeader'", field);
     }
 }
@@ -2050,7 +2052,7 @@ unsigned int Ieee80211IrPhyHeaderDescriptor::getFieldTypeFlags(int field) const
     }
     static unsigned int fieldTypeFlags[] = {
         FD_ISEDITABLE,    // FIELD_crc
-        0,    // FIELD_crcMode
+        FD_ISEDITABLE,    // FIELD_crcMode
     };
     return (field >= 0 && field < 2) ? fieldTypeFlags[field] : 0;
 }
@@ -2200,6 +2202,7 @@ void Ieee80211IrPhyHeaderDescriptor::setFieldValueAsString(omnetpp::any_ptr obje
     Ieee80211IrPhyHeader *pp = omnetpp::fromAnyPtr<Ieee80211IrPhyHeader>(object); (void)pp;
     switch (field) {
         case FIELD_crc: pp->setCrc(string2ulong(value)); break;
+        case FIELD_crcMode: pp->setCrcMode((inet::CrcMode)string2enum(value, "inet::CrcMode")); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'Ieee80211IrPhyHeader'", field);
     }
 }
@@ -2233,6 +2236,7 @@ void Ieee80211IrPhyHeaderDescriptor::setFieldValue(omnetpp::any_ptr object, int 
     Ieee80211IrPhyHeader *pp = omnetpp::fromAnyPtr<Ieee80211IrPhyHeader>(object); (void)pp;
     switch (field) {
         case FIELD_crc: pp->setCrc(omnetpp::checked_int_cast<uint16_t>(value.intValue())); break;
+        case FIELD_crcMode: pp->setCrcMode(static_cast<inet::CrcMode>(value.intValue())); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'Ieee80211IrPhyHeader'", field);
     }
 }
@@ -2787,7 +2791,7 @@ unsigned int Ieee80211DsssPhyHeaderDescriptor::getFieldTypeFlags(int field) cons
         FD_ISEDITABLE,    // FIELD_signal
         FD_ISEDITABLE,    // FIELD_service
         FD_ISEDITABLE,    // FIELD_crc
-        0,    // FIELD_crcMode
+        FD_ISEDITABLE,    // FIELD_crcMode
     };
     return (field >= 0 && field < 4) ? fieldTypeFlags[field] : 0;
 }
@@ -2947,6 +2951,7 @@ void Ieee80211DsssPhyHeaderDescriptor::setFieldValueAsString(omnetpp::any_ptr ob
         case FIELD_signal: pp->setSignal(string2ulong(value)); break;
         case FIELD_service: pp->setService(string2ulong(value)); break;
         case FIELD_crc: pp->setCrc(string2ulong(value)); break;
+        case FIELD_crcMode: pp->setCrcMode((inet::CrcMode)string2enum(value, "inet::CrcMode")); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'Ieee80211DsssPhyHeader'", field);
     }
 }
@@ -2984,6 +2989,7 @@ void Ieee80211DsssPhyHeaderDescriptor::setFieldValue(omnetpp::any_ptr object, in
         case FIELD_signal: pp->setSignal(omnetpp::checked_int_cast<uint8_t>(value.intValue())); break;
         case FIELD_service: pp->setService(omnetpp::checked_int_cast<uint8_t>(value.intValue())); break;
         case FIELD_crc: pp->setCrc(omnetpp::checked_int_cast<uint16_t>(value.intValue())); break;
+        case FIELD_crcMode: pp->setCrcMode(static_cast<inet::CrcMode>(value.intValue())); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'Ieee80211DsssPhyHeader'", field);
     }
 }

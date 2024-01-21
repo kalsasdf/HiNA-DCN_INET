@@ -411,7 +411,7 @@ unsigned int ProbabilisticBroadcastHeaderDescriptor::getFieldTypeFlags(int field
         0,    // FIELD_destAddr
         FD_ISEDITABLE,    // FIELD_id
         FD_ISEDITABLE,    // FIELD_nbHops
-        FD_ISEDITABLE,    // FIELD_protocolId
+        0,    // FIELD_protocolId
         FD_ISEDITABLE,    // FIELD_appTtl
         0,    // FIELD_initialSrcAddr
         0,    // FIELD_finalDestAddr
@@ -594,7 +594,6 @@ void ProbabilisticBroadcastHeaderDescriptor::setFieldValueAsString(omnetpp::any_
     switch (field) {
         case FIELD_id: pp->setId(string2long(value)); break;
         case FIELD_nbHops: pp->setNbHops(string2long(value)); break;
-        case FIELD_protocolId: pp->setProtocolId((inet::IpProtocolId)string2enum(value, "inet::IpProtocolId")); break;
         case FIELD_appTtl: pp->setAppTtl(string2simtime(value)); break;
         case FIELD_payloadLengthField: pp->setPayloadLengthField(B(string2long(value))); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'ProbabilisticBroadcastHeader'", field);
@@ -638,7 +637,6 @@ void ProbabilisticBroadcastHeaderDescriptor::setFieldValue(omnetpp::any_ptr obje
     switch (field) {
         case FIELD_id: pp->setId(omnetpp::checked_int_cast<long>(value.intValue())); break;
         case FIELD_nbHops: pp->setNbHops(omnetpp::checked_int_cast<int>(value.intValue())); break;
-        case FIELD_protocolId: pp->setProtocolId(static_cast<inet::IpProtocolId>(value.intValue())); break;
         case FIELD_appTtl: pp->setAppTtl(value.doubleValue()); break;
         case FIELD_payloadLengthField: pp->setPayloadLengthField(B(value.intValueInUnit("B"))); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'ProbabilisticBroadcastHeader'", field);

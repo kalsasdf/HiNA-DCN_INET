@@ -398,7 +398,7 @@ void SWIFT::receive_data(Packet *pck)
             }
             SackItem *sackItem = new SackItem;
             sackItem->setPacketid(curRcvNum);
-            receiver_Map[srcAddr].sacks_array.push_back(*sackItem);//插入时先到在前
+            receiver_Map[srcAddr].sacks_array.push_front(*sackItem);//插入时后到在前，因为SACK需要先包含新的packetid
 
             it = receiver_Map[srcAddr].sacks_array.begin();
             for (; it != receiver_Map[srcAddr].sacks_array.end(); it++) {//删除重复
@@ -431,7 +431,7 @@ void SWIFT::receive_data(Packet *pck)
                 n=4;//maxnode
             content->setSackItemArraySize(n);
             for (it = receiver_Map[srcAddr].sacks_array.begin(); it != receiver_Map[srcAddr].sacks_array.end() && counter < n; it++) {
-                content->setSackItem(counter++, *it);//一般来说counter越小序号越小
+                content->setSackItem(counter++, *it);//一般来说counter越小序号越大
             }
 
             sack->insertAtFront(content);

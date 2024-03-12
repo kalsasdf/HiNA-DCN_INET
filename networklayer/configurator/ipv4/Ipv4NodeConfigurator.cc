@@ -36,7 +36,7 @@ void Ipv4NodeConfigurator::initialize(int stage)
         if (!nodeStatus || nodeStatus->getState() == NodeStatus::UP)
             prepareAllInterfaces();
     }
-    else if (stage == INITSTAGE_NETWORK_ADDRESS_ASSIGNMENT) {
+    else if (stage == INITSTAGE_NETWORK_ADDRESS_ASSIGNMENT) {EV<<"Ipv4NodeConfigurator initialize(), networkConfigurator = "<<networkConfigurator<<endl;
         if ((!nodeStatus || nodeStatus->getState() == NodeStatus::UP) && networkConfigurator)
             configureAllInterfaces();
     }

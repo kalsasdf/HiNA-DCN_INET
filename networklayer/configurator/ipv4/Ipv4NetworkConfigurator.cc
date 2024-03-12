@@ -92,7 +92,7 @@ void Ipv4NetworkConfigurator::computeConfiguration()
     // calculate shortest paths, and add corresponding static routes
     if (addStaticRoutesParameter) {
         cXMLElementList autorouteElements = configuration->getChildrenByTagName("autoroute");
-        if (autorouteElements.size() == 0) {EV_INFO<<"Ipv4NetworkConfigurator.cc: line 95"<<endl;
+        if (autorouteElements.size() == 0) {EV_INFO<<"Ipv4NetworkConfigurator.cc: LINE "<<__LINE__<<endl;
             cXMLElement defaultAutorouteElement("autoroute", "", nullptr);
             TIME(addStaticRoutes(topology, &defaultAutorouteElement));
         }

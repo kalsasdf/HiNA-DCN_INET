@@ -240,8 +240,8 @@ void SWIFT::send_data()
         SenderState = STOPPING;
     }
     else if(snd_cwnd>=1){
-        nxtSendpacketid++;
-        if(snd_cwnd-(nxtSendpacketid-snd_una)>0){
+        if(snd_cwnd-(nxtSendpacketid+1-snd_una)>0){
+            nxtSendpacketid++;
             EV<<"snd_cwnd = "<<snd_cwnd<<", sended window - "<<packetid-snd_una<<endl;
             send_data();
         }

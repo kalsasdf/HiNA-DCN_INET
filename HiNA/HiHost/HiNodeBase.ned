@@ -37,7 +37,7 @@ module HiNodeBase like INetworkNode
         *.energySourceModule = default(exists(energyStorage) ? absPath(".energyStorage") : "");
         *.energyGeneratorModule = default(exists(energyGenerator) ? absPath(".energyGenerator") : "");
         *.clockModule = default(exists(clock) ? absPath(".clock") : "");
-        @class(NodeBase);
+        @class(HiNodeBase);
         @display("bgb=1256,1125");
     submodules:
         status: NodeStatus if hasStatus {

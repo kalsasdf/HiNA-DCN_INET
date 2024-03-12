@@ -283,7 +283,6 @@ L3Address HiUdpApp::chooseDestAddr(int k)
 void HiUdpApp::processPacket(Packet *pck)
 {
     auto addressReq = pck->addTagIfAbsent<L3AddressInd>();
-    L3Address this_flow_src = addressReq->getSrcAddress();
     auto appbitpersec = pck->getBitLength() / (simTime()-last_pck_time).dbl();
     goodputVector.recordWithTimestamp(simTime(), appbitpersec);
     EV_INFO << "Received packet: " << UdpSocket::getReceivedPacketInfo(pck) << endl;

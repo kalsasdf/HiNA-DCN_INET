@@ -32,13 +32,6 @@ public:
     };
     SenderState SenderState=STOPPING;
 
-    enum SenderAcceleratingState{
-        Normal, //0
-        Fast_Recovery,  //1
-        Additive_Increase,//2
-        Hyper_Increase //3
-    };
-
     enum SelfpckKindValues {
         SENDDATA,
         ALPHATIMER,
@@ -62,10 +55,6 @@ public:
         // for record flowsize
         uint64_t flowsize;
 
-        //为每条流记录的加速状态
-        SenderAcceleratingState SenderAcceleratingState = Normal;
-//        TimerMsg *rateTimer;
-//        TimerMsg *alphaTimer;
         int ByteCounter = 0;
         double currentRate;
         double targetRate;

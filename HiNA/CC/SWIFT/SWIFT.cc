@@ -229,7 +229,7 @@ void SWIFT::send_data()
             if(sacks_array_snd.empty())
             {
                 FAST_RECOVERY=false;
-                EV << "SACK array is empty" <<endl;
+                EV << "SACK array is empty"<<endl;
                 nxtSendpacketid = pre_snd;
             }
         }
@@ -386,27 +386,27 @@ void SWIFT::receive_data(Packet *pck)
             receiver_Map[srcAddr].acksequence.push_back(curRcvNum);
 
             auto it = receiver_Map[srcAddr].sacks_array.begin();
-            while (it != receiver_Map[srcAddr].sacks_array.end()) {
+            while (it != receiver_Map[srcAddr].sacks_array.end()) {//删除小于rcv_nxt的序号
                 if (it->getPacketid()<receiver_Map[srcAddr].rcv_nxt) {
-                    EV_DETAIL << "\t SACK in sacks_array: " << " " << it->str() << " delete now\n";
+                    EV_DETAIL << "\t SACK in sacks_array: " << " " << it->getPacketid() << " delete now\n";
                     it = receiver_Map[srcAddr].sacks_array.erase(it);
                 }
                 else {
-                    EV_DETAIL << "\t SACK in sacks_array: " << " " << it->str() << endl;
+                    EV_DETAIL << "\t SACK in sacks_array: " << " " << it->getPacketid() << endl;
                     it++;
                 }
             }
             SackItem *sackItem = new SackItem;
             sackItem->setPacketid(curRcvNum);
-            receiver_Map[srcAddr].sacks_array.push_front(*sackItem);
+            receiver_Map[srcAddr].sacks_array.push_back(*sackItem);//插入时先到在前
 
             it = receiver_Map[srcAddr].sacks_array.begin();
-            for (; it != receiver_Map[srcAddr].sacks_array.end(); it++) {
+            for (; it != receiver_Map[srcAddr].sacks_array.end(); it++) {//删除重复
                 auto it2 = it;
                 it2++;
                 while (it2 != receiver_Map[srcAddr].sacks_array.end()) {
                     if (it->getPacketid()==it2->getPacketid()) {
-                        EV_DETAIL << "sack matched, delete contained : a=" << it->str() << ", b=" << it2->str() << endl;
+                        EV_DETAIL << "sack matched, delete contained : a=" << it->getPacketid() << ", b=" << it2->getPacketid() << endl;
                         it2 = receiver_Map[srcAddr].sacks_array.erase(it2);
                     }
                     else
@@ -431,7 +431,7 @@ void SWIFT::receive_data(Packet *pck)
                 n=4;//maxnode
             content->setSackItemArraySize(n);
             for (it = receiver_Map[srcAddr].sacks_array.begin(); it != receiver_Map[srcAddr].sacks_array.end() && counter < n; it++) {
-                content->setSackItem(counter++, *it);
+                content->setSackItem(counter++, *it);//一般来说counter越小序号越小
             }
 
             sack->insertAtFront(content);
@@ -476,16 +476,28 @@ void SWIFT::receive_ack(Packet *pck)
             for(uint i=0; i<n;i++){
                 for(uint i2=ackid;i2<SACK_msg->getSackItem(i).getPacketid();i2++){
                     if(std::find(sacks_array_snd.begin(),sacks_array_snd.end(),i2)==sacks_array_snd.end())
-                        sacks_array_snd.push_front(i2);
+                        sacks_array_snd.push_back(i2);
                 }
             }
+            for(uint i=0;i<n;i++){
+                auto i2=sacks_array_snd.begin();
+                while(i2!=sacks_array_snd.end()){
+                    if(SACK_msg->getSackItem(i).getPacketid()==*i2)
+                        i2 = sacks_array_snd.erase(i2);
+                    else
+                        i2++;
+                }
+            }
+        }
+        for(auto i=sacks_array_snd.begin();i!=sacks_array_snd.end();i++){
+            EV<<"remain sack id = "<<*i<<endl;
         }
         if(num_dupack==3){
             retransmit_cnt = 0;
             num_dupack = 0;
             num_acked = 0;
             FAST_RECOVERY=true;
-            pre_snd = nxtSendpacketid;
+            pre_snd = nxtSendpacketid;EV<<"recovery begin, pre_snd = "<<pre_snd<<endl;
             nxtSendpacketid = sacks_array_snd.front();
             send_data();
         }
@@ -496,6 +508,10 @@ void SWIFT::receive_ack(Packet *pck)
         num_acked = 0;
         retransmit_cnt = 0;
         sender_packetMap.erase(ackid);EV<<"erase "<<ackid<<endl;
+        if(nxtSendpacketid<snd_una)
+            nxtSendpacketid=snd_una;
+        if(pre_snd<snd_una)
+            pre_snd=snd_una;
     }
 
 

@@ -7,29 +7,6 @@
 
 #include "BFCqueue.h"
 
-#include "inet/common/ModuleAccess.h"
-#include "inet/common/PacketEventTag.h"
-#include "inet/common/Simsignals.h"
-#include "inet/common/TimeTag.h"
-#include "inet/queueing/function/PacketComparatorFunction.h"
-#include "inet/queueing/function/PacketDropperFunction.h"
-#include "inet/common/packet/chunk/Chunk.h"
-#include "inet/common/packet/Packet.h"
-
-#include <vector>
-#include <algorithm>
-
-#include "inet/networklayer/common/NetworkInterface.h"
-
-#include "inet/linklayer/base/MacProtocolBase.h"
-#include <algorithm>
-#include "inet/HiNA/Messages/BFCHeader/BFCHeader_m.h"
-#include "inet/HiNA/Messages/BFCHeader/BFCHeaderSerializer.h"
-#include "inet/HiNA/Messages/BFCTag/isPause_m.h"
-
-#include "inet/networklayer/common/NetworkInterface.h"
-#include "inet/networklayer/ipv4/Ipv4Header_m.h"
-
 
 namespace inet {
 

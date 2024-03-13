@@ -8,9 +8,9 @@
 #ifndef __INET_HIPRIORITYSCHEDULER_H
 #define __INET_HIPRIORITYSCHEDULER_H
 
-#include "inet/queueing/base/PacketSchedulerBase.h"
-#include "inet/queueing/contract/IPacketCollection.h"
-#include "inet/HiNA/Ethernet/HiEthernetMac/HiEthernetMac.h"
+#include "../../../../queueing/base/PacketSchedulerBase.h"
+#include "../../../../queueing/contract/IPacketCollection.h"
+#include "../../HiEthernetMac/HiEthernetMac.h"
 #include "../REDPFCQueue/REDPFCQueue.h"
 
 namespace inet {

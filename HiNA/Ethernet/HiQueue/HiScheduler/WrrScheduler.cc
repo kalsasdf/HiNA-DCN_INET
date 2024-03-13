@@ -7,8 +7,6 @@
 
 #include "WrrScheduler.h"
 
-#include "inet/common/INETUtils.h"
-
 namespace inet {
 
 Define_Module(WrrScheduler);

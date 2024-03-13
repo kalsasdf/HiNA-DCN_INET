@@ -8,12 +8,7 @@
 #ifndef __INET_RATELIMITQUEUE_H
 #define __INET_RATELIMITQUEUE_H
 
-#include "inet/queueing/base/PacketQueueBase.h"
-#include "inet/queueing/contract/IActivePacketSink.h"
-#include "inet/queueing/contract/IActivePacketSource.h"
-#include "inet/queueing/contract/IPacketBuffer.h"
-#include "inet/queueing/contract/IPacketComparatorFunction.h"
-#include "inet/queueing/contract/IPacketDropperFunction.h"
+#include "../REDPFCQueue/REDPFCQueue.h"
 
 namespace inet {
 using namespace inet::queueing;

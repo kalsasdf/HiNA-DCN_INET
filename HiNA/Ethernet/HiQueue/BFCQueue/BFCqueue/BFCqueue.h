@@ -8,24 +8,21 @@
 #ifndef INET_HINA_ETHERNET_HIQUEUE_BFCQUEUE_BFCQUEUE_H_
 #define INET_HINA_ETHERNET_HIQUEUE_BFCQUEUE_BFCQUEUE_H_
 
+#include <vector>
+#include <algorithm>
 
-#include "inet/queueing/base/PacketQueueBase.h"
-#include "inet/queueing/contract/IActivePacketSink.h"
-#include "inet/queueing/contract/IActivePacketSource.h"
-#include "inet/queueing/contract/IPacketBuffer.h"
-#include "inet/queueing/contract/IPacketComparatorFunction.h"
-#include "inet/queueing/contract/IPacketDropperFunction.h"
+#include "../../REDPFCQueue/REDPFCQueue.h"
 
-#include "inet/linklayer/common/FcsMode_m.h"
-#include "inet/linklayer/common/InterfaceTag_m.h"
-#include "inet/HiNA/Messages/HiTag/HiTag_m.h"
-#include "inet/HiNA/Messages/BfcFrame/EthernetBfcFrame_m.h"
-#include "inet/common/IProtocolRegistrationListener.h"
-#include "inet/linklayer/ethernet/common/EthernetMacHeader_m.h"
-#include "inet/linklayer/ethernet/common/EthernetControlFrame_m.h"
-#include "inet/networklayer/common/NetworkInterface.h"
-#include "inet/queueing/marker/EcnMarker.h"
-#include "inet/queueing/contract/IPassivePacketSource.h"
+#include "../../../../Messages/BfcFrame/EthernetBfcFrame_m.h"
+#include "../../../../Messages/BFCHeader/BFCHeader_m.h"
+#include "../../../../Messages/BFCHeader/BFCHeaderSerializer.h"
+#include "../../../../Messages/BFCTag/isPause_m.h"
+
+#include "../../../../../networklayer/ipv4/Ipv4Header_m.h"
+
+#include "../../../../../common/packet/chunk/Chunk.h"
+#include "../../../../../common/packet/Packet.h"
+
 
 namespace inet {
 using namespace inet::queueing;

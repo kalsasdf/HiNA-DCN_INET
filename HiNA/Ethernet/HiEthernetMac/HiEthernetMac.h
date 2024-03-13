@@ -8,7 +8,29 @@
 #ifndef __INET_ETHERNETMAC_H
 #define __INET_ETHERNETMAC_H
 
-#include "../EtherHeader.h"
+#include "../../../linklayer/ethernet/base/EthernetMacBase.h"
+#include "../../../linklayer/common/EtherType_m.h"
+#include "../../../linklayer/common/InterfaceTag_m.h"
+#include "../../../linklayer/common/MacAddressTag_m.h"
+#include "../../../linklayer/ethernet/common/EthernetControlFrame_m.h"
+#include "../../../linklayer/ethernet/common/EthernetMacHeader_m.h"
+
+#include "../../Messages/HiTag/HiTag_m.h"
+#include "../../Messages/PfcFrame/EthernetPfcFrame_m.h"
+#include "../../Messages/HPCC/INTHeader_m.h"
+#include "../../Messages/POSEIDON/PSDINTHeader_m.h"
+#include "../HiQueue/HiScheduler/WrrScheduler.h"
+
+#include "../../../networklayer/ipv4/Ipv4Header_m.h"
+#include "../../../networklayer/common/NetworkInterface.h"
+
+#include "../../../transportlayer/udp/UdpHeader_m.h"
+
+#include "../../../common/ProtocolTag_m.h"
+#include "../../../common/Simsignals.h"
+
+#include "../../../physicallayer/wired/ethernet/EthernetSignal_m.h"
+
 
 namespace inet {
 

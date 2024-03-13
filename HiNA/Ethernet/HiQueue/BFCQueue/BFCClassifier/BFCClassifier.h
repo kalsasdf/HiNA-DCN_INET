@@ -15,13 +15,43 @@
 #ifndef __INET_BFCCLASSIFIER_H
 #define __INET_BFCCLASSIFIER_H
 
-#include "inet/queueing/base/PacketClassifierBase.h"
-#include "inet/queueing/contract/IPacketCollection.h"
-#include "inet/HiNA/Messages/HiTag/HiTag_m.h"
-#include "inet/common/packet/Packet.h"
-#include "inet/HiNA/Ethernet/BFCMac/BFCMac.h"
-#include <string.h>
+#include "../../HiClassifier/HiClassifier.h"
+
 #include <limits>
+#include <iostream>
+#include <stdlib.h>
+#include <time.h>
+
+#include "../../../../../common/ProtocolTag_m.h"
+#include "../../../../../common/Simsignals.h"
+#include "../../../../../common/packet/Packet.h"
+
+#include "../BFCqueue/BFCqueue.h"
+#include "../../../BFCMac/BFCMac.h"
+#include "../../../HiQueue/REDPFCQueue/REDPFCQueue.h"
+#include "../../../HiQueue/ABMQueue/ABMQueue.h"
+#include "../../../HiQueue/HiScheduler/WrrScheduler.h"
+#include "../../../../Messages/HiTag/HiTag_m.h"
+#include "../../../../Messages/PfcFrame/EthernetPfcFrame_m.h"
+#include "../../../../Messages/HPCC/INTHeader_m.h"
+
+
+#include "../../../../../linklayer/common/EtherType_m.h"
+#include "../../../../../linklayer/common/InterfaceTag_m.h"
+#include "../../../../../linklayer/common/MacAddressTag_m.h"
+#include "../../../../../linklayer/ethernet/common/EthernetControlFrame_m.h"
+#include "../../../../../linklayer/ethernet/common/EthernetMacHeader_m.h"
+#include "../../../../../linklayer/ethernet/base/EthernetMacBase.h"
+
+#include "../../../../../networklayer/common/NetworkInterface.h"
+#include "../../../../../networklayer/ipv4/Ipv4Header_m.h"
+
+#include "../../../../../physicallayer/wired/ethernet/EthernetSignal_m.h"
+
+#include "../../../../../transportlayer/udp/UdpHeader_m.h"
+
+
+
 using namespace inet::queueing;
 
 namespace inet {

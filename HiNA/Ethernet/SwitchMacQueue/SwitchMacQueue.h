@@ -8,19 +8,8 @@
 #ifndef __INET_MACQUEUE_H
 #define __INET_MACQUEUE_H
 
-#include "inet/queueing/base/PacketQueueBase.h"
-#include "inet/queueing/contract/IActivePacketSink.h"
-#include "inet/queueing/contract/IActivePacketSource.h"
-#include "inet/queueing/contract/IPassivePacketSource.h"
-#include "inet/queueing/contract/IPacketBuffer.h"
-#include "inet/queueing/contract/IPacketComparatorFunction.h"
-#include "inet/queueing/contract/IPacketDropperFunction.h"
-#include "inet/common/ModuleAccess.h"
-#include "inet/common/PacketEventTag.h"
-#include "inet/common/Simsignals.h"
-#include "inet/common/TimeTag.h"
-#include "inet/queueing/function/PacketComparatorFunction.h"
-#include "inet/queueing/function/PacketDropperFunction.h"
+#include "../HiQueue/REDPFCQueue/REDPFCQueue.h"
+
 using namespace inet::queueing;
 
 namespace inet {

@@ -8,25 +8,32 @@
 #ifndef __INET_REDPFCQUEUE_H
 #define __INET_REDPFCQUEUE_H
 
-#include "inet/queueing/base/PacketQueueBase.h"
-#include "inet/queueing/contract/IActivePacketSink.h"
-#include "inet/queueing/contract/IActivePacketSource.h"
-#include "inet/queueing/contract/IPacketBuffer.h"
-#include "inet/queueing/contract/IPacketComparatorFunction.h"
-#include "inet/queueing/contract/IPacketDropperFunction.h"
+#include "../../../../queueing/base/PacketQueueBase.h"
+#include "../../../../queueing/contract/IActivePacketSink.h"
+#include "../../../../queueing/contract/IActivePacketSource.h"
+#include "../../../../queueing/contract/IPacketBuffer.h"
+#include "../../../../queueing/contract/IPacketComparatorFunction.h"
+#include "../../../../queueing/contract/IPacketDropperFunction.h"
+#include "../../../../queueing/function/PacketComparatorFunction.h"
+#include "../../../../queueing/function/PacketDropperFunction.h"
+#include "../../../../queueing/marker/EcnMarker.h"
 
-#include "inet/linklayer/common/FcsMode_m.h"
-#include "inet/linklayer/common/InterfaceTag_m.h"
-#include "inet/HiNA/Messages/HiTag/HiTag_m.h"
-#include "inet/HiNA/Messages/PfcFrame/EthernetPfcFrame_m.h"
-#include "inet/common/IProtocolRegistrationListener.h"
-#include "inet/linklayer/ethernet/common/EthernetMacHeader_m.h"
-#include "inet/linklayer/ethernet/common/EthernetControlFrame_m.h"
-#include "inet/networklayer/common/NetworkInterface.h"
-#include "inet/queueing/marker/EcnMarker.h"
+#include "../../../../linklayer/common/FcsMode_m.h"
+#include "../../../../linklayer/common/InterfaceTag_m.h"
+#include "../../../../linklayer/ethernet/common/EthernetMacHeader_m.h"
+#include "../../../../linklayer/ethernet/common/EthernetControlFrame_m.h"
 
+#include "../../../../networklayer/common/NetworkInterface.h"
 
-//#include "inet/HiNA/Ethernet/HiEthernetMac/HiEthernetMac.h"
+#include "../../../../common/ModuleAccess.h"
+#include "../../../../common/PacketEventTag.h"
+#include "../../../../common/Simsignals.h"
+#include "../../../../common/TimeTag.h"
+#include "../../../../common/IProtocolRegistrationListener.h"
+
+#include "../../../Messages/HiTag/HiTag_m.h"
+#include "../../../Messages/PfcFrame/EthernetPfcFrame_m.h"
+#include "../../../Ethernet/HiEthernetMac/HiEthernetMac.h"
 
 namespace inet {
 using namespace inet::queueing;

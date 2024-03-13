@@ -8,7 +8,6 @@
 #ifndef __INET_ABMQUEUE_H
 #define __INET_ABMQUEUE_H
 
-#include "inet/HiNA/Ethernet/HiEthernetMac/HiEthernetMac.h"
 #include "../REDPFCQueue/REDPFCQueue.h"
 
 namespace inet {

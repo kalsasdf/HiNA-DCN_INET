@@ -16,12 +16,11 @@
 #ifndef __INET_BCNSCHEDULER_H
 #define __INET_BCNSCHEDULER_H
 
-#include "inet/queueing/base/PacketSchedulerBase.h"
-#include "inet/queueing/contract/IPacketCollection.h"
-#include "inet/HiNA/Ethernet/HiEthernetMac/HiEthernetMac.h"
-#include "inet/HiNA/Ethernet/BCNMac/BCNMac.h"
-#include "inet/HiNA/Messages/BfcFrame/EthernetBfcFrame_m.h"
-#include "inet/HiNA/Ethernet/HiQueue/BCNQueue/BCNqueue/BCNqueue.h"
+#include "../../../../../queueing/base/PacketSchedulerBase.h"
+#include "../../../../../queueing/contract/IPacketCollection.h"
+#include "../../../../Messages/BfcFrame/EthernetBfcFrame_m.h"
+#include "../../../BCNMac/BCNMac.h"
+#include "../../../HiQueue/BCNQueue/BCNqueue/BCNqueue.h"
 
 namespace inet {
 using namespace inet::queueing;

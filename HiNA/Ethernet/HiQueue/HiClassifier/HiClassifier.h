@@ -8,11 +8,12 @@
 #ifndef __INET_HICLASSIFIER_H
 #define __INET_HICLASSIFIER_H
 
-#include "inet/queueing/base/PacketClassifierBase.h"
-#include "inet/queueing/contract/IPacketCollection.h"
-#include "inet/HiNA/Messages/HiTag/HiTag_m.h"
-#include "inet/common/packet/Packet.h"
 #include <string.h>
+#include "../../../../queueing/base/PacketClassifierBase.h"
+#include "../../../../queueing/contract/IPacketCollection.h"
+#include "../../../../common/packet/Packet.h"
+#include "../../../Messages/HiTag/HiTag_m.h"
+
 using namespace inet::queueing;
 
 namespace inet {

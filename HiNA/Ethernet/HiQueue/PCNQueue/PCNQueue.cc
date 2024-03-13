@@ -4,13 +4,6 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 //
 
-
-#include "inet/common/ModuleAccess.h"
-#include "inet/common/PacketEventTag.h"
-#include "inet/common/Simsignals.h"
-#include "inet/common/TimeTag.h"
-#include "inet/queueing/function/PacketComparatorFunction.h"
-#include "inet/queueing/function/PacketDropperFunction.h"
 #include "PCNQueue.h"
 
 namespace inet {

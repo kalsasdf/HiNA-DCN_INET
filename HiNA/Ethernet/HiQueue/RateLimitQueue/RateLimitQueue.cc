@@ -7,13 +7,6 @@
 
 #include "RateLimitQueue.h"
 
-#include "inet/common/ModuleAccess.h"
-#include "inet/common/PacketEventTag.h"
-#include "inet/common/Simsignals.h"
-#include "inet/common/TimeTag.h"
-#include "inet/queueing/function/PacketComparatorFunction.h"
-#include "inet/queueing/function/PacketDropperFunction.h"
-
 namespace inet {
 
 Define_Module(RateLimitQueue);

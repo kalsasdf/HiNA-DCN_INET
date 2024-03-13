@@ -7,6 +7,10 @@
 
 #include "HiEthernetMac.h"
 
+#include "../HiQueue/REDPFCQueue/REDPFCQueue.h"
+#include "../HiQueue/ABMQueue/ABMQueue.h"
+
+
 namespace inet {
 
 // TODO refactor using a statemachine that is present in a single function

@@ -5,10 +5,7 @@
  *      Author: ergeng2001
  */
 
-
-
 #include "BCNMac.h"
-
 
 namespace inet {
 

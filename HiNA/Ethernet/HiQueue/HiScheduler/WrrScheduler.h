@@ -8,8 +8,9 @@
 #ifndef __INET_WRRSCHEDULER_H
 #define __INET_WRRSCHEDULER_H
 
-#include "inet/queueing/base/PacketSchedulerBase.h"
-#include "inet/queueing/contract/IPacketCollection.h"
+#include "../../../../common/INETUtils.h"
+#include "../../../../queueing/base/PacketSchedulerBase.h"
+#include "../../../../queueing/contract/IPacketCollection.h"
 
 namespace inet {
 using namespace inet::queueing;

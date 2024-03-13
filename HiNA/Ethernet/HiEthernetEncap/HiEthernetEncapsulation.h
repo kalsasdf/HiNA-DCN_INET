@@ -14,39 +14,39 @@
 #ifndef __INET_HIETHERNETENCAPSULATION_H
 #define __INET_HIETHERNETENCAPSULATION_H
 
-#include "inet/common/IProtocolRegistrationListener.h"
-#include "inet/common/lifecycle/ModuleOperations.h"
-#include "inet/common/lifecycle/OperationalBase.h"
-#include "inet/common/packet/Message.h"
-#include "inet/common/packet/Packet.h"
-#include "inet/linklayer/common/FcsMode_m.h"
-#include "inet/linklayer/ethernet/common/Ethernet.h"
-#include "inet/linklayer/ethernet/common/EthernetMacHeader_m.h"
-#include "inet/networklayer/common/NetworkInterface.h"
-#include "inet/linklayer/ethernet/basic/EthernetEncapsulation.h"
-#include "inet/common/INETUtils.h"
-#include "inet/common/socket/SocketTag_m.h"
-#include "inet/common/stlutils.h"
-#include "inet/linklayer/common/FcsMode_m.h"
-#include "inet/linklayer/common/Ieee802Ctrl.h"
-#include "inet/linklayer/common/InterfaceTag_m.h"
-#include "inet/linklayer/common/MacAddressTag_m.h"
-#include "inet/linklayer/ethernet/common/EthernetCommand_m.h"
-#include "inet/linklayer/ethernet/common/EthernetControlFrame_m.h"
-#include "inet/linklayer/ethernet/common/EthernetMacHeader_m.h"
-#include "inet/networklayer/contract/IInterfaceTable.h"
-#include "inet/HiNA/Messages/BFCHeader/BFCHeader_m.h"
-#include "inet/HiNA/Messages/BFCHeader/BFCHeaderSerializer.h"
-#include "inet/HiNA/Messages/HiTag/HiTag_m.h"
-
-
-#include "inet/common/packet/chunk/SliceChunk.h"
-#include "inet/common/packet/serializer/ChunkSerializer.h"
-#include "inet/common/packet/serializer/ChunkSerializerRegistry.h"
-
-
-
 #include<map>
+
+#include "../../../common/IProtocolRegistrationListener.h"
+#include "../../../common/lifecycle/ModuleOperations.h"
+#include "../../../common/lifecycle/OperationalBase.h"
+#include "../../../common/packet/Message.h"
+#include "../../../common/packet/Packet.h"
+#include "../../../common/INETUtils.h"
+#include "../../../common/socket/SocketTag_m.h"
+#include "../../../common/stlutils.h"
+#include "../../../common/packet/chunk/SliceChunk.h"
+#include "../../../common/packet/serializer/ChunkSerializer.h"
+#include "../../../common/packet/serializer/ChunkSerializerRegistry.h"
+
+#include "../../../linklayer/common/FcsMode_m.h"
+#include "../../../linklayer/ethernet/common/Ethernet.h"
+#include "../../../linklayer/ethernet/common/EthernetMacHeader_m.h"
+#include "../../../linklayer/ethernet/basic/EthernetEncapsulation.h"
+#include "../../../linklayer/common/FcsMode_m.h"
+#include "../../../linklayer/common/Ieee802Ctrl.h"
+#include "../../../linklayer/common/InterfaceTag_m.h"
+#include "../../../linklayer/common/MacAddressTag_m.h"
+#include "../../../linklayer/ethernet/common/EthernetCommand_m.h"
+#include "../../../linklayer/ethernet/common/EthernetControlFrame_m.h"
+
+#include "../../../networklayer/common/NetworkInterface.h"
+#include "../../../networklayer/contract/IInterfaceTable.h"
+
+#include "../../Messages/BFCHeader/BFCHeader_m.h"
+#include "../../Messages/BFCHeader/BFCHeaderSerializer.h"
+#include "../../Messages/HiTag/HiTag_m.h"
+
+
 namespace inet {
 
 /**

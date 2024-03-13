@@ -9,7 +9,7 @@
 #define INET__SWIFT_H_
 
 #include "../ccheaders.h"
-#include "inet/HiNA/Messages/SWIFT/SACK_m.h"
+#include "../../Messages/SWIFT/SACK_m.h"
 
 using namespace std;
 

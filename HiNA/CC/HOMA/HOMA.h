@@ -7,11 +7,6 @@
 #ifndef INET_HINA_CC_HOMA_HOMA_H
 #define INET_HINA_CC_HOMA_HOMA_H
 
-#include <map>
-#include <queue>
-#include <stdlib.h>
-#include <string.h>
-
 #include "../ccheaders.h"
 
 using namespace std;

@@ -5,7 +5,6 @@
 */
 
 #include "HOMA.h"
-#include "inet/common/INETDefs.h"
 
 namespace inet {
 

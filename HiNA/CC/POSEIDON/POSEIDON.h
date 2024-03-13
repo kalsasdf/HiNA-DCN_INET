@@ -7,7 +7,7 @@
 #define __INET_POSEIDON_H
 
 #include "../ccheaders.h"
-#include "inet/HiNA/Messages/POSEIDON/PSDINTHeader_m.h"
+#include "../../Messages/POSEIDON/PSDINTHeader_m.h"
 #include<cmath>
 using namespace std;
 

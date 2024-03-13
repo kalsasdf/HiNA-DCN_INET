@@ -9,9 +9,13 @@
 #ifndef __INET_BFC_H
 #define __INET_BFC_H
 
+#include <iostream>
+#include <stdlib.h>
+#include <time.h>
 #include "../ccheaders.h"
-#include "inet/HiNA/Messages/BFCHeader/BFCHeader_m.h"
-#include "inet/HiNA/Messages/BFCHeader/BFCHeaderSerializer.h"
+#include "../../Messages/BFCHeader/BFCHeader_m.h"
+#include "../../Messages/BFCHeader/BFCHeaderSerializer.h"
+
 
 using namespace std;
 

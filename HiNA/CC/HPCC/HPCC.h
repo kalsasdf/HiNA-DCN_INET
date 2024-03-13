@@ -7,7 +7,7 @@
 #define __INET_HPCC_H
 
 #include "../ccheaders.h"
-#include "inet/HiNA/Messages/HPCC/INTHeader_m.h"
+#include "../../Messages/HPCC/INTHeader_m.h"
 using namespace std;
 
 namespace inet {

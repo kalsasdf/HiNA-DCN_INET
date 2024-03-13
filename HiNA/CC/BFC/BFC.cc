@@ -8,24 +8,6 @@
 
 
 #include "BFC.h"
-#include "inet/HiNA/Messages/HiTag/HiTag_m.h"
-#include "inet/networklayer/common/L3AddressTag_m.h"
-#include "inet/applications/base/ApplicationBase.h"
-#include "inet/transportlayer/contract/udp/UdpSocket.h"
-#include "inet/common/clock/ClockUserModuleMixin.h"
-
-#include "inet/applications/base/ApplicationPacket_m.h"
-#include "inet/common/ModuleAccess.h"
-#include "inet/common/packet/Packet.h"
-#include "inet/common/TagBase_m.h"
-#include "inet/common/TimeTag_m.h"
-#include "inet/networklayer/common/L3AddressResolver.h"
-#include "inet/transportlayer/contract/udp/UdpControlInfo_m.h"
-#include "inet/applications/tcpapp/GenericAppMsg_m.h"
-
-#include <iostream>
-#include <stdlib.h>
-#include <time.h>
 
 namespace inet {
 

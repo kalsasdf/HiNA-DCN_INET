@@ -8,11 +8,6 @@
 #ifndef INET_HINA_CC_XPASS_XPASS_H_
 #define INET_HINA_CC_XPASS_XPASS_H_
 
-#include <map>
-#include <queue>
-#include <stdlib.h>
-#include <string.h>
-
 #include "../ccheaders.h"
 
 using namespace std;

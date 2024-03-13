@@ -1,15 +1,20 @@
 // Copyright (C)
 /*
- * Developed by Angrydudu
- * Begin at 05/09/2019
+ * Developed by ergeng2001
+ * Begin at 2023Äê6ÔÂ27ÈÕ
 */
 
 #ifndef __INET_BCN_H
 #define __INET_BCN_H
 
+
+
+#include <stdlib.h>
+
 #include "../ccheaders.h"
-#include "inet/HiNA/Messages/BFCHeader/BFCHeader_m.h"
-#include "inet/HiNA/Messages/BFCHeader/BFCHeaderSerializer.h"
+#include "../../Messages/BFCHeader/BFCHeader_m.h"
+#include "../../Messages/BFCHeader/BFCHeaderSerializer.h"
+
 
 using namespace std;
 

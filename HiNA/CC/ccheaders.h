@@ -1,8 +1,10 @@
 #include <map>
 #include <queue>
+#include <iostream>
 
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "inet/applications/base/ApplicationPacket_m.h"
 

@@ -264,7 +264,7 @@ void HOMA::receive_unscheduledata(Packet* pck)
    rcv_info.now_send_grt_seq = -1;
    rcv_info.if_get[rcv_info.now_received_data_seq] = true;
    if(last) {
-       rcv_info.ReceiverState = GRANT_STOP;
+       rcv_info.RcvState = GRANT_STOP;
        priorityUse[rcv_info.SenderPriority] = false;
        cancelEvent(rcv_info.sendresend);
        delete rcv_info.sendresend;
@@ -273,11 +273,11 @@ void HOMA::receive_unscheduledata(Packet* pck)
        receiver_flowMap.erase(flowid);
    }
    else {
-       rcv_info.ReceiverState = GRANT_SENDING;
+       rcv_info.RcvState = GRANT_SENDING;
        receiver_flowMap[flowid] = rcv_info;
    }
-   EV <<" receiver state is "<<receiver_flowMap[flowid].ReceiverState<< endl;
-   if(receiver_flowMap[flowid].ReceiverState == GRANT_SENDING)
+   EV <<" receiver state is "<<receiver_flowMap[flowid].RcvState<< endl;
+   if(receiver_flowMap[flowid].RcvState == GRANT_SENDING)
    {
        send_grant(flowid);
    }
@@ -415,7 +415,7 @@ void HOMA::receive_scheduledata(Packet* pck)
 
     rcv_info.if_get[rcv_info.now_received_data_seq] = true;
     if(last){
-        rcv_info.ReceiverState = GRANT_STOP;
+        rcv_info.RcvState = GRANT_STOP;
         priorityUse[priority] = false;
         cancelEvent(rcv_info.sendresend);
         delete rcv_info.sendresend;
@@ -425,7 +425,7 @@ void HOMA::receive_scheduledata(Packet* pck)
     }
     else receiver_flowMap[flowid] = rcv_info;
 
-    if(rcv_info.ReceiverState == GRANT_SENDING)
+    if(rcv_info.RcvState == GRANT_SENDING)
     {
         EV << "The flow " << flowid << " unschedule data has been all received, send GRANT" << endl;
 
@@ -549,7 +549,7 @@ void HOMA::receive_busy(Packet* pck)
 void HOMA::time_out(uint32_t flowid)
 {
     receiver_flowinfo rcv_info = receiver_flowMap.find(flowid) -> second;
-    if(rcv_info.ReceiverState!=GRANT_STOP){
+    if(rcv_info.RcvState!=GRANT_STOP){
         for(int i = 0; i <= 10000; i ++)
         {
             if(rcv_info.if_get[i] == false)

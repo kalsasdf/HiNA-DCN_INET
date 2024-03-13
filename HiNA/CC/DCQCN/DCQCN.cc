@@ -215,7 +215,7 @@ void DCQCN::send_data()
         iter++;
         sender_flowMap.erase(snd_info.flowid);
     }else{
-        if (snd_info.SenderAcceleratingState != Normal)
+        if (snd_info.SndAccState != Normal)
         {
             snd_info.ByteCounter += packet->getByteLength();
             if (snd_info.ByteCounter >= ByteCounter_th)
@@ -325,30 +325,30 @@ void DCQCN::increaseTxRate(uint32_t flowid)
 
     if (max(sndinfo.ByteFrSteps,sndinfo.TimeFrSteps) < frSteps_th)
     {
-        sndinfo.SenderAcceleratingState = Fast_Recovery;
+        sndinfo.SndAccState = Fast_Recovery;
     }
     else if (min(sndinfo.ByteFrSteps,sndinfo.TimeFrSteps) > frSteps_th)
     {
-        sndinfo.SenderAcceleratingState = Hyper_Increase;
+        sndinfo.SndAccState = Hyper_Increase;
     }
     else
     {
-        sndinfo.SenderAcceleratingState = Additive_Increase;
+        sndinfo.SndAccState = Additive_Increase;
     }
-    EV<<"sender state = "<<sndinfo.SenderAcceleratingState<<", current rate = "<<sndinfo.currentRate<<", target rate = "<<sndinfo.targetRate<<endl;
+    EV<<"sender state = "<<sndinfo.SndAccState<<", current rate = "<<sndinfo.currentRate<<", target rate = "<<sndinfo.targetRate<<endl;
 
-    if (sndinfo.SenderAcceleratingState == Fast_Recovery)
+    if (sndinfo.SndAccState == Fast_Recovery)
     {// Fast Recovery
         sndinfo.currentRate = (sndinfo.currentRate + sndinfo.targetRate) / 2;
     }
-    else if (sndinfo.SenderAcceleratingState == Additive_Increase)
+    else if (sndinfo.SndAccState == Additive_Increase)
     {// Additive Increase
         sndinfo.targetRate += Rai;
         sndinfo.targetRate = (sndinfo.targetRate > sndinfo.maxTxRate) ? sndinfo.maxTxRate : sndinfo.targetRate;
 
         sndinfo.currentRate = (sndinfo.currentRate + sndinfo.targetRate) / 2;
     }
-    else if (sndinfo.SenderAcceleratingState == Hyper_Increase)
+    else if (sndinfo.SndAccState == Hyper_Increase)
     {// Hyper Increase
         sndinfo.iRhai++;
         sndinfo.targetRate += sndinfo.iRhai*Rhai;

@@ -5,7 +5,6 @@
  *      Author: kalsasdf
  */
 
-#include "inet/common/INETDefs.h"
 #include "XPASS.h"
 
 

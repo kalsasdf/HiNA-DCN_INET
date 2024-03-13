@@ -49,7 +49,7 @@ protected:
         simtime_t cretime;
         int64_t remainLength;
 
-        SenderAcceleratingState SenderAcceleratingState = Normal;
+        SenderAcceleratingState SndAccState = Normal;
         TimerMsg *rateTimer;
         TimerMsg *alphaTimer;
         int ByteCounter = 0;

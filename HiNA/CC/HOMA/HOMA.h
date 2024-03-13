@@ -39,7 +39,7 @@ class HOMA : public TransportProtocolBase
         bool if_get[10000]; //包是否收到状态表
         int now_received_data_seq; //当前收到的包序列号
         long now_send_grt_seq; //当前发送的GRANT序列号
-        ReceiverState ReceiverState;
+        ReceiverState RcvState;
         int SenderPriority = -1;
         TimerMsg *sendresend;
         TimerMsg *timeout;

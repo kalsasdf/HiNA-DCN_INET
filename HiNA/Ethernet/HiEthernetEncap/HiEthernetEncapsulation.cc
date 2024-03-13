@@ -10,27 +10,6 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 //
 
-
-#include "inet/common/INETUtils.h"
-#include "inet/common/socket/SocketTag_m.h"
-#include "inet/common/stlutils.h"
-#include "inet/linklayer/common/FcsMode_m.h"
-#include "inet/linklayer/common/Ieee802Ctrl.h"
-#include "inet/linklayer/common/InterfaceTag_m.h"
-#include "inet/linklayer/common/MacAddressTag_m.h"
-#include "inet/linklayer/ethernet/common/EthernetCommand_m.h"
-#include "inet/linklayer/ethernet/common/EthernetControlFrame_m.h"
-#include "inet/linklayer/ethernet/common/EthernetMacHeader_m.h"
-#include "inet/networklayer/contract/IInterfaceTable.h"
-#include "inet/HiNA/Messages/BFCHeader/BFCHeader_m.h"
-#include "inet/HiNA/Messages/BFCHeader/BFCHeaderSerializer.h"
-#include "inet/HiNA/Messages/HiTag/HiTag_m.h"
-
-
-#include "inet/common/packet/chunk/SliceChunk.h"
-#include "inet/common/packet/serializer/ChunkSerializer.h"
-#include "inet/common/packet/serializer/ChunkSerializerRegistry.h"
-
 #include "HiEthernetEncapsulation.h"
 
 namespace inet {

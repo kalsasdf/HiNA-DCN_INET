@@ -7,18 +7,6 @@
 
 #include "HiEthernetMac.h"
 
-#include "../HiQueue/REDPFCQueue/REDPFCQueue.h"
-#include "../HiQueue/ABMQueue/ABMQueue.h"
-#include "inet/common/ProtocolTag_m.h"
-#include "inet/common/Simsignals.h"
-#include "inet/linklayer/common/EtherType_m.h"
-#include "inet/linklayer/common/InterfaceTag_m.h"
-#include "inet/linklayer/common/MacAddressTag_m.h"
-#include "inet/linklayer/ethernet/common/EthernetControlFrame_m.h"
-#include "inet/linklayer/ethernet/common/EthernetMacHeader_m.h"
-#include "inet/networklayer/common/NetworkInterface.h"
-#include "inet/physicallayer/wired/ethernet/EthernetSignal_m.h"
-
 namespace inet {
 
 // TODO refactor using a statemachine that is present in a single function

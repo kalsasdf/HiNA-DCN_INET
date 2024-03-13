@@ -10,23 +10,6 @@
 #include "BFCMac.h"
 
 
-#include "inet/HiNA/Messages/HiTag/HiTag_m.h"
-#include "inet/common/ProtocolTag_m.h"
-#include "inet/common/Simsignals.h"
-#include "inet/HiNA/Ethernet/HiQueue/BFCQueue/BFCqueue/BFCqueue.h"
-#include "inet/linklayer/common/EtherType_m.h"
-#include "inet/linklayer/common/InterfaceTag_m.h"
-#include "inet/linklayer/common/MacAddressTag_m.h"
-#include "inet/linklayer/ethernet/common/EthernetControlFrame_m.h"
-#include "inet/linklayer/ethernet/common/EthernetMacHeader_m.h"
-#include "inet/networklayer/common/NetworkInterface.h"
-#include "inet/physicallayer/wired/ethernet/EthernetSignal_m.h"
-
-#include "inet/networklayer/common/L3Address.h"
-#include "inet/networklayer/common/L3AddressTag_m.h"
-
-
-
 namespace inet {
 
 // TODO refactor using a statemachine that is present in a single function

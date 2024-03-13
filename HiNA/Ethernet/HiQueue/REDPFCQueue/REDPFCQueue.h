@@ -26,7 +26,7 @@
 #include "inet/queueing/marker/EcnMarker.h"
 
 
-#include "inet/HiNA/Ethernet/HiEthernetMac/HiEthernetMac.h"
+//#include "inet/HiNA/Ethernet/HiEthernetMac/HiEthernetMac.h"
 
 namespace inet {
 using namespace inet::queueing;

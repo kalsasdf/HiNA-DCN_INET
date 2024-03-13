@@ -15,6 +15,12 @@
 #include "inet/queueing/contract/IPacketBuffer.h"
 #include "inet/queueing/contract/IPacketComparatorFunction.h"
 #include "inet/queueing/contract/IPacketDropperFunction.h"
+#include "inet/common/ModuleAccess.h"
+#include "inet/common/PacketEventTag.h"
+#include "inet/common/Simsignals.h"
+#include "inet/common/TimeTag.h"
+#include "inet/queueing/function/PacketComparatorFunction.h"
+#include "inet/queueing/function/PacketDropperFunction.h"
 using namespace inet::queueing;
 
 namespace inet {

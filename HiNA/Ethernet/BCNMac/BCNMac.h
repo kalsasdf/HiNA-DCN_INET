@@ -11,15 +11,11 @@
 #ifndef INET_HINA_ETHERNET_BCNMAC_BCNMAC_H_
 #define INET_HINA_ETHERNET_BCNMAC_BCNMAC_H_
 
-#include "inet/linklayer/ethernet/base/EthernetMacBase.h"
-#include "inet/HiNA/Messages/HiTag/HiTag_m.h"
-#include "inet/HiNA/Messages/BfcFrame/EthernetBfcFrame_m.h"
-#include "inet/networklayer/ipv4/Ipv4Header_m.h"
-#include "inet/transportlayer/udp/UdpHeader_m.h"
-#include "inet/HiNA/Messages/HPCC/INTHeader_m.h"
-#include "inet/HiNA/Ethernet/HiQueue/HiScheduler/WrrScheduler.h"
-#include "inet/HiNA/Messages/BFCHeader/BFCHeader_m.h"
-#include "inet/HiNA/Messages/BFCHeader/BFCHeaderSerializer.h"
+#include "../EtherHeader.h"
+#include "../../Messages/BfcFrame/EthernetBfcFrame_m.h"
+#include "../../Messages/BFCHeader/BFCHeader_m.h"
+#include "../../Messages/BFCHeader/BFCHeaderSerializer.h"
+#include "../HiQueue/BCNQueue/BCNqueue/BCNqueue.h"
 
 namespace inet {
 

@@ -8,14 +8,7 @@
 #ifndef __INET_ETHERNETMAC_H
 #define __INET_ETHERNETMAC_H
 
-#include "inet/linklayer/ethernet/base/EthernetMacBase.h"
-#include "inet/HiNA/Messages/HiTag/HiTag_m.h"
-#include "inet/HiNA/Messages/PfcFrame/EthernetPfcFrame_m.h"
-#include "inet/networklayer/ipv4/Ipv4Header_m.h"
-#include "inet/transportlayer/udp/UdpHeader_m.h"
-#include "inet/HiNA/Messages/HPCC/INTHeader_m.h"
-#include "inet/HiNA/Messages/POSEIDON/PSDINTHeader_m.h"
-#include "inet/HiNA/Ethernet/HiQueue/HiScheduler/WrrScheduler.h"
+#include "../EtherHeader.h"
 
 namespace inet {
 

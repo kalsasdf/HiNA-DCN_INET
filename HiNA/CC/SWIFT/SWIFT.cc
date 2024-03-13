@@ -2,7 +2,7 @@
  * SWIFT.cc
  *
  *  Created on: 20230205
- *      Author: luca
+ *      Author: HiNA
  */
 #include "SWIFT.h"
 

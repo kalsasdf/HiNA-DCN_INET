@@ -221,27 +221,28 @@ void SWIFT::send_data()
     cancelEvent(timeout);
     scheduleAt(simTime() + RTO, timeout);
 
-    if(FAST_RECOVERY){
-        if(!sacks_array_snd.empty())
-        {
-            sacks_array_snd.pop_front();
-            nxtSendpacketid = sacks_array_snd.front();
-            if(sacks_array_snd.empty())
-            {
-                FAST_RECOVERY=false;
-                EV << "SACK array is empty"<<endl;
-                nxtSendpacketid = pre_snd;
-            }
-        }
-    }
 
     if(sender_packetMap.find(nxtSendpacketid+1)==sender_packetMap.end()){
         EV<<"packet run out, stopping"<<endl;
         SenderState = STOPPING;
     }
     else if(snd_cwnd>=1){
-        if(snd_cwnd-(nxtSendpacketid+1-snd_una)>0){
+        if(FAST_RECOVERY){
+            if(!sacks_array_snd.empty())
+            {
+                sacks_array_snd.pop_front();
+                nxtSendpacketid = sacks_array_snd.front();
+                if(sacks_array_snd.empty())
+                {
+                    FAST_RECOVERY=false;
+                    EV << "SACK array is empty"<<endl;
+                    nxtSendpacketid = pre_snd;
+                }
+            }
+        }else{
             nxtSendpacketid++;
+        }
+        if(snd_cwnd-(nxtSendpacketid-snd_una)>0){
             EV<<"snd_cwnd = "<<snd_cwnd<<", sended window - "<<packetid-snd_una<<endl;
             send_data();
         }
@@ -251,7 +252,21 @@ void SWIFT::send_data()
         }
     }
     else if(snd_cwnd<1){
-        nxtSendpacketid++;
+        if(FAST_RECOVERY){
+            if(!sacks_array_snd.empty())
+            {
+                sacks_array_snd.pop_front();
+                nxtSendpacketid = sacks_array_snd.front();
+                if(sacks_array_snd.empty())
+                {
+                    FAST_RECOVERY=false;
+                    EV << "SACK array is empty"<<endl;
+                    nxtSendpacketid = pre_snd;
+                }
+            }
+        }else{
+            nxtSendpacketid++;
+        }
         EV<<"snd_cwnd < 1, nxtSendtime = "<<simTime()+pacing_delay<<endl;
         cancelEvent(senddata);
         scheduleAt(simTime()+pacing_delay,senddata);
@@ -361,13 +376,13 @@ void SWIFT::receive_data(Packet *pck)
                 receiver_Map[srcAddr].rcv_nxt++;
             }
 
-            EV_DETAIL<<"packet is ordered, send ACK-"<<curRcvNum<<endl;
+            EV_DETAIL<<"packet is ordered, send ACK-"<<receiver_Map[srcAddr].rcv_nxt-1<<endl;
             std::ostringstream str;
-            str <<"ACK-" <<curRcvNum;
+            str <<"ACK-" <<receiver_Map[srcAddr].rcv_nxt-1;
             Packet *ack = new Packet(str.str().c_str());
             const auto& payload = makeShared<ByteCountChunk>(B(26));
             auto tag=payload->addTag<HiTag>();
-            tag->setPacketId(curRcvNum);
+            tag->setPacketId(receiver_Map[srcAddr].rcv_nxt-1);
             payload->enableImplicitChunkSerialization = true;
             ack->insertAtBack(payload);
 
@@ -508,6 +523,13 @@ void SWIFT::receive_ack(Packet *pck)
         num_acked = 0;
         retransmit_cnt = 0;
         sender_packetMap.erase(ackid);EV<<"erase "<<ackid<<endl;
+        auto i2=sacks_array_snd.begin();
+        while(i2!=sacks_array_snd.end()){
+            if(ackid>=*i2)
+                i2 = sacks_array_snd.erase(i2);
+            else
+                i2++;
+        }
         if(nxtSendpacketid<snd_una)
             nxtSendpacketid=snd_una;
         if(pre_snd<snd_una)

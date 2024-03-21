@@ -24,10 +24,21 @@
 
 #include "GlobalFlowId.h"
 #include "inet/HiNA/Messages/HiTag/HiTag_m.h"
+
 #include "inet/networklayer/common/L3AddressTag_m.h"
+#include "inet/networklayer/common/L3AddressResolver.h"
+
 #include "inet/applications/base/ApplicationBase.h"
+#include "inet/applications/base/ApplicationPacket_m.h"
+
 #include "inet/transportlayer/contract/udp/UdpSocket.h"
+#include "inet/transportlayer/contract/udp/UdpControlInfo_m.h"
+
 #include "inet/common/clock/ClockUserModuleMixin.h"
+#include "inet/common/ModuleAccess.h"
+#include "inet/common/packet/Packet.h"
+#include "inet/common/TagBase_m.h"
+#include "inet/common/TimeTag_m.h"
 
 
 namespace inet {
@@ -97,7 +108,7 @@ class INET_API HiUdpApp : public ClockUserModuleMixin<ApplicationBase>, public U
 
     // chooses random destination address
     virtual L3Address chooseDestAddr(int k);
-    virtual void sendPacket(int packetlength, uint64_t flowid);
+    virtual void sendPacket(int packetlength);
     virtual void processPacket(Packet *msg);
 
     virtual void processStart();

@@ -22,11 +22,23 @@
 #include <fstream>
 
 #include "GlobalFlowId.h"
+#include "inet/HiNA/Messages/HiTag/HiTag_m.h"
+
 #include "inet/common/INETDefs.h"
 #include "inet/common/lifecycle/LifecycleOperation.h"
-#include "inet/applications/tcpapp/TcpAppBase.h"
-#include "inet/HiNA/Messages/HiTag/HiTag_m.h"
 #include "inet/common/socket/SocketMap.h"
+#include "inet/common/lifecycle/ModuleOperations.h"
+#include "inet/common/ModuleAccess.h"
+#include "inet/common/packet/chunk/ByteCountChunk.h"
+#include "inet/common/packet/chunk/BytesChunk.h"
+#include "inet/common/packet/Packet.h"
+#include "inet/common/TagBase_m.h"
+#include "inet/common/TimeTag_m.h"
+
+#include "inet/applications/tcpapp/TcpAppBase.h"
+#include "inet/applications/base/ApplicationPacket_m.h"
+
+#include "inet/networklayer/common/L3AddressResolver.h"
 
 
 namespace inet {

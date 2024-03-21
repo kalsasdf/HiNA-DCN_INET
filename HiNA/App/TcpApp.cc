@@ -17,16 +17,6 @@
 
 #include "TcpApp.h"
 
-#include "inet/applications/base/ApplicationPacket_m.h"
-#include "inet/common/lifecycle/ModuleOperations.h"
-#include "inet/common/ModuleAccess.h"
-#include "inet/common/packet/chunk/ByteCountChunk.h"
-#include "inet/common/packet/chunk/BytesChunk.h"
-#include "inet/common/packet/Packet.h"
-#include "inet/common/TagBase_m.h"
-#include "inet/common/TimeTag_m.h"
-#include "inet/networklayer/common/L3AddressResolver.h"
-
 namespace inet {
 
 Define_Module(TcpApp);
@@ -336,28 +326,28 @@ void TcpApp::parseScript(const char *script)
 {
     // ------------------------------------------------------------------------
     // 从指定的脚本文件 或 ini字符串参数中读取流量模式
-//    char* buffer = nullptr;
-//    if(*script){
-//        std::fstream SCRIPT_FILE;
-//        int file_length;
-//        SCRIPT_FILE.open(script);
-//        if(!SCRIPT_FILE.is_open()){     // 脚本文件不存在，表示script指向ini文件配置的字符串参数
-//            EV_INFO << "Script file not found! Traffic Pattern is configured by const string." << endl;
-//            EV_INFO << script << endl;
-//        }
-//        else{                           // 脚本文件存在,取出文件内容，赋值给buffer，再传给script
-//            SCRIPT_FILE.seekg(0, std::ios::end);    // 将文件指针定位到文件结束位置
-//            file_length = SCRIPT_FILE.tellg();      // 根据文件指针当前位置，计算得到文件长度
-//            SCRIPT_FILE.seekg(0, std::ios::beg);    // 将文件指针定位到文件开始位置
-//            if(file_length == 0) script = "";
-//            else{
-//                buffer = new char[file_length];
-//                SCRIPT_FILE.read(buffer, file_length);
-//                script = buffer;
-//            }
-//            SCRIPT_FILE.close();
-//        }
-//    }
+    char* buffer = nullptr;
+    if(*script){
+        std::fstream SCRIPT_FILE;
+        int file_length;
+        SCRIPT_FILE.open(script);
+        if(!SCRIPT_FILE.is_open()){     // 脚本文件不存在，表示script指向ini文件配置的字符串参数
+            EV_INFO << "Script file not found! Traffic Pattern is configured by const string." << endl;
+            EV_INFO << script << endl;
+        }
+        else{                           // 脚本文件存在,取出文件内容，赋值给buffer，再传给script
+            SCRIPT_FILE.seekg(0, std::ios::end);    // 将文件指针定位到文件结束位置
+            file_length = SCRIPT_FILE.tellg();      // 根据文件指针当前位置，计算得到文件长度
+            SCRIPT_FILE.seekg(0, std::ios::beg);    // 将文件指针定位到文件开始位置
+            if(file_length == 0) script = "";
+            else{
+                buffer = new char[file_length];
+                SCRIPT_FILE.read(buffer, file_length);
+                script = buffer;
+            }
+            SCRIPT_FILE.close();
+        }
+    }
     // else{} 为空时，script指向空串 ""，表示既未指定脚本文件路径、又没有指定ini字符串参数
     // ------------------------------------------------------------------------
     const char *s = script;
@@ -408,7 +398,7 @@ void TcpApp::parseScript(const char *script)
         while (isspace(*s))
             s++;
     }
-    //    delete[] buffer;
+        delete[] buffer;
     EV << "parser finished\n";
 }
 

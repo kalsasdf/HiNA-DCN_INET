@@ -334,6 +334,7 @@ void XPASS::receive_credit(Packet *pck)
             packetLength=max_pck_size;
         }
         else {
+            last = true;
             packetLength=max_pck_size;
             remainSize=0;
         }

@@ -43,7 +43,9 @@ network crossDCN
 
     submodules:
         configurator: Ipv4NetworkConfigurator {
-            @display("p=5534.8325,176.2981;is=s");
+            @display("p=4585.59,864.7566;is=s");
+            // + "<interface hosts='Spine1' address='192.168.5.x' netmask='255.0.0.0'/>"
+            // + "<interface hosts='Spine2' address='202.197.5.x' netmask='255.255.0.0'/>"
             config = xml("<config>"
                         + "<interface hosts='Hosts1' address='192.168.1.x'  />"
                         + "<interface hosts='Hosts2' address='192.168.1.x'  />"

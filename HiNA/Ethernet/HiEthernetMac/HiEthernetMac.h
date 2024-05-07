@@ -63,7 +63,7 @@ class INET_API HiEthernetMac : public EthernetMacBase
     unsigned long intvlNumPackets;
     unsigned long intvlNumBits;
     unsigned long intvlPriBits[11];
-    unsigned long pribitpersec[11];
+    unsigned long deqrate[11];
 
     // statistics
     cOutVector bitpersecVector;

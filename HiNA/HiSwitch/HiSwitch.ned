@@ -50,7 +50,7 @@ import inet.routing.contract.IPim;
 module HiSwitch extends HiApplicationLayer
 {
     parameters:
-        @display("i=device/router;is=s");
+        @display("i=device/router;is=s;bgb=1254.2788,1205.4926");
         @figure[submodules];
         forwarding = true;
         bool hasOspf = default(false);

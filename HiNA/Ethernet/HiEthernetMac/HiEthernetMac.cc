@@ -249,7 +249,7 @@ void HiEthernetMac::beginNewInterval(simtime_t now)
     double pkpersec = intvlNumPackets / duration.dbl();
     EV<<"currate = "<<bitpersec<<"bps "<<pkpersec<<"pps"<<endl;
     for(int i = 0 ; i < 11 ; i++){
-        pribitpersec[i] = intvlPriBits[i] / duration.dbl();
+        deqrate[i] = intvlPriBits[i] / duration.dbl()/curEtherDescr->txrate;
         intvlPriBits[i] = 0;
     }
 
@@ -638,7 +638,7 @@ void HiEthernetMac::handleCanPullPacketChanged(cGate *gate)
 {
     EV_INFO<<"HiEthernetMac::handleCanPullPacketChanged()"<<endl;
     Enter_Method("handleCanPullPacketChanged");
-    if (currentTxFrame == nullptr && transmitState == TX_IDLE_STATE && canDequeuePacket() ){//&& only) {
+    if (currentTxFrame == nullptr && transmitState == TX_IDLE_STATE && canDequeuePacket() ){
         Packet *packet = dequeuePacket();
         handleUpperPacket(packet);
     }

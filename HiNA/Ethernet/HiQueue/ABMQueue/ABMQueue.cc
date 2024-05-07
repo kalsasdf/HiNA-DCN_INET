@@ -18,7 +18,7 @@ bool ABMQueue::BufferManagement(cMessage *msg){
     Packet *packet = check_and_cast<Packet*>(msg);
     int64_t queueLength = queue.getBitLength();
     HiEthernetMac *radioModule = check_and_cast<HiEthernetMac*>(getParentModule() -> getParentModule() -> getSubmodule("mac"));
-    DeqRate = radioModule->pribitpersec[priority];
+    DeqRate = radioModule->deqrate[priority];
     if(!isOverloaded())
     {
         return true;

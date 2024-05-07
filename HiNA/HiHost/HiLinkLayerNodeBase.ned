@@ -45,7 +45,7 @@ module HiLinkLayerNodeBase extends HiNodeBase like IEthernetNetworkNode
         @figure[linkLayer.title](type=text; pos=1245,463; anchor=ne; text="link layer");
         @figure[interfaceLayer](type=rectangle; pos=250,758; size=1000,360; fillColor=#00ffff; lineColor=#808080; cornerRadius=5; fillOpacity=0.1);
         @figure[interfaceLayer.title](type=text; pos=1245,763; anchor=ne; text="interface layer");
-        @display("bgb=2080.0798,1512.552");
+        @display("bgb=2552.944,1616.056");
     gates:
         input radioIn[numWlanInterfaces] @directIn;
         inout pppg[numPppInterfaces] @labels(PppFrame-conn) @allowUnconnected;

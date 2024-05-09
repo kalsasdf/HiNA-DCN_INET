@@ -106,12 +106,12 @@ class HOMA : public TransportProtocolBase
     virtual void handleSelfMessage(cMessage *msg) override;
     virtual void refreshDisplay() const override;
     virtual ~HOMA() {
-        for(auto i = receiver_flowMap.begin();i != receiver_flowMap.end();i++){
-            cancelEvent(i->second.sendresend);
-            delete i->second.sendresend;
-            cancelEvent(i->second.timeout);
-            delete i->second.timeout;
-        }
+//        for(auto i = receiver_flowMap.begin();i != receiver_flowMap.end();i++){
+//            cancelEvent(i->second.sendresend);
+//            delete i->second.sendresend;
+//            cancelEvent(i->second.timeout);
+//            delete i->second.timeout;
+//        }
     }
 
     /**

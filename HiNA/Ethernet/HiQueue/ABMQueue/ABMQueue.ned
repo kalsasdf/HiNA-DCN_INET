@@ -58,6 +58,7 @@ simple ABMQueue extends REDPFCQueue like IPacketQueue
 {
     parameters:
         @class(ABMQueue);
+        double Timer @unit(s) = default(2us);
         @signal[packetPushStarted](type=inet::Packet);
         @signal[packetPushEnded](type=inet::Packet?);
         @signal[packetPulled](type=inet::Packet);
